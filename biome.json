@@ -1,0 +1,3 @@
+{
+  "extends": ["@ale0aranda/rules/biome"]
+}

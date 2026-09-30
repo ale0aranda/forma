@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
 
 import {
@@ -282,12 +283,13 @@ export default function Home() {
         </div>
 
         <div className='flex items-center gap-2'>
-          <button
+          <Link
             className='rounded-lg border border-neutral-200 px-3 py-2 text-sm transition-colors hover:bg-neutral-50'
-            type='button'
+            href={`/${profile.username}`}
+            target='_blank'
           >
             Preview
-          </button>
+          </Link>
 
           <button
             className='rounded-lg bg-neutral-950 px-3 py-2 font-medium text-sm text-white transition-colors hover:bg-neutral-800'

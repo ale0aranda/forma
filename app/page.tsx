@@ -38,7 +38,24 @@ const initialProfile: Profile = {
         'A customizable profile builder for creating personal pages.',
       url: ''
     }
-  ]
+  ],
+  blocks: {
+    identity: {
+      visible: true
+    },
+    about: {
+      visible: true
+    },
+    links: {
+      visible: true
+    },
+    projects: {
+      visible: true
+    },
+    now: {
+      visible: true
+    }
+  }
 };
 
 export default function Home() {
@@ -142,6 +159,19 @@ export default function Home() {
     }));
   }
 
+  function toggleBlock(block: ProfileBlock) {
+    setProfile((current) => ({
+      ...current,
+      blocks: {
+        ...current.blocks,
+        [block]: {
+          ...current.blocks[block],
+          visible: !current.blocks[block].visible
+        }
+      }
+    }));
+  }
+
   return (
     <main className='min-h-screen bg-white text-neutral-950'>
       <header className='flex h-16 items-center justify-between border-neutral-200 border-b px-5'>
@@ -172,6 +202,7 @@ export default function Home() {
 
       <div className='flex min-h-screen'>
         <EditorSidebar
+          blocks={profile.blocks}
           onSelectBlock={setSelectedBlock}
           selectedBlock={selectedBlock}
         />
@@ -187,6 +218,7 @@ export default function Home() {
           onAddProject={addProject}
           onRemoveLink={removeLink}
           onRemoveProject={removeProject}
+          onToggleBlock={toggleBlock}
           onUpdateAbout={updateAbout}
           onUpdateIdentity={updateIdentity}
           onUpdateLink={updateLink}

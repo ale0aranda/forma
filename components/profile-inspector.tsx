@@ -8,6 +8,7 @@ import type {
 interface ProfileInspectorProps {
   profile: Profile;
   selectedBlock: ProfileBlock;
+  onToggleBlock: (block: ProfileBlock) => void;
   onUpdateIdentity: (field: keyof Profile['identity'], value: string) => void;
   onUpdateAbout: (value: string) => void;
   onUpdateNow: (value: string) => void;
@@ -34,6 +35,7 @@ const blockLabels: Record<ProfileBlock, string> = {
 export function ProfileInspector({
   profile,
   selectedBlock,
+  onToggleBlock,
   onUpdateIdentity,
   onUpdateAbout,
   onUpdateNow,
@@ -50,6 +52,28 @@ export function ProfileInspector({
         <p className='font-medium'>{blockLabels[selectedBlock]}</p>
 
         <p className='mt-1 text-neutral-500 text-sm'>Edit this block.</p>
+      </div>
+      <div className='mb-6 flex items-center justify-between rounded-lg border border-neutral-200 p-3'>
+        <div>
+          <p className='text-sm'>Visible</p>
+
+          <p className='mt-1 text-neutral-500 text-xs'>
+            Show this block on your profile.
+          </p>
+        </div>
+
+        <button
+          aria-pressed={profile.blocks[selectedBlock].visible}
+          className={`rounded-full px-3 py-1 font-medium text-xs transition-colors ${
+            profile.blocks[selectedBlock].visible
+              ? 'bg-neutral-950 text-white'
+              : 'bg-neutral-100 text-neutral-500'
+          }`}
+          onClick={() => onToggleBlock(selectedBlock)}
+          type='button'
+        >
+          {profile.blocks[selectedBlock].visible ? 'On' : 'Off'}
+        </button>
       </div>
 
       {selectedBlock === 'identity' && (

@@ -1,11 +1,12 @@
-import type { ProfileBlock } from '@/lib/profile';
+import type { ProfileBlock, ProfileBlockSettings } from '@/lib/profile';
 
 interface EditorSidebarProps {
+  blocks: Record<ProfileBlock, ProfileBlockSettings>;
   selectedBlock: ProfileBlock;
   onSelectBlock: (block: ProfileBlock) => void;
 }
 
-const blocks: {
+const blockOptions: {
   id: ProfileBlock;
   label: string;
 }[] = [
@@ -32,6 +33,7 @@ const blocks: {
 ];
 
 export function EditorSidebar({
+  blocks,
   selectedBlock,
   onSelectBlock
 }: EditorSidebarProps) {
@@ -43,20 +45,30 @@ export function EditorSidebar({
         </p>
 
         <div className='space-y-1'>
-          {blocks.map((block) => (
-            <button
-              className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-                selectedBlock === block.id
-                  ? 'bg-neutral-100 font-medium text-neutral-950'
-                  : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-950'
-              }`}
-              key={block.id}
-              onClick={() => onSelectBlock(block.id)}
-              type='button'
-            >
-              {block.label}
-            </button>
-          ))}
+          {blockOptions.map((block) => {
+            const visible = blocks[block.id].visible;
+
+            return (
+              <button
+                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+                  selectedBlock === block.id
+                    ? 'bg-neutral-100 font-medium text-neutral-950'
+                    : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-950'
+                }`}
+                key={block.id}
+                onClick={() => onSelectBlock(block.id)}
+                type='button'
+              >
+                <span>{block.label}</span>
+
+                {!visible && (
+                  <span className='font-normal text-neutral-400 text-xs'>
+                    Hidden
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </nav>
 

@@ -13,6 +13,10 @@ export interface ProfileProject {
   url: string;
 }
 
+export interface ProfileBlockSettings {
+  visible: boolean;
+}
+
 export interface Profile {
   username: string;
   identity: {
@@ -24,4 +28,5 @@ export interface Profile {
   now: string;
   links: ProfileLink[];
   projects: ProfileProject[];
+  blocks: Record<ProfileBlock, ProfileBlockSettings>;
 }

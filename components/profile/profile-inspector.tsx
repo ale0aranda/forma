@@ -2,6 +2,7 @@ import { DesignEditor } from '@/components/profile/editors/design-editor';
 import { ExperienceEditor } from '@/components/profile/editors/experience-editor';
 import { GalleryEditor } from '@/components/profile/editors/gallery-editor';
 import { LinksEditor } from '@/components/profile/editors/links-editor';
+import { ProfileSettingsEditor } from '@/components/profile/editors/profile-settings-editor';
 import { ProjectsEditor } from '@/components/profile/editors/projects-editor';
 
 import type {
@@ -18,7 +19,8 @@ import type {
 
 interface ProfileInspectorProps {
   profile: Profile;
-  selectedBlock: ProfileBlock | 'design';
+  selectedBlock: ProfileBlock | 'profile' | 'design';
+  onUpdateUsername: (username: string) => void;
   onToggleBlock: (block: ProfileBlock) => void;
   onUpdateIdentity: (field: keyof Profile['identity'], value: string) => void;
   onUpdateAbout: (value: string) => void;
@@ -73,6 +75,7 @@ export function ProfileInspector({
   onUpdateIdentity,
   onUpdateAbout,
   onUpdateNow,
+  onUpdateUsername,
   onAddLink,
   onUpdateLink,
   onRemoveLink,
@@ -93,6 +96,20 @@ export function ProfileInspector({
   onChangeRadius,
   onChangeBorders
 }: ProfileInspectorProps) {
+  if (selectedBlock === 'profile') {
+    return (
+      <InspectorShell
+        description='Manage your public profile.'
+        title='Profile'
+      >
+        <ProfileSettingsEditor
+          onUpdateUsername={onUpdateUsername}
+          username={profile.username}
+        />
+      </InspectorShell>
+    );
+  }
+
   if (selectedBlock === 'design') {
     return (
       <InspectorShell

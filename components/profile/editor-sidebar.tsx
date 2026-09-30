@@ -1,6 +1,6 @@
 import type { ProfileBlock, ProfileBlockSettings } from '@/lib/profile';
 
-export type EditorSelection = ProfileBlock | 'design';
+export type EditorSelection = ProfileBlock | 'profile' | 'design';
 
 interface EditorSidebarProps {
   blocks: Record<ProfileBlock, ProfileBlockSettings>;
@@ -29,6 +29,26 @@ export function EditorSidebar({
 }: EditorSidebarProps) {
   return (
     <aside className='w-56 shrink-0 border-neutral-200 border-r bg-white p-4'>
+      <nav>
+        <p className='mb-2 px-2 text-neutral-400 text-xs uppercase tracking-wider'>
+          Profile
+        </p>
+
+        <button
+          className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+            selected === 'profile'
+              ? 'bg-neutral-100 font-medium text-neutral-950'
+              : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-950'
+          }`}
+          onClick={() => onSelect('profile')}
+          type='button'
+        >
+          Settings
+        </button>
+      </nav>
+
+      <div className='my-5 border-neutral-200 border-t' />
+
       <nav>
         <p className='mb-2 px-2 text-neutral-400 text-xs uppercase tracking-wider'>
           Blocks

@@ -7,6 +7,7 @@ import {
   type EditorSelection,
   EditorSidebar
 } from '@/components/profile/editor-sidebar';
+import { isValidUsername } from '@/components/profile/editors/profile-settings-editor';
 import { ProfileInspector } from '@/components/profile/profile-inspector';
 import { ProfilePreview } from '@/components/profile/profile-preview';
 import { useProfileEditor } from '@/hooks/use-profile-editor';
@@ -15,12 +16,13 @@ import { getDefaultProfile } from '@/lib/profiles';
 const initialProfile = getDefaultProfile();
 
 export default function EditorPage() {
-  const [selected, setSelected] = useState<EditorSelection>('identity');
+  const [selected, setSelected] = useState<EditorSelection>('profile');
 
   const {
     profile,
     loaded,
     hasUnsavedChanges,
+    updateUsername,
     updateIdentity,
     updateAbout,
     updateNow,
@@ -50,6 +52,8 @@ export default function EditorPage() {
   } = useProfileEditor({
     initialProfile
   });
+
+  const validUsername = isValidUsername(profile.username);
 
   if (!loaded) {
     return (
@@ -88,17 +92,23 @@ export default function EditorPage() {
             Reset
           </button>
 
-          <Link
-            className='rounded-lg border border-neutral-200 px-3 py-2 text-sm transition-colors hover:bg-neutral-50'
-            href={`/${profile.username}`}
-            target='_blank'
-          >
-            Preview
-          </Link>
+          {validUsername ? (
+            <Link
+              className='rounded-lg border border-neutral-200 px-3 py-2 text-sm transition-colors hover:bg-neutral-50'
+              href={`/${profile.username}`}
+              target='_blank'
+            >
+              Preview
+            </Link>
+          ) : (
+            <span className='cursor-not-allowed rounded-lg border border-neutral-200 px-3 py-2 text-neutral-300 text-sm'>
+              Preview
+            </span>
+          )}
 
           <button
             className='rounded-lg bg-neutral-950 px-3 py-2 font-medium text-sm text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40'
-            disabled={!hasUnsavedChanges}
+            disabled={!hasUnsavedChanges || !validUsername}
             onClick={save}
             type='button'
           >
@@ -142,6 +152,7 @@ export default function EditorPage() {
           onUpdateLink={updateLink}
           onUpdateNow={updateNow}
           onUpdateProject={updateProject}
+          onUpdateUsername={updateUsername}
           profile={profile}
           selectedBlock={selected}
         />

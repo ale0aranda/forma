@@ -49,6 +49,13 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
   const hasUnsavedChanges =
     JSON.stringify(profile) !== JSON.stringify(savedProfile);
 
+  const updateUsername = useCallback((username: string) => {
+    setProfile((current) => ({
+      ...current,
+      username
+    }));
+  }, []);
+
   const updateIdentity = useCallback(
     (field: keyof Profile['identity'], value: string) => {
       setProfile((current) => ({
@@ -347,6 +354,7 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     loaded,
     hasUnsavedChanges,
     updateIdentity,
+    updateUsername,
     updateAbout,
     updateNow,
     addLink,

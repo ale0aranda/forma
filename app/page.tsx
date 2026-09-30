@@ -9,6 +9,7 @@ import { ProfilePreview } from '@/components/profile-preview';
 import type {
   Profile,
   ProfileBlock,
+  ProfileExperience,
   ProfileLink,
   ProfileProject
 } from '@/lib/profile';
@@ -39,6 +40,7 @@ const initialProfile: Profile = {
       url: ''
     }
   ],
+  experience: [],
   blocks: {
     identity: {
       visible: true
@@ -52,10 +54,14 @@ const initialProfile: Profile = {
     projects: {
       visible: true
     },
+    experience: {
+      visible: true
+    },
     now: {
       visible: true
     }
-  }
+  },
+  blockOrder: ['identity', 'about', 'links', 'projects', 'experience', 'now']
 };
 
 export default function Home() {
@@ -159,6 +165,48 @@ export default function Home() {
     }));
   }
 
+  function addExperience() {
+    const experience: ProfileExperience = {
+      id: crypto.randomUUID(),
+      company: '',
+      role: 'New role',
+      period: '',
+      description: ''
+    };
+
+    setProfile((current) => ({
+      ...current,
+      experience: [...current.experience, experience]
+    }));
+  }
+
+  function updateExperience(
+    id: string,
+    field: 'company' | 'role' | 'period' | 'description',
+    value: string
+  ) {
+    setProfile((current) => ({
+      ...current,
+      experience: current.experience.map((experience) =>
+        experience.id === id
+          ? {
+              ...experience,
+              [field]: value
+            }
+          : experience
+      )
+    }));
+  }
+
+  function removeExperience(id: string) {
+    setProfile((current) => ({
+      ...current,
+      experience: current.experience.filter(
+        (experience) => experience.id !== id
+      )
+    }));
+  }
+
   function toggleBlock(block: ProfileBlock) {
     setProfile((current) => ({
       ...current,
@@ -170,6 +218,34 @@ export default function Home() {
         }
       }
     }));
+  }
+
+  function moveBlock(block: ProfileBlock, direction: 'up' | 'down') {
+    setProfile((current) => {
+      const currentIndex = current.blockOrder.indexOf(block);
+      const nextIndex =
+        direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+
+      if (
+        currentIndex === -1
+        || nextIndex < 0
+        || nextIndex >= current.blockOrder.length
+      ) {
+        return current;
+      }
+
+      const blockOrder = [...current.blockOrder];
+
+      [blockOrder[currentIndex], blockOrder[nextIndex]] = [
+        blockOrder[nextIndex],
+        blockOrder[currentIndex]
+      ];
+
+      return {
+        ...current,
+        blockOrder
+      };
+    });
   }
 
   return (
@@ -203,6 +279,8 @@ export default function Home() {
       <div className='flex min-h-screen'>
         <EditorSidebar
           blocks={profile.blocks}
+          blockOrder={profile.blockOrder}
+          onMoveBlock={moveBlock}
           onSelectBlock={setSelectedBlock}
           selectedBlock={selectedBlock}
         />
@@ -214,12 +292,15 @@ export default function Home() {
         />
 
         <ProfileInspector
+          onAddExperience={addExperience}
           onAddLink={addLink}
           onAddProject={addProject}
+          onRemoveExperience={removeExperience}
           onRemoveLink={removeLink}
           onRemoveProject={removeProject}
           onToggleBlock={toggleBlock}
           onUpdateAbout={updateAbout}
+          onUpdateExperience={updateExperience}
           onUpdateIdentity={updateIdentity}
           onUpdateLink={updateLink}
           onUpdateNow={updateNow}

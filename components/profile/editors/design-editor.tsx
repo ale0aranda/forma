@@ -1,5 +1,8 @@
 import type {
+  ProfileAppearance,
+  ProfileBorders,
   ProfileDensity,
+  ProfilePalette,
   ProfilePreset,
   ProfileRadius,
   ProfileTypography
@@ -8,12 +11,18 @@ import type {
 interface DesignEditorProps {
   preset: ProfilePreset;
   typography: ProfileTypography;
+  appearance: ProfileAppearance;
+  palette: ProfilePalette;
   density: ProfileDensity;
   radius: ProfileRadius;
+  borders: ProfileBorders;
   onChangePreset: (preset: ProfilePreset) => void;
   onChangeTypography: (typography: ProfileTypography) => void;
+  onChangeAppearance: (appearance: ProfileAppearance) => void;
+  onChangePalette: (palette: ProfilePalette) => void;
   onChangeDensity: (density: ProfileDensity) => void;
   onChangeRadius: (radius: ProfileRadius) => void;
+  onChangeBorders: (borders: ProfileBorders) => void;
 }
 
 const presets: {
@@ -50,6 +59,24 @@ const typographyOptions: {
   { value: 'mono', label: 'Mono' }
 ];
 
+const appearanceOptions: {
+  value: ProfileAppearance;
+  label: string;
+}[] = [
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' }
+];
+
+const paletteOptions: {
+  value: ProfilePalette;
+  label: string;
+}[] = [
+  { value: 'mono', label: 'Mono' },
+  { value: 'paper', label: 'Paper' },
+  { value: 'forest', label: 'Forest' },
+  { value: 'blue', label: 'Blue' }
+];
+
 const densityOptions: {
   value: ProfileDensity;
   label: string;
@@ -68,15 +95,30 @@ const radiusOptions: {
   { value: 'rounded', label: 'Rounded' }
 ];
 
+const borderOptions: {
+  value: ProfileBorders;
+  label: string;
+}[] = [
+  { value: 'none', label: 'None' },
+  { value: 'subtle', label: 'Subtle' },
+  { value: 'strong', label: 'Strong' }
+];
+
 export function DesignEditor({
   preset,
   typography,
+  appearance,
+  palette,
   density,
   radius,
+  borders,
   onChangePreset,
   onChangeTypography,
+  onChangeAppearance,
+  onChangePalette,
   onChangeDensity,
-  onChangeRadius
+  onChangeRadius,
+  onChangeBorders
 }: DesignEditorProps) {
   return (
     <div className='space-y-8'>
@@ -109,23 +151,46 @@ export function DesignEditor({
       <div>
         <EditorLabel>Typography</EditorLabel>
 
-        <div className='grid grid-cols-2 gap-2'>
+        <OptionGrid>
           {typographyOptions.map((option) => (
-            <button
-              aria-pressed={typography === option.value}
-              className={`rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
-                typography === option.value
-                  ? 'border-neutral-950 bg-neutral-50'
-                  : 'border-neutral-200 hover:bg-neutral-50'
-              }`}
+            <OptionButton
+              active={typography === option.value}
               key={option.value}
+              label={option.label}
               onClick={() => onChangeTypography(option.value)}
-              type='button'
-            >
-              {option.label}
-            </button>
+            />
           ))}
-        </div>
+        </OptionGrid>
+      </div>
+
+      <div>
+        <EditorLabel>Appearance</EditorLabel>
+
+        <OptionGrid>
+          {appearanceOptions.map((option) => (
+            <OptionButton
+              active={appearance === option.value}
+              key={option.value}
+              label={option.label}
+              onClick={() => onChangeAppearance(option.value)}
+            />
+          ))}
+        </OptionGrid>
+      </div>
+
+      <div>
+        <EditorLabel>Palette</EditorLabel>
+
+        <OptionGrid>
+          {paletteOptions.map((option) => (
+            <OptionButton
+              active={palette === option.value}
+              key={option.value}
+              label={option.label}
+              onClick={() => onChangePalette(option.value)}
+            />
+          ))}
+        </OptionGrid>
       </div>
 
       <div>
@@ -133,19 +198,13 @@ export function DesignEditor({
 
         <div className='flex gap-2'>
           {densityOptions.map((option) => (
-            <button
-              aria-pressed={density === option.value}
-              className={`flex-1 rounded-lg border px-2 py-2 text-xs transition-colors ${
-                density === option.value
-                  ? 'border-neutral-950 bg-neutral-50'
-                  : 'border-neutral-200 hover:bg-neutral-50'
-              }`}
+            <OptionButton
+              active={density === option.value}
+              grow
               key={option.value}
+              label={option.label}
               onClick={() => onChangeDensity(option.value)}
-              type='button'
-            >
-              {option.label}
-            </button>
+            />
           ))}
         </div>
       </div>
@@ -155,19 +214,29 @@ export function DesignEditor({
 
         <div className='flex gap-2'>
           {radiusOptions.map((option) => (
-            <button
-              aria-pressed={radius === option.value}
-              className={`flex-1 rounded-lg border px-2 py-2 text-xs transition-colors ${
-                radius === option.value
-                  ? 'border-neutral-950 bg-neutral-50'
-                  : 'border-neutral-200 hover:bg-neutral-50'
-              }`}
+            <OptionButton
+              active={radius === option.value}
+              grow
               key={option.value}
+              label={option.label}
               onClick={() => onChangeRadius(option.value)}
-              type='button'
-            >
-              {option.label}
-            </button>
+            />
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <EditorLabel>Borders</EditorLabel>
+
+        <div className='flex gap-2'>
+          {borderOptions.map((option) => (
+            <OptionButton
+              active={borders === option.value}
+              grow
+              key={option.value}
+              label={option.label}
+              onClick={() => onChangeBorders(option.value)}
+            />
           ))}
         </div>
       </div>
@@ -184,5 +253,42 @@ function EditorLabel({ children }: EditorLabelProps) {
     <p className='mb-3 text-neutral-500 text-xs uppercase tracking-wider'>
       {children}
     </p>
+  );
+}
+
+interface OptionGridProps {
+  children: React.ReactNode;
+}
+
+function OptionGrid({ children }: OptionGridProps) {
+  return <div className='grid grid-cols-2 gap-2'>{children}</div>;
+}
+
+interface OptionButtonProps {
+  active: boolean;
+  label: string;
+  grow?: boolean;
+  onClick: () => void;
+}
+
+function OptionButton({
+  active,
+  label,
+  grow = false,
+  onClick
+}: OptionButtonProps) {
+  return (
+    <button
+      aria-pressed={active}
+      className={`${grow ? 'flex-1' : ''} rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
+        active
+          ? 'border-neutral-950 bg-neutral-50'
+          : 'border-neutral-200 hover:bg-neutral-50'
+      }`}
+      onClick={onClick}
+      type='button'
+    >
+      {label}
+    </button>
   );
 }

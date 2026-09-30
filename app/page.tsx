@@ -5,17 +5,20 @@ import { useState } from 'react';
 import {
   type EditorSelection,
   EditorSidebar
-} from '@/components/editor-sidebar';
-import { ProfileInspector } from '@/components/profile-inspector';
-import { ProfilePreview } from '@/components/profile-preview';
+} from '@/components/profile/editor-sidebar';
+import { ProfileInspector } from '@/components/profile/profile-inspector';
+import { ProfilePreview } from '@/components/profile/profile-preview';
 
 import type {
   Profile,
+  ProfileAppearance,
   ProfileBlock,
+  ProfileBorders,
   ProfileDensity,
   ProfileExperience,
   ProfileGalleryItem,
   ProfileLink,
+  ProfilePalette,
   ProfilePreset,
   ProfileProject,
   ProfileRadius,
@@ -51,27 +54,13 @@ const initialProfile: Profile = {
   experience: [],
   gallery: [],
   blocks: {
-    identity: {
-      visible: true
-    },
-    about: {
-      visible: true
-    },
-    links: {
-      visible: true
-    },
-    projects: {
-      visible: true
-    },
-    experience: {
-      visible: true
-    },
-    gallery: {
-      visible: true
-    },
-    now: {
-      visible: true
-    }
+    identity: { visible: true },
+    about: { visible: true },
+    links: { visible: true },
+    projects: { visible: true },
+    experience: { visible: true },
+    gallery: { visible: true },
+    now: { visible: true }
   },
   blockOrder: [
     'identity',
@@ -85,8 +74,11 @@ const initialProfile: Profile = {
   design: {
     preset: 'minimal',
     typography: 'system',
+    appearance: 'light',
+    palette: 'mono',
     density: 'airy',
-    radius: 'small'
+    radius: 'small',
+    borders: 'subtle'
   }
 };
 
@@ -135,12 +127,7 @@ export default function Home() {
     setProfile((current) => ({
       ...current,
       links: current.links.map((link) =>
-        link.id === id
-          ? {
-              ...link,
-              [field]: value
-            }
-          : link
+        link.id === id ? { ...link, [field]: value } : link
       )
     }));
   }
@@ -174,12 +161,7 @@ export default function Home() {
     setProfile((current) => ({
       ...current,
       projects: current.projects.map((project) =>
-        project.id === id
-          ? {
-              ...project,
-              [field]: value
-            }
-          : project
+        project.id === id ? { ...project, [field]: value } : project
       )
     }));
   }
@@ -214,12 +196,7 @@ export default function Home() {
     setProfile((current) => ({
       ...current,
       experience: current.experience.map((experience) =>
-        experience.id === id
-          ? {
-              ...experience,
-              [field]: value
-            }
-          : experience
+        experience.id === id ? { ...experience, [field]: value } : experience
       )
     }));
   }
@@ -255,12 +232,7 @@ export default function Home() {
     setProfile((current) => ({
       ...current,
       gallery: current.gallery.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              [field]: value
-            }
-          : item
+        item.id === id ? { ...item, [field]: value } : item
       )
     }));
   }
@@ -273,41 +245,42 @@ export default function Home() {
   }
 
   function changePreset(preset: ProfilePreset) {
-    setProfile((current) => ({
-      ...current,
-      design: {
-        ...current.design,
-        preset
-      }
-    }));
+    updateDesign('preset', preset);
   }
 
   function changeTypography(typography: ProfileTypography) {
-    setProfile((current) => ({
-      ...current,
-      design: {
-        ...current.design,
-        typography
-      }
-    }));
+    updateDesign('typography', typography);
+  }
+
+  function changeAppearance(appearance: ProfileAppearance) {
+    updateDesign('appearance', appearance);
+  }
+
+  function changePalette(palette: ProfilePalette) {
+    updateDesign('palette', palette);
   }
 
   function changeDensity(density: ProfileDensity) {
-    setProfile((current) => ({
-      ...current,
-      design: {
-        ...current.design,
-        density
-      }
-    }));
+    updateDesign('density', density);
   }
 
   function changeRadius(radius: ProfileRadius) {
+    updateDesign('radius', radius);
+  }
+
+  function changeBorders(borders: ProfileBorders) {
+    updateDesign('borders', borders);
+  }
+
+  function updateDesign<Key extends keyof Profile['design']>(
+    field: Key,
+    value: Profile['design'][Key]
+  ) {
     setProfile((current) => ({
       ...current,
       design: {
         ...current.design,
-        radius
+        [field]: value
       }
     }));
   }
@@ -401,7 +374,10 @@ export default function Home() {
           onAddGalleryItem={addGalleryItem}
           onAddLink={addLink}
           onAddProject={addProject}
+          onChangeAppearance={changeAppearance}
+          onChangeBorders={changeBorders}
           onChangeDensity={changeDensity}
+          onChangePalette={changePalette}
           onChangePreset={changePreset}
           onChangeRadius={changeRadius}
           onChangeTypography={changeTypography}

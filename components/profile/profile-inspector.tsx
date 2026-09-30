@@ -6,8 +6,11 @@ import { ProjectsEditor } from '@/components/profile/editors/projects-editor';
 
 import type {
   Profile,
+  ProfileAppearance,
   ProfileBlock,
+  ProfileBorders,
   ProfileDensity,
+  ProfilePalette,
   ProfilePreset,
   ProfileRadius,
   ProfileTypography
@@ -46,8 +49,11 @@ interface ProfileInspectorProps {
   onRemoveGalleryItem: (id: string) => void;
   onChangePreset: (preset: ProfilePreset) => void;
   onChangeTypography: (typography: ProfileTypography) => void;
+  onChangeAppearance: (appearance: ProfileAppearance) => void;
+  onChangePalette: (palette: ProfilePalette) => void;
   onChangeDensity: (density: ProfileDensity) => void;
   onChangeRadius: (radius: ProfileRadius) => void;
+  onChangeBorders: (borders: ProfileBorders) => void;
 }
 
 const blockLabels: Record<ProfileBlock, string> = {
@@ -81,8 +87,11 @@ export function ProfileInspector({
   onRemoveGalleryItem,
   onChangePreset,
   onChangeTypography,
+  onChangeAppearance,
+  onChangePalette,
   onChangeDensity,
-  onChangeRadius
+  onChangeRadius,
+  onChangeBorders
 }: ProfileInspectorProps) {
   if (selectedBlock === 'design') {
     return (
@@ -91,11 +100,17 @@ export function ProfileInspector({
         title='Appearance'
       >
         <DesignEditor
+          appearance={profile.design.appearance}
+          borders={profile.design.borders}
           density={profile.design.density}
+          onChangeAppearance={onChangeAppearance}
+          onChangeBorders={onChangeBorders}
           onChangeDensity={onChangeDensity}
+          onChangePalette={onChangePalette}
           onChangePreset={onChangePreset}
           onChangeRadius={onChangeRadius}
           onChangeTypography={onChangeTypography}
+          palette={profile.design.palette}
           preset={profile.design.preset}
           radius={profile.design.radius}
           typography={profile.design.typography}

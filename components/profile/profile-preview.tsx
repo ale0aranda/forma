@@ -1,7 +1,10 @@
 import type {
   Profile,
+  ProfileAppearance,
   ProfileBlock,
+  ProfileBorders,
   ProfileDensity,
+  ProfilePalette,
   ProfilePreset,
   ProfileRadius,
   ProfileTypography
@@ -12,12 +15,6 @@ interface ProfilePreviewProps {
   selectedBlock: ProfileBlock | 'design';
   onSelectBlock: (block: ProfileBlock) => void;
 }
-
-const presetClasses: Record<ProfilePreset, string> = {
-  minimal: 'border border-neutral-200 bg-white',
-  editorial: 'border border-neutral-300 bg-white',
-  blueprint: 'border-2 border-neutral-900 bg-white'
-};
 
 const typographyClasses: Record<ProfileTypography, string> = {
   sans: 'font-profile-sans',
@@ -46,6 +43,36 @@ const itemGapClasses: Record<ProfileDensity, string> = {
   airy: 'space-y-5'
 };
 
+const borderClasses: Record<ProfileBorders, string> = {
+  none: 'border-transparent',
+  subtle: 'border-current/10',
+  strong: 'border-current/30'
+};
+
+const appearanceClasses: Record<
+  ProfileAppearance,
+  Record<ProfilePalette, string>
+> = {
+  light: {
+    mono: 'bg-white text-neutral-950',
+    paper: 'bg-stone-100 text-stone-900',
+    forest: 'bg-emerald-50 text-emerald-950',
+    blue: 'bg-sky-50 text-slate-950'
+  },
+  dark: {
+    mono: 'bg-neutral-950 text-neutral-100',
+    paper: 'bg-stone-900 text-stone-100',
+    forest: 'bg-emerald-950 text-emerald-50',
+    blue: 'bg-slate-950 text-sky-50'
+  }
+};
+
+const presetClasses: Record<ProfilePreset, string> = {
+  minimal: '',
+  editorial: 'tracking-tight',
+  blueprint: 'border-2'
+};
+
 interface ProfilePreviewBlockProps {
   block: ProfileBlock;
   profile: Profile;
@@ -60,11 +87,11 @@ export function ProfilePreview({
 }: ProfilePreviewProps) {
   const { design } = profile;
 
+  const borderClass = borderClasses[design.borders];
+
   return (
     <section className='flex min-w-0 flex-1 justify-center bg-neutral-50 p-10'>
-      <div
-        className={`w-full max-w-2xl ${typographyClasses[design.typography]}`}
-      >
+      <div className='w-full max-w-2xl'>
         <div className='mb-3 flex items-center justify-between'>
           <p className='text-neutral-500 text-xs'>Preview</p>
 
@@ -72,7 +99,7 @@ export function ProfilePreview({
         </div>
 
         <article
-          className={`overflow-hidden ${presetClasses[design.preset]} ${radiusClasses[design.radius]}`}
+          className={`overflow-hidden border ${typographyClasses[design.typography]} ${appearanceClasses[design.appearance][design.palette]} ${radiusClasses[design.radius]} ${borderClass} ${presetClasses[design.preset]}`}
         >
           {profile.blockOrder.map((block) => {
             if (!profile.blocks[block].visible) {
@@ -103,11 +130,12 @@ function ProfilePreviewBlock({
 }: ProfilePreviewBlockProps) {
   const { design } = profile;
 
-  const className = `block w-full border-neutral-200 border-b text-left transition-colors last:border-b-0 ${
-    blockPaddingClasses[design.density]
-  } ${selected ? 'bg-neutral-50' : 'hover:bg-neutral-50'}`;
-
+  const borderClass = borderClasses[design.borders];
   const itemRadius = radiusClasses[design.radius];
+
+  const className = `block w-full border-b text-left transition-colors last:border-b-0 ${
+    blockPaddingClasses[design.density]
+  } ${borderClass} ${selected ? 'bg-current/5' : 'hover:bg-current/5'}`;
 
   if (block === 'identity') {
     return (
@@ -116,13 +144,13 @@ function ProfilePreviewBlock({
         onClick={onSelect}
         type='button'
       >
-        <p className='text-neutral-500 text-sm'>{profile.identity.role}</p>
+        <p className='opacity-60 text-sm'>{profile.identity.role}</p>
 
         <h1 className='mt-2 font-semibold text-3xl tracking-tight'>
           {profile.identity.name}
         </h1>
 
-        <p className='mt-4 max-w-lg text-neutral-600 leading-7'>
+        <p className='mt-4 max-w-lg opacity-70 leading-7'>
           {profile.identity.bio}
         </p>
       </button>
@@ -138,9 +166,7 @@ function ProfilePreviewBlock({
       >
         <h2 className='font-medium'>About</h2>
 
-        <p className='mt-3 max-w-lg text-neutral-600 leading-7'>
-          {profile.about}
-        </p>
+        <p className='mt-3 max-w-lg opacity-70 leading-7'>{profile.about}</p>
       </button>
     );
   }
@@ -158,7 +184,7 @@ function ProfilePreviewBlock({
           <div className='mt-4 flex flex-wrap gap-2'>
             {profile.links.map((link) => (
               <span
-                className={`border border-neutral-200 px-3 py-2 text-neutral-700 text-sm ${itemRadius}`}
+                className={`border px-3 py-2 text-sm ${borderClass} ${itemRadius}`}
                 key={link.id}
               >
                 {link.label || 'Untitled'}
@@ -166,7 +192,7 @@ function ProfilePreviewBlock({
             ))}
           </div>
         ) : (
-          <p className='mt-3 text-neutral-400 text-sm'>No links yet.</p>
+          <p className='mt-3 opacity-50 text-sm'>No links yet.</p>
         )}
       </button>
     );
@@ -185,7 +211,7 @@ function ProfilePreviewBlock({
           <div className={`mt-4 ${itemGapClasses[design.density]}`}>
             {profile.projects.map((project) => (
               <div
-                className={`border border-neutral-200 p-4 ${itemRadius}`}
+                className={`border p-4 ${borderClass} ${itemRadius}`}
                 key={project.id}
               >
                 <p className='font-medium'>
@@ -193,7 +219,7 @@ function ProfilePreviewBlock({
                 </p>
 
                 {project.description && (
-                  <p className='mt-1 text-neutral-500 text-sm leading-6'>
+                  <p className='mt-1 opacity-60 text-sm leading-6'>
                     {project.description}
                   </p>
                 )}
@@ -201,7 +227,7 @@ function ProfilePreviewBlock({
             ))}
           </div>
         ) : (
-          <p className='mt-3 text-neutral-400 text-sm'>No projects yet.</p>
+          <p className='mt-3 opacity-50 text-sm'>No projects yet.</p>
         )}
       </button>
     );
@@ -226,20 +252,20 @@ function ProfilePreviewBlock({
                       {experience.role || 'Untitled role'}
                     </p>
 
-                    <p className='mt-1 text-neutral-500 text-sm'>
+                    <p className='mt-1 opacity-60 text-sm'>
                       {experience.company || 'Company'}
                     </p>
                   </div>
 
                   {experience.period && (
-                    <p className='shrink-0 text-neutral-400 text-xs'>
+                    <p className='shrink-0 opacity-50 text-xs'>
                       {experience.period}
                     </p>
                   )}
                 </div>
 
                 {experience.description && (
-                  <p className='mt-2 text-neutral-500 text-sm leading-6'>
+                  <p className='mt-2 opacity-60 text-sm leading-6'>
                     {experience.description}
                   </p>
                 )}
@@ -247,7 +273,7 @@ function ProfilePreviewBlock({
             ))}
           </div>
         ) : (
-          <p className='mt-3 text-neutral-400 text-sm'>No experience yet.</p>
+          <p className='mt-3 opacity-50 text-sm'>No experience yet.</p>
         )}
       </button>
     );
@@ -266,7 +292,7 @@ function ProfilePreviewBlock({
           <div className='mt-4 grid grid-cols-2 gap-3'>
             {profile.gallery.map((item) => (
               <div
-                className={`overflow-hidden border border-neutral-200 ${itemRadius}`}
+                className={`overflow-hidden border ${borderClass} ${itemRadius}`}
                 key={item.id}
               >
                 {item.src ? (
@@ -276,19 +302,19 @@ function ProfilePreviewBlock({
                     src={item.src}
                   />
                 ) : (
-                  <div className='flex aspect-square items-center justify-center bg-neutral-100 text-neutral-400 text-xs'>
+                  <div className='flex aspect-square items-center justify-center bg-current/5 opacity-60 text-xs'>
                     No image
                   </div>
                 )}
 
                 {item.caption && (
-                  <p className='p-3 text-neutral-500 text-xs'>{item.caption}</p>
+                  <p className='p-3 opacity-60 text-xs'>{item.caption}</p>
                 )}
               </div>
             ))}
           </div>
         ) : (
-          <p className='mt-3 text-neutral-400 text-sm'>No images yet.</p>
+          <p className='mt-3 opacity-50 text-sm'>No images yet.</p>
         )}
       </button>
     );
@@ -302,7 +328,7 @@ function ProfilePreviewBlock({
     >
       <h2 className='font-medium'>Now</h2>
 
-      <p className='mt-3 max-w-lg text-neutral-600 leading-7'>{profile.now}</p>
+      <p className='mt-3 max-w-lg opacity-70 leading-7'>{profile.now}</p>
     </button>
   );
 }

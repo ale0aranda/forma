@@ -17,9 +17,15 @@ export type ProfileTypography =
   | 'times'
   | 'mono';
 
+export type ProfileAppearance = 'light' | 'dark';
+
+export type ProfilePalette = 'mono' | 'paper' | 'forest' | 'blue';
+
 export type ProfileDensity = 'compact' | 'balanced' | 'airy';
 
 export type ProfileRadius = 'square' | 'small' | 'rounded';
+
+export type ProfileBorders = 'none' | 'subtle' | 'strong';
 
 export interface ProfileLink {
   id: string;
@@ -56,8 +62,11 @@ export interface ProfileBlockSettings {
 export interface ProfileDesign {
   preset: ProfilePreset;
   typography: ProfileTypography;
+  appearance: ProfileAppearance;
+  palette: ProfilePalette;
   density: ProfileDensity;
   radius: ProfileRadius;
+  borders: ProfileBorders;
 }
 
 export interface Profile {

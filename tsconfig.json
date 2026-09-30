@@ -1,5 +1,10 @@
 {
   "extends": "@ale0aranda/rules/typescript/web",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
   "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }

@@ -1,12 +1,14 @@
+import { DesignEditor } from '@/components/profile/editors/design-editor';
+import { ExperienceEditor } from '@/components/profile/editors/experience-editor';
+import { GalleryEditor } from '@/components/profile/editors/gallery-editor';
+import { LinksEditor } from '@/components/profile/editors/links-editor';
+import { ProjectsEditor } from '@/components/profile/editors/projects-editor';
+
 import type {
   Profile,
   ProfileBlock,
   ProfileDensity,
-  ProfileExperience,
-  ProfileGalleryItem,
-  ProfileLink,
   ProfilePreset,
-  ProfileProject,
   ProfileRadius,
   ProfileTypography
 } from '@/lib/profile';
@@ -84,15 +86,10 @@ export function ProfileInspector({
 }: ProfileInspectorProps) {
   if (selectedBlock === 'design') {
     return (
-      <aside className='w-80 shrink-0 border-neutral-200 border-l bg-white p-6'>
-        <div className='mb-8'>
-          <p className='font-medium'>Appearance</p>
-
-          <p className='mt-1 text-neutral-500 text-sm'>
-            Customize how your profile looks.
-          </p>
-        </div>
-
+      <InspectorShell
+        description='Customize how your profile looks.'
+        title='Appearance'
+      >
         <DesignEditor
           density={profile.design.density}
           onChangeDensity={onChangeDensity}
@@ -103,87 +100,32 @@ export function ProfileInspector({
           radius={profile.design.radius}
           typography={profile.design.typography}
         />
-      </aside>
+      </InspectorShell>
     );
   }
 
   return (
-    <aside className='w-80 shrink-0 border-neutral-200 border-l bg-white p-6'>
-      <div className='mb-8'>
-        <p className='font-medium'>{blockLabels[selectedBlock]}</p>
-
-        <p className='mt-1 text-neutral-500 text-sm'>Edit this block.</p>
-      </div>
-
-      <div className='mb-6 flex items-center justify-between rounded-lg border border-neutral-200 p-3'>
-        <div>
-          <p className='text-sm'>Visible</p>
-
-          <p className='mt-1 text-neutral-500 text-xs'>
-            Show this block on your profile.
-          </p>
-        </div>
-
-        <button
-          aria-pressed={profile.blocks[selectedBlock].visible}
-          className={`rounded-full px-3 py-1 font-medium text-xs transition-colors ${
-            profile.blocks[selectedBlock].visible
-              ? 'bg-neutral-950 text-white'
-              : 'bg-neutral-100 text-neutral-500'
-          }`}
-          onClick={() => onToggleBlock(selectedBlock)}
-          type='button'
-        >
-          {profile.blocks[selectedBlock].visible ? 'On' : 'Off'}
-        </button>
-      </div>
+    <InspectorShell
+      description='Edit this block.'
+      title={blockLabels[selectedBlock]}
+    >
+      <VisibilityControl
+        onToggle={() => onToggleBlock(selectedBlock)}
+        visible={profile.blocks[selectedBlock].visible}
+      />
 
       {selectedBlock === 'identity' && (
-        <div className='space-y-5'>
-          <label className='block'>
-            <span className='mb-2 block text-neutral-600 text-sm'>Name</span>
-
-            <input
-              className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-              onChange={(event) => onUpdateIdentity('name', event.target.value)}
-              type='text'
-              value={profile.identity.name}
-            />
-          </label>
-
-          <label className='block'>
-            <span className='mb-2 block text-neutral-600 text-sm'>Role</span>
-
-            <input
-              className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-              onChange={(event) => onUpdateIdentity('role', event.target.value)}
-              type='text'
-              value={profile.identity.role}
-            />
-          </label>
-
-          <label className='block'>
-            <span className='mb-2 block text-neutral-600 text-sm'>Bio</span>
-
-            <textarea
-              className='min-h-28 w-full resize-none rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-              onChange={(event) => onUpdateIdentity('bio', event.target.value)}
-              value={profile.identity.bio}
-            />
-          </label>
-        </div>
+        <IdentityEditor
+          identity={profile.identity}
+          onUpdate={onUpdateIdentity}
+        />
       )}
 
       {selectedBlock === 'about' && (
-        <label className='block'>
-          <span className='mb-2 block text-neutral-600 text-sm'>About</span>
-
-          <textarea
-            className='min-h-40 w-full resize-none rounded-lg border border-neutral-200 px-3 py-2 text-sm leading-6 outline-none focus:border-neutral-400'
-            onChange={(event) => onUpdateAbout(event.target.value)}
-            value={profile.about}
-          />
-        </label>
+        <AboutEditor
+          onUpdate={onUpdateAbout}
+          value={profile.about}
+        />
       )}
 
       {selectedBlock === 'links' && (
@@ -197,10 +139,10 @@ export function ProfileInspector({
 
       {selectedBlock === 'projects' && (
         <ProjectsEditor
-          projects={profile.projects}
           onAdd={onAddProject}
           onRemove={onRemoveProject}
           onUpdate={onUpdateProject}
+          projects={profile.projects}
         />
       )}
 
@@ -223,581 +165,144 @@ export function ProfileInspector({
       )}
 
       {selectedBlock === 'now' && (
-        <label className='block'>
-          <span className='mb-2 block text-neutral-600 text-sm'>Now</span>
-
-          <textarea
-            className='min-h-32 w-full resize-none rounded-lg border border-neutral-200 px-3 py-2 text-sm leading-6 outline-none focus:border-neutral-400'
-            onChange={(event) => onUpdateNow(event.target.value)}
-            value={profile.now}
-          />
-        </label>
+        <NowEditor
+          onUpdate={onUpdateNow}
+          value={profile.now}
+        />
       )}
+    </InspectorShell>
+  );
+}
+
+interface InspectorShellProps {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+}
+
+function InspectorShell({ title, description, children }: InspectorShellProps) {
+  return (
+    <aside className='w-80 shrink-0 border-neutral-200 border-l bg-white p-6'>
+      <div className='mb-8'>
+        <p className='font-medium'>{title}</p>
+
+        <p className='mt-1 text-neutral-500 text-sm'>{description}</p>
+      </div>
+
+      {children}
     </aside>
   );
 }
 
-interface DesignEditorProps {
-  preset: ProfilePreset;
-  typography: ProfileTypography;
-  density: ProfileDensity;
-  radius: ProfileRadius;
-  onChangePreset: (preset: ProfilePreset) => void;
-  onChangeTypography: (typography: ProfileTypography) => void;
-  onChangeDensity: (density: ProfileDensity) => void;
-  onChangeRadius: (radius: ProfileRadius) => void;
+interface VisibilityControlProps {
+  visible: boolean;
+  onToggle: () => void;
 }
 
-function DesignEditor({
-  preset,
-  typography,
-  density,
-  radius,
-  onChangePreset,
-  onChangeTypography,
-  onChangeDensity,
-  onChangeRadius
-}: DesignEditorProps) {
-  const typographyOptions: {
-    value: ProfileTypography;
-    label: string;
-  }[] = [
-    { value: 'sans', label: 'Helvetica' },
-    { value: 'arial', label: 'Arial' },
-    { value: 'system', label: 'System' },
-    { value: 'serif', label: 'Georgia' },
-    { value: 'times', label: 'Times' },
-    { value: 'mono', label: 'Mono' }
-  ];
-
-  const densityOptions: {
-    value: ProfileDensity;
-    label: string;
-  }[] = [
-    { value: 'compact', label: 'Compact' },
-    { value: 'balanced', label: 'Balanced' },
-    { value: 'airy', label: 'Airy' }
-  ];
-
-  const radiusOptions: {
-    value: ProfileRadius;
-    label: string;
-  }[] = [
-    { value: 'square', label: 'Square' },
-    { value: 'small', label: 'Small' },
-    { value: 'rounded', label: 'Rounded' }
-  ];
-
+function VisibilityControl({ visible, onToggle }: VisibilityControlProps) {
   return (
-    <div className='space-y-8'>
+    <div className='mb-6 flex items-center justify-between rounded-lg border border-neutral-200 p-3'>
       <div>
-        <p className='mb-3 text-neutral-500 text-xs uppercase tracking-wider'>
-          Preset
-        </p>
+        <p className='text-sm'>Visible</p>
 
-        <PresetEditor
-          onChange={onChangePreset}
-          value={preset}
+        <p className='mt-1 text-neutral-500 text-xs'>
+          Show this block on your profile.
+        </p>
+      </div>
+
+      <button
+        aria-pressed={visible}
+        className={`rounded-full px-3 py-1 font-medium text-xs transition-colors ${
+          visible
+            ? 'bg-neutral-950 text-white'
+            : 'bg-neutral-100 text-neutral-500'
+        }`}
+        onClick={onToggle}
+        type='button'
+      >
+        {visible ? 'On' : 'Off'}
+      </button>
+    </div>
+  );
+}
+
+interface IdentityEditorProps {
+  identity: Profile['identity'];
+  onUpdate: (field: keyof Profile['identity'], value: string) => void;
+}
+
+function IdentityEditor({ identity, onUpdate }: IdentityEditorProps) {
+  return (
+    <div className='space-y-5'>
+      <label className='block'>
+        <span className='mb-2 block text-neutral-600 text-sm'>Name</span>
+
+        <input
+          className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
+          onChange={(event) => onUpdate('name', event.target.value)}
+          type='text'
+          value={identity.name}
         />
-      </div>
+      </label>
 
-      <div>
-        <p className='mb-3 text-neutral-500 text-xs uppercase tracking-wider'>
-          Typography
-        </p>
+      <label className='block'>
+        <span className='mb-2 block text-neutral-600 text-sm'>Role</span>
 
-        <div className='grid grid-cols-2 gap-2'>
-          {typographyOptions.map((option) => (
-            <button
-              aria-pressed={typography === option.value}
-              className={`rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
-                typography === option.value
-                  ? 'border-neutral-950 bg-neutral-50'
-                  : 'border-neutral-200 hover:bg-neutral-50'
-              }`}
-              key={option.value}
-              onClick={() => onChangeTypography(option.value)}
-              type='button'
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      </div>
+        <input
+          className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
+          onChange={(event) => onUpdate('role', event.target.value)}
+          type='text'
+          value={identity.role}
+        />
+      </label>
 
-      <div>
-        <p className='mb-3 text-neutral-500 text-xs uppercase tracking-wider'>
-          Density
-        </p>
+      <label className='block'>
+        <span className='mb-2 block text-neutral-600 text-sm'>Bio</span>
 
-        <div className='flex gap-2'>
-          {densityOptions.map((option) => (
-            <button
-              aria-pressed={density === option.value}
-              className={`flex-1 rounded-lg border px-2 py-2 text-xs transition-colors ${
-                density === option.value
-                  ? 'border-neutral-950 bg-neutral-50'
-                  : 'border-neutral-200 hover:bg-neutral-50'
-              }`}
-              key={option.value}
-              onClick={() => onChangeDensity(option.value)}
-              type='button'
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <p className='mb-3 text-neutral-500 text-xs uppercase tracking-wider'>
-          Corners
-        </p>
-
-        <div className='flex gap-2'>
-          {radiusOptions.map((option) => (
-            <button
-              aria-pressed={radius === option.value}
-              className={`flex-1 rounded-lg border px-2 py-2 text-xs transition-colors ${
-                radius === option.value
-                  ? 'border-neutral-950 bg-neutral-50'
-                  : 'border-neutral-200 hover:bg-neutral-50'
-              }`}
-              key={option.value}
-              onClick={() => onChangeRadius(option.value)}
-              type='button'
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      </div>
+        <textarea
+          className='min-h-28 w-full resize-none rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
+          onChange={(event) => onUpdate('bio', event.target.value)}
+          value={identity.bio}
+        />
+      </label>
     </div>
   );
 }
 
-interface PresetEditorProps {
-  value: ProfilePreset;
-  onChange: (preset: ProfilePreset) => void;
+interface AboutEditorProps {
+  value: string;
+  onUpdate: (value: string) => void;
 }
 
-const presets: {
-  id: ProfilePreset;
-  label: string;
-  description: string;
-}[] = [
-  {
-    id: 'minimal',
-    label: 'Minimal',
-    description: 'Simple and balanced.'
-  },
-  {
-    id: 'editorial',
-    label: 'Editorial',
-    description: 'Sharper and more structured.'
-  },
-  {
-    id: 'blueprint',
-    label: 'Blueprint',
-    description: 'Strong borders and structure.'
-  }
-];
-
-function PresetEditor({ value, onChange }: PresetEditorProps) {
+function AboutEditor({ value, onUpdate }: AboutEditorProps) {
   return (
-    <div className='space-y-2'>
-      {presets.map((preset) => (
-        <button
-          aria-pressed={value === preset.id}
-          className={`w-full rounded-lg border p-3 text-left transition-colors ${
-            value === preset.id
-              ? 'border-neutral-950 bg-neutral-50'
-              : 'border-neutral-200 hover:bg-neutral-50'
-          }`}
-          key={preset.id}
-          onClick={() => onChange(preset.id)}
-          type='button'
-        >
-          <p className='font-medium text-sm'>{preset.label}</p>
+    <label className='block'>
+      <span className='mb-2 block text-neutral-600 text-sm'>About</span>
 
-          <p className='mt-1 text-neutral-500 text-xs'>{preset.description}</p>
-        </button>
-      ))}
-    </div>
+      <textarea
+        className='min-h-40 w-full resize-none rounded-lg border border-neutral-200 px-3 py-2 text-sm leading-6 outline-none focus:border-neutral-400'
+        onChange={(event) => onUpdate(event.target.value)}
+        value={value}
+      />
+    </label>
   );
 }
 
-interface LinksEditorProps {
-  links: ProfileLink[];
-  onAdd: () => void;
-  onUpdate: (id: string, field: 'label' | 'url', value: string) => void;
-  onRemove: (id: string) => void;
+interface NowEditorProps {
+  value: string;
+  onUpdate: (value: string) => void;
 }
 
-function LinksEditor({ links, onAdd, onUpdate, onRemove }: LinksEditorProps) {
+function NowEditor({ value, onUpdate }: NowEditorProps) {
   return (
-    <div>
-      <div className='space-y-3'>
-        {links.map((link) => (
-          <div
-            className='rounded-lg border border-neutral-200 p-3'
-            key={link.id}
-          >
-            <label className='block'>
-              <span className='mb-2 block text-neutral-500 text-xs'>Label</span>
+    <label className='block'>
+      <span className='mb-2 block text-neutral-600 text-sm'>Now</span>
 
-              <input
-                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-                onChange={(event) =>
-                  onUpdate(link.id, 'label', event.target.value)
-                }
-                type='text'
-                value={link.label}
-              />
-            </label>
-
-            <label className='mt-3 block'>
-              <span className='mb-2 block text-neutral-500 text-xs'>URL</span>
-
-              <input
-                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-                onChange={(event) =>
-                  onUpdate(link.id, 'url', event.target.value)
-                }
-                placeholder='https://'
-                type='url'
-                value={link.url}
-              />
-            </label>
-
-            <button
-              className='mt-3 text-neutral-500 text-xs hover:text-red-600'
-              onClick={() => onRemove(link.id)}
-              type='button'
-            >
-              Remove
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {links.length === 0 && (
-        <p className='mb-4 text-neutral-500 text-sm'>
-          You haven't added any links yet.
-        </p>
-      )}
-
-      <button
-        className='mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50'
-        onClick={onAdd}
-        type='button'
-      >
-        + Add link
-      </button>
-    </div>
-  );
-}
-
-interface ProjectsEditorProps {
-  projects: ProfileProject[];
-  onAdd: () => void;
-  onUpdate: (
-    id: string,
-    field: 'name' | 'description' | 'url',
-    value: string
-  ) => void;
-  onRemove: (id: string) => void;
-}
-
-function ProjectsEditor({
-  projects,
-  onAdd,
-  onUpdate,
-  onRemove
-}: ProjectsEditorProps) {
-  return (
-    <div>
-      <div className='space-y-3'>
-        {projects.map((project) => (
-          <div
-            className='rounded-lg border border-neutral-200 p-3'
-            key={project.id}
-          >
-            <label className='block'>
-              <span className='mb-2 block text-neutral-500 text-xs'>Name</span>
-
-              <input
-                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-                onChange={(event) =>
-                  onUpdate(project.id, 'name', event.target.value)
-                }
-                type='text'
-                value={project.name}
-              />
-            </label>
-
-            <label className='mt-3 block'>
-              <span className='mb-2 block text-neutral-500 text-xs'>
-                Description
-              </span>
-
-              <textarea
-                className='min-h-24 w-full resize-none rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-                onChange={(event) =>
-                  onUpdate(project.id, 'description', event.target.value)
-                }
-                value={project.description}
-              />
-            </label>
-
-            <label className='mt-3 block'>
-              <span className='mb-2 block text-neutral-500 text-xs'>URL</span>
-
-              <input
-                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-                onChange={(event) =>
-                  onUpdate(project.id, 'url', event.target.value)
-                }
-                placeholder='https://'
-                type='url'
-                value={project.url}
-              />
-            </label>
-
-            <button
-              className='mt-3 text-neutral-500 text-xs hover:text-red-600'
-              onClick={() => onRemove(project.id)}
-              type='button'
-            >
-              Remove
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {projects.length === 0 && (
-        <p className='mb-4 text-neutral-500 text-sm'>
-          You haven't added any projects yet.
-        </p>
-      )}
-
-      <button
-        className='mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50'
-        onClick={onAdd}
-        type='button'
-      >
-        + Add project
-      </button>
-    </div>
-  );
-}
-
-interface ExperienceEditorProps {
-  experience: ProfileExperience[];
-  onAdd: () => void;
-  onUpdate: (
-    id: string,
-    field: 'company' | 'role' | 'period' | 'description',
-    value: string
-  ) => void;
-  onRemove: (id: string) => void;
-}
-
-function ExperienceEditor({
-  experience,
-  onAdd,
-  onUpdate,
-  onRemove
-}: ExperienceEditorProps) {
-  return (
-    <div>
-      <div className='space-y-3'>
-        {experience.map((item) => (
-          <div
-            className='rounded-lg border border-neutral-200 p-3'
-            key={item.id}
-          >
-            <label className='block'>
-              <span className='mb-2 block text-neutral-500 text-xs'>
-                Company
-              </span>
-
-              <input
-                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-                onChange={(event) =>
-                  onUpdate(item.id, 'company', event.target.value)
-                }
-                type='text'
-                value={item.company}
-              />
-            </label>
-
-            <label className='mt-3 block'>
-              <span className='mb-2 block text-neutral-500 text-xs'>Role</span>
-
-              <input
-                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-                onChange={(event) =>
-                  onUpdate(item.id, 'role', event.target.value)
-                }
-                type='text'
-                value={item.role}
-              />
-            </label>
-
-            <label className='mt-3 block'>
-              <span className='mb-2 block text-neutral-500 text-xs'>
-                Period
-              </span>
-
-              <input
-                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-                onChange={(event) =>
-                  onUpdate(item.id, 'period', event.target.value)
-                }
-                placeholder='2025 — Present'
-                type='text'
-                value={item.period}
-              />
-            </label>
-
-            <label className='mt-3 block'>
-              <span className='mb-2 block text-neutral-500 text-xs'>
-                Description
-              </span>
-
-              <textarea
-                className='min-h-24 w-full resize-none rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-                onChange={(event) =>
-                  onUpdate(item.id, 'description', event.target.value)
-                }
-                value={item.description}
-              />
-            </label>
-
-            <button
-              className='mt-3 text-neutral-500 text-xs hover:text-red-600'
-              onClick={() => onRemove(item.id)}
-              type='button'
-            >
-              Remove
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {experience.length === 0 && (
-        <p className='mb-4 text-neutral-500 text-sm'>
-          You haven't added any experience yet.
-        </p>
-      )}
-
-      <button
-        className='mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50'
-        onClick={onAdd}
-        type='button'
-      >
-        + Add experience
-      </button>
-    </div>
-  );
-}
-
-interface GalleryEditorProps {
-  gallery: ProfileGalleryItem[];
-  onAdd: () => void;
-  onUpdate: (
-    id: string,
-    field: 'src' | 'alt' | 'caption',
-    value: string
-  ) => void;
-  onRemove: (id: string) => void;
-}
-
-function GalleryEditor({
-  gallery,
-  onAdd,
-  onUpdate,
-  onRemove
-}: GalleryEditorProps) {
-  return (
-    <div>
-      <div className='space-y-3'>
-        {gallery.map((item) => (
-          <div
-            className='rounded-lg border border-neutral-200 p-3'
-            key={item.id}
-          >
-            <label className='block'>
-              <span className='mb-2 block text-neutral-500 text-xs'>
-                Image URL
-              </span>
-
-              <input
-                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-                onChange={(event) =>
-                  onUpdate(item.id, 'src', event.target.value)
-                }
-                placeholder='https://'
-                type='url'
-                value={item.src}
-              />
-            </label>
-
-            <label className='mt-3 block'>
-              <span className='mb-2 block text-neutral-500 text-xs'>
-                Alt text
-              </span>
-
-              <input
-                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-                onChange={(event) =>
-                  onUpdate(item.id, 'alt', event.target.value)
-                }
-                type='text'
-                value={item.alt}
-              />
-            </label>
-
-            <label className='mt-3 block'>
-              <span className='mb-2 block text-neutral-500 text-xs'>
-                Caption
-              </span>
-
-              <input
-                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-                onChange={(event) =>
-                  onUpdate(item.id, 'caption', event.target.value)
-                }
-                type='text'
-                value={item.caption}
-              />
-            </label>
-
-            <button
-              className='mt-3 text-neutral-500 text-xs hover:text-red-600'
-              onClick={() => onRemove(item.id)}
-              type='button'
-            >
-              Remove
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {gallery.length === 0 && (
-        <p className='mb-4 text-neutral-500 text-sm'>
-          You haven't added any images yet.
-        </p>
-      )}
-
-      <button
-        className='mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50'
-        onClick={onAdd}
-        type='button'
-      >
-        + Add image
-      </button>
-    </div>
+      <textarea
+        className='min-h-32 w-full resize-none rounded-lg border border-neutral-200 px-3 py-2 text-sm leading-6 outline-none focus:border-neutral-400'
+        onChange={(event) => onUpdate(event.target.value)}
+        value={value}
+      />
+    </label>
   );
 }

@@ -86,6 +86,41 @@ export function ProfilePreview({
 
           <button
             className={`block w-full border-neutral-200 border-t p-10 text-left transition-colors ${
+              selectedBlock === 'projects'
+                ? 'bg-neutral-50'
+                : 'hover:bg-neutral-50'
+            }`}
+            onClick={() => onSelectBlock('projects')}
+            type='button'
+          >
+            <h2 className='font-medium'>Projects</h2>
+
+            {profile.projects.length > 0 ? (
+              <div className='mt-4 space-y-3'>
+                {profile.projects.map((project) => (
+                  <div
+                    className='rounded-lg border border-neutral-200 p-4'
+                    key={project.id}
+                  >
+                    <p className='font-medium'>
+                      {project.name || 'Untitled project'}
+                    </p>
+
+                    {project.description && (
+                      <p className='mt-1 text-neutral-500 text-sm leading-6'>
+                        {project.description}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className='mt-3 text-neutral-400 text-sm'>No projects yet.</p>
+            )}
+          </button>
+
+          <button
+            className={`block w-full border-neutral-200 border-t p-10 text-left transition-colors ${
               selectedBlock === 'now' ? 'bg-neutral-50' : 'hover:bg-neutral-50'
             }`}
             onClick={() => onSelectBlock('now')}

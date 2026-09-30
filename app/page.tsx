@@ -6,7 +6,12 @@ import { EditorSidebar } from '@/components/editor-sidebar';
 import { ProfileInspector } from '@/components/profile-inspector';
 import { ProfilePreview } from '@/components/profile-preview';
 
-import type { Profile, ProfileBlock, ProfileLink } from '@/lib/profile';
+import type {
+  Profile,
+  ProfileBlock,
+  ProfileLink,
+  ProfileProject
+} from '@/lib/profile';
 
 const initialProfile: Profile = {
   username: 'alejandro',
@@ -23,6 +28,15 @@ const initialProfile: Profile = {
       id: 'github',
       label: 'GitHub',
       url: 'https://github.com/ale0aranda'
+    }
+  ],
+  projects: [
+    {
+      id: 'forma',
+      name: 'Forma',
+      description:
+        'A customizable profile builder for creating personal pages.',
+      url: ''
     }
   ]
 };
@@ -89,6 +103,45 @@ export default function Home() {
     }));
   }
 
+  function addProject() {
+    const project: ProfileProject = {
+      id: crypto.randomUUID(),
+      name: 'New project',
+      description: '',
+      url: ''
+    };
+
+    setProfile((current) => ({
+      ...current,
+      projects: [...current.projects, project]
+    }));
+  }
+
+  function updateProject(
+    id: string,
+    field: 'name' | 'description' | 'url',
+    value: string
+  ) {
+    setProfile((current) => ({
+      ...current,
+      projects: current.projects.map((project) =>
+        project.id === id
+          ? {
+              ...project,
+              [field]: value
+            }
+          : project
+      )
+    }));
+  }
+
+  function removeProject(id: string) {
+    setProfile((current) => ({
+      ...current,
+      projects: current.projects.filter((project) => project.id !== id)
+    }));
+  }
+
   return (
     <main className='min-h-screen bg-white text-neutral-950'>
       <header className='flex h-16 items-center justify-between border-neutral-200 border-b px-5'>
@@ -131,11 +184,14 @@ export default function Home() {
 
         <ProfileInspector
           onAddLink={addLink}
+          onAddProject={addProject}
           onRemoveLink={removeLink}
+          onRemoveProject={removeProject}
           onUpdateAbout={updateAbout}
           onUpdateIdentity={updateIdentity}
           onUpdateLink={updateLink}
           onUpdateNow={updateNow}
+          onUpdateProject={updateProject}
           profile={profile}
           selectedBlock={selectedBlock}
         />

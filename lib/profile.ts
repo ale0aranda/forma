@@ -1,8 +1,15 @@
-export type ProfileBlock = 'identity' | 'about' | 'links' | 'now';
+export type ProfileBlock = 'identity' | 'about' | 'links' | 'projects' | 'now';
 
 export interface ProfileLink {
   id: string;
   label: string;
+  url: string;
+}
+
+export interface ProfileProject {
+  id: string;
+  name: string;
+  description: string;
   url: string;
 }
 
@@ -16,4 +23,5 @@ export interface Profile {
   about: string;
   now: string;
   links: ProfileLink[];
+  projects: ProfileProject[];
 }

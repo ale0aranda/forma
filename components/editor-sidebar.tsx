@@ -22,6 +22,10 @@ const blocks: {
     label: 'Links'
   },
   {
+    id: 'projects',
+    label: 'Projects'
+  },
+  {
     id: 'now',
     label: 'Now'
   }

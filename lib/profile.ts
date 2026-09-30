@@ -1,4 +1,10 @@
-export type ProfileBlock = 'identity' | 'about' | 'links' | 'projects' | 'now';
+export type ProfileBlock =
+  | 'identity'
+  | 'about'
+  | 'links'
+  | 'projects'
+  | 'experience'
+  | 'now';
 
 export interface ProfileLink {
   id: string;
@@ -11,6 +17,14 @@ export interface ProfileProject {
   name: string;
   description: string;
   url: string;
+}
+
+export interface ProfileExperience {
+  id: string;
+  company: string;
+  role: string;
+  period: string;
+  description: string;
 }
 
 export interface ProfileBlockSettings {
@@ -28,5 +42,7 @@ export interface Profile {
   now: string;
   links: ProfileLink[];
   projects: ProfileProject[];
+  experience: ProfileExperience[];
   blocks: Record<ProfileBlock, ProfileBlockSettings>;
+  blockOrder: ProfileBlock[];
 }

@@ -1,6 +1,7 @@
 import type {
   Profile,
   ProfileBlock,
+  ProfileExperience,
   ProfileLink,
   ProfileProject
 } from '@/lib/profile';
@@ -22,6 +23,13 @@ interface ProfileInspectorProps {
     value: string
   ) => void;
   onRemoveProject: (id: string) => void;
+  onAddExperience: () => void;
+  onUpdateExperience: (
+    id: string,
+    field: 'company' | 'role' | 'period' | 'description',
+    value: string
+  ) => void;
+  onRemoveExperience: (id: string) => void;
 }
 
 const blockLabels: Record<ProfileBlock, string> = {
@@ -29,6 +37,7 @@ const blockLabels: Record<ProfileBlock, string> = {
   about: 'About',
   links: 'Links',
   projects: 'Projects',
+  experience: 'Experience',
   now: 'Now'
 };
 
@@ -44,7 +53,10 @@ export function ProfileInspector({
   onRemoveLink,
   onAddProject,
   onUpdateProject,
-  onRemoveProject
+  onRemoveProject,
+  onAddExperience,
+  onUpdateExperience,
+  onRemoveExperience
 }: ProfileInspectorProps) {
   return (
     <aside className='w-80 shrink-0 border-neutral-200 border-l bg-white p-6'>
@@ -53,6 +65,7 @@ export function ProfileInspector({
 
         <p className='mt-1 text-neutral-500 text-sm'>Edit this block.</p>
       </div>
+
       <div className='mb-6 flex items-center justify-between rounded-lg border border-neutral-200 p-3'>
         <div>
           <p className='text-sm'>Visible</p>
@@ -142,6 +155,15 @@ export function ProfileInspector({
         />
       )}
 
+      {selectedBlock === 'experience' && (
+        <ExperienceEditor
+          experience={profile.experience}
+          onAdd={onAddExperience}
+          onRemove={onRemoveExperience}
+          onUpdate={onUpdateExperience}
+        />
+      )}
+
       {selectedBlock === 'now' && (
         <label className='block'>
           <span className='mb-2 block text-neutral-600 text-sm'>Now</span>
@@ -177,7 +199,7 @@ function LinksEditor({ links, onAdd, onUpdate, onRemove }: LinksEditorProps) {
               <span className='mb-2 block text-neutral-500 text-xs'>Label</span>
 
               <input
-                className='w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-neutral-400'
+                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
                 onChange={(event) =>
                   onUpdate(link.id, 'label', event.target.value)
                 }
@@ -190,7 +212,7 @@ function LinksEditor({ links, onAdd, onUpdate, onRemove }: LinksEditorProps) {
               <span className='mb-2 block text-neutral-500 text-xs'>URL</span>
 
               <input
-                className='w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-neutral-400'
+                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
                 onChange={(event) =>
                   onUpdate(link.id, 'url', event.target.value)
                 }
@@ -201,7 +223,7 @@ function LinksEditor({ links, onAdd, onUpdate, onRemove }: LinksEditorProps) {
             </label>
 
             <button
-              className='mt-3 text-neutral-500 text-xs transition-colors hover:text-red-600'
+              className='mt-3 text-neutral-500 text-xs hover:text-red-600'
               onClick={() => onRemove(link.id)}
               type='button'
             >
@@ -211,14 +233,8 @@ function LinksEditor({ links, onAdd, onUpdate, onRemove }: LinksEditorProps) {
         ))}
       </div>
 
-      {links.length === 0 && (
-        <p className='mb-4 text-neutral-500 text-sm'>
-          You haven't added any links yet.
-        </p>
-      )}
-
       <button
-        className='mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm transition-colors hover:bg-neutral-50'
+        className='mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50'
         onClick={onAdd}
         type='button'
       >
@@ -257,7 +273,7 @@ function ProjectsEditor({
               <span className='mb-2 block text-neutral-500 text-xs'>Name</span>
 
               <input
-                className='w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-neutral-400'
+                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
                 onChange={(event) =>
                   onUpdate(project.id, 'name', event.target.value)
                 }
@@ -272,7 +288,7 @@ function ProjectsEditor({
               </span>
 
               <textarea
-                className='min-h-24 w-full resize-none rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-neutral-400'
+                className='min-h-24 w-full resize-none rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
                 onChange={(event) =>
                   onUpdate(project.id, 'description', event.target.value)
                 }
@@ -284,7 +300,7 @@ function ProjectsEditor({
               <span className='mb-2 block text-neutral-500 text-xs'>URL</span>
 
               <input
-                className='w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-neutral-400'
+                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
                 onChange={(event) =>
                   onUpdate(project.id, 'url', event.target.value)
                 }
@@ -295,7 +311,7 @@ function ProjectsEditor({
             </label>
 
             <button
-              className='mt-3 text-neutral-500 text-xs transition-colors hover:text-red-600'
+              className='mt-3 text-neutral-500 text-xs hover:text-red-600'
               onClick={() => onRemove(project.id)}
               type='button'
             >
@@ -305,18 +321,117 @@ function ProjectsEditor({
         ))}
       </div>
 
-      {projects.length === 0 && (
-        <p className='mb-4 text-neutral-500 text-sm'>
-          You haven't added any projects yet.
-        </p>
-      )}
-
       <button
-        className='mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm transition-colors hover:bg-neutral-50'
+        className='mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50'
         onClick={onAdd}
         type='button'
       >
         + Add project
+      </button>
+    </div>
+  );
+}
+
+interface ExperienceEditorProps {
+  experience: ProfileExperience[];
+  onAdd: () => void;
+  onUpdate: (
+    id: string,
+    field: 'company' | 'role' | 'period' | 'description',
+    value: string
+  ) => void;
+  onRemove: (id: string) => void;
+}
+
+function ExperienceEditor({
+  experience,
+  onAdd,
+  onUpdate,
+  onRemove
+}: ExperienceEditorProps) {
+  return (
+    <div>
+      <div className='space-y-3'>
+        {experience.map((item) => (
+          <div
+            className='rounded-lg border border-neutral-200 p-3'
+            key={item.id}
+          >
+            <label className='block'>
+              <span className='mb-2 block text-neutral-500 text-xs'>
+                Company
+              </span>
+
+              <input
+                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
+                onChange={(event) =>
+                  onUpdate(item.id, 'company', event.target.value)
+                }
+                type='text'
+                value={item.company}
+              />
+            </label>
+
+            <label className='mt-3 block'>
+              <span className='mb-2 block text-neutral-500 text-xs'>Role</span>
+
+              <input
+                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
+                onChange={(event) =>
+                  onUpdate(item.id, 'role', event.target.value)
+                }
+                type='text'
+                value={item.role}
+              />
+            </label>
+
+            <label className='mt-3 block'>
+              <span className='mb-2 block text-neutral-500 text-xs'>
+                Period
+              </span>
+
+              <input
+                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
+                onChange={(event) =>
+                  onUpdate(item.id, 'period', event.target.value)
+                }
+                placeholder='2025 — Present'
+                type='text'
+                value={item.period}
+              />
+            </label>
+
+            <label className='mt-3 block'>
+              <span className='mb-2 block text-neutral-500 text-xs'>
+                Description
+              </span>
+
+              <textarea
+                className='min-h-24 w-full resize-none rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
+                onChange={(event) =>
+                  onUpdate(item.id, 'description', event.target.value)
+                }
+                value={item.description}
+              />
+            </label>
+
+            <button
+              className='mt-3 text-neutral-500 text-xs hover:text-red-600'
+              onClick={() => onRemove(item.id)}
+              type='button'
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <button
+        className='mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50'
+        onClick={onAdd}
+        type='button'
+      >
+        + Add experience
       </button>
     </div>
   );

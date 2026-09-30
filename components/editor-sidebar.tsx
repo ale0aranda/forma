@@ -2,39 +2,26 @@ import type { ProfileBlock, ProfileBlockSettings } from '@/lib/profile';
 
 interface EditorSidebarProps {
   blocks: Record<ProfileBlock, ProfileBlockSettings>;
+  blockOrder: ProfileBlock[];
   selectedBlock: ProfileBlock;
+  onMoveBlock: (block: ProfileBlock, direction: 'up' | 'down') => void;
   onSelectBlock: (block: ProfileBlock) => void;
 }
 
-const blockOptions: {
-  id: ProfileBlock;
-  label: string;
-}[] = [
-  {
-    id: 'identity',
-    label: 'Identity'
-  },
-  {
-    id: 'about',
-    label: 'About'
-  },
-  {
-    id: 'links',
-    label: 'Links'
-  },
-  {
-    id: 'projects',
-    label: 'Projects'
-  },
-  {
-    id: 'now',
-    label: 'Now'
-  }
-];
+const blockLabels: Record<ProfileBlock, string> = {
+  identity: 'Identity',
+  about: 'About',
+  links: 'Links',
+  projects: 'Projects',
+  experience: 'Experience',
+  now: 'Now'
+};
 
 export function EditorSidebar({
   blocks,
+  blockOrder,
   selectedBlock,
+  onMoveBlock,
   onSelectBlock
 }: EditorSidebarProps) {
   return (
@@ -45,28 +32,62 @@ export function EditorSidebar({
         </p>
 
         <div className='space-y-1'>
-          {blockOptions.map((block) => {
-            const visible = blocks[block.id].visible;
+          {blockOrder.map((block, index) => {
+            const visible = blocks[block].visible;
+            const first = index === 0;
+            const last = index === blockOrder.length - 1;
 
             return (
-              <button
-                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-                  selectedBlock === block.id
-                    ? 'bg-neutral-100 font-medium text-neutral-950'
-                    : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-950'
+              <div
+                className={`flex items-center rounded-lg transition-colors ${
+                  selectedBlock === block
+                    ? 'bg-neutral-100'
+                    : 'hover:bg-neutral-50'
                 }`}
-                key={block.id}
-                onClick={() => onSelectBlock(block.id)}
-                type='button'
+                key={block}
               >
-                <span>{block.label}</span>
+                <button
+                  className={`min-w-0 flex-1 px-3 py-2 text-left text-sm ${
+                    selectedBlock === block
+                      ? 'font-medium text-neutral-950'
+                      : 'text-neutral-600'
+                  }`}
+                  onClick={() => onSelectBlock(block)}
+                  type='button'
+                >
+                  <span className='flex items-center justify-between gap-2'>
+                    <span>{blockLabels[block]}</span>
 
-                {!visible && (
-                  <span className='font-normal text-neutral-400 text-xs'>
-                    Hidden
+                    {!visible && (
+                      <span className='font-normal text-neutral-400 text-xs'>
+                        Hidden
+                      </span>
+                    )}
                   </span>
-                )}
-              </button>
+                </button>
+
+                <div className='flex pr-1'>
+                  <button
+                    aria-label={`Move ${blockLabels[block]} up`}
+                    className='px-1 text-neutral-400 text-xs hover:text-neutral-950 disabled:cursor-not-allowed disabled:opacity-30'
+                    disabled={first}
+                    onClick={() => onMoveBlock(block, 'up')}
+                    type='button'
+                  >
+                    ↑
+                  </button>
+
+                  <button
+                    aria-label={`Move ${blockLabels[block]} down`}
+                    className='px-1 text-neutral-400 text-xs hover:text-neutral-950 disabled:cursor-not-allowed disabled:opacity-30'
+                    disabled={last}
+                    onClick={() => onMoveBlock(block, 'down')}
+                    type='button'
+                  >
+                    ↓
+                  </button>
+                </div>
+              </div>
             );
           })}
         </div>

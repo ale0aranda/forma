@@ -1,3 +1,9 @@
+export interface ProfileLink {
+  id: string;
+  label: string;
+  url: string;
+}
+
 export interface Profile {
   username: string;
   identity: {
@@ -7,4 +13,5 @@ export interface Profile {
   };
   about: string;
   now: string;
+  links: ProfileLink[];
 }

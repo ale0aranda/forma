@@ -1,3 +1,5 @@
+export type ProfileBlock = 'identity' | 'about' | 'links' | 'now';
+
 export interface ProfileLink {
   id: string;
   label: string;

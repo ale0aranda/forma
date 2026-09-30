@@ -9,6 +9,18 @@ export type ProfileBlock =
 
 export type ProfilePreset = 'minimal' | 'editorial' | 'blueprint';
 
+export type ProfileTypography =
+  | 'sans'
+  | 'arial'
+  | 'system'
+  | 'serif'
+  | 'times'
+  | 'mono';
+
+export type ProfileDensity = 'compact' | 'balanced' | 'airy';
+
+export type ProfileRadius = 'square' | 'small' | 'rounded';
+
 export interface ProfileLink {
   id: string;
   label: string;
@@ -43,6 +55,9 @@ export interface ProfileBlockSettings {
 
 export interface ProfileDesign {
   preset: ProfilePreset;
+  typography: ProfileTypography;
+  density: ProfileDensity;
+  radius: ProfileRadius;
 }
 
 export interface Profile {

@@ -12,11 +12,14 @@ import { ProfilePreview } from '@/components/profile-preview';
 import type {
   Profile,
   ProfileBlock,
+  ProfileDensity,
   ProfileExperience,
   ProfileGalleryItem,
   ProfileLink,
   ProfilePreset,
-  ProfileProject
+  ProfileProject,
+  ProfileRadius,
+  ProfileTypography
 } from '@/lib/profile';
 
 const initialProfile: Profile = {
@@ -80,7 +83,10 @@ const initialProfile: Profile = {
     'now'
   ],
   design: {
-    preset: 'minimal'
+    preset: 'minimal',
+    typography: 'system',
+    density: 'airy',
+    radius: 'small'
   }
 };
 
@@ -276,6 +282,36 @@ export default function Home() {
     }));
   }
 
+  function changeTypography(typography: ProfileTypography) {
+    setProfile((current) => ({
+      ...current,
+      design: {
+        ...current.design,
+        typography
+      }
+    }));
+  }
+
+  function changeDensity(density: ProfileDensity) {
+    setProfile((current) => ({
+      ...current,
+      design: {
+        ...current.design,
+        density
+      }
+    }));
+  }
+
+  function changeRadius(radius: ProfileRadius) {
+    setProfile((current) => ({
+      ...current,
+      design: {
+        ...current.design,
+        radius
+      }
+    }));
+  }
+
   function toggleBlock(block: ProfileBlock) {
     setProfile((current) => ({
       ...current,
@@ -365,7 +401,10 @@ export default function Home() {
           onAddGalleryItem={addGalleryItem}
           onAddLink={addLink}
           onAddProject={addProject}
+          onChangeDensity={changeDensity}
           onChangePreset={changePreset}
+          onChangeRadius={changeRadius}
+          onChangeTypography={changeTypography}
           onRemoveExperience={removeExperience}
           onRemoveGalleryItem={removeGalleryItem}
           onRemoveLink={removeLink}

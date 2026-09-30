@@ -1,4 +1,11 @@
-import type { Profile, ProfileBlock, ProfilePreset } from '@/lib/profile';
+import type {
+  Profile,
+  ProfileBlock,
+  ProfileDensity,
+  ProfilePreset,
+  ProfileRadius,
+  ProfileTypography
+} from '@/lib/profile';
 
 interface ProfilePreviewProps {
   profile: Profile;
@@ -7,9 +14,36 @@ interface ProfilePreviewProps {
 }
 
 const presetClasses: Record<ProfilePreset, string> = {
-  minimal: 'rounded-xl border border-neutral-200 bg-white',
+  minimal: 'border border-neutral-200 bg-white',
   editorial: 'border border-neutral-300 bg-white',
-  blueprint: 'rounded-2xl border-2 border-neutral-900 bg-white'
+  blueprint: 'border-2 border-neutral-900 bg-white'
+};
+
+const typographyClasses: Record<ProfileTypography, string> = {
+  sans: 'font-profile-sans',
+  arial: 'font-profile-arial',
+  system: 'font-profile-system',
+  serif: 'font-profile-serif',
+  times: 'font-profile-times',
+  mono: 'font-profile-mono'
+};
+
+const radiusClasses: Record<ProfileRadius, string> = {
+  square: 'rounded-none',
+  small: 'rounded-md',
+  rounded: 'rounded-2xl'
+};
+
+const blockPaddingClasses: Record<ProfileDensity, string> = {
+  compact: 'p-6',
+  balanced: 'p-10',
+  airy: 'p-14'
+};
+
+const itemGapClasses: Record<ProfileDensity, string> = {
+  compact: 'space-y-2',
+  balanced: 'space-y-3',
+  airy: 'space-y-5'
 };
 
 interface ProfilePreviewBlockProps {
@@ -24,9 +58,13 @@ export function ProfilePreview({
   selectedBlock,
   onSelectBlock
 }: ProfilePreviewProps) {
+  const { design } = profile;
+
   return (
     <section className='flex min-w-0 flex-1 justify-center bg-neutral-50 p-10'>
-      <div className='w-full max-w-2xl'>
+      <div
+        className={`w-full max-w-2xl ${typographyClasses[design.typography]}`}
+      >
         <div className='mb-3 flex items-center justify-between'>
           <p className='text-neutral-500 text-xs'>Preview</p>
 
@@ -34,7 +72,7 @@ export function ProfilePreview({
         </div>
 
         <article
-          className={`overflow-hidden ${presetClasses[profile.design.preset]}`}
+          className={`overflow-hidden ${presetClasses[design.preset]} ${radiusClasses[design.radius]}`}
         >
           {profile.blockOrder.map((block) => {
             if (!profile.blocks[block].visible) {
@@ -63,9 +101,13 @@ function ProfilePreviewBlock({
   selected,
   onSelect
 }: ProfilePreviewBlockProps) {
-  const className = `block w-full border-neutral-200 border-b p-10 text-left transition-colors last:border-b-0 ${
-    selected ? 'bg-neutral-50' : 'hover:bg-neutral-50'
-  }`;
+  const { design } = profile;
+
+  const className = `block w-full border-neutral-200 border-b text-left transition-colors last:border-b-0 ${
+    blockPaddingClasses[design.density]
+  } ${selected ? 'bg-neutral-50' : 'hover:bg-neutral-50'}`;
+
+  const itemRadius = radiusClasses[design.radius];
 
   if (block === 'identity') {
     return (
@@ -116,7 +158,7 @@ function ProfilePreviewBlock({
           <div className='mt-4 flex flex-wrap gap-2'>
             {profile.links.map((link) => (
               <span
-                className='rounded-lg border border-neutral-200 px-3 py-2 text-neutral-700 text-sm'
+                className={`border border-neutral-200 px-3 py-2 text-neutral-700 text-sm ${itemRadius}`}
                 key={link.id}
               >
                 {link.label || 'Untitled'}
@@ -140,10 +182,10 @@ function ProfilePreviewBlock({
         <h2 className='font-medium'>Projects</h2>
 
         {profile.projects.length > 0 ? (
-          <div className='mt-4 space-y-3'>
+          <div className={`mt-4 ${itemGapClasses[design.density]}`}>
             {profile.projects.map((project) => (
               <div
-                className='rounded-lg border border-neutral-200 p-4'
+                className={`border border-neutral-200 p-4 ${itemRadius}`}
                 key={project.id}
               >
                 <p className='font-medium'>
@@ -175,7 +217,7 @@ function ProfilePreviewBlock({
         <h2 className='font-medium'>Experience</h2>
 
         {profile.experience.length > 0 ? (
-          <div className='mt-4 space-y-5'>
+          <div className={`mt-4 ${itemGapClasses[design.density]}`}>
             {profile.experience.map((experience) => (
               <div key={experience.id}>
                 <div className='flex items-start justify-between gap-4'>
@@ -224,7 +266,7 @@ function ProfilePreviewBlock({
           <div className='mt-4 grid grid-cols-2 gap-3'>
             {profile.gallery.map((item) => (
               <div
-                className='overflow-hidden rounded-lg border border-neutral-200'
+                className={`overflow-hidden border border-neutral-200 ${itemRadius}`}
                 key={item.id}
               >
                 {item.src ? (

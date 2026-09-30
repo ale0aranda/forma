@@ -1,11 +1,14 @@
 import type {
   Profile,
   ProfileBlock,
+  ProfileDensity,
   ProfileExperience,
   ProfileGalleryItem,
   ProfileLink,
   ProfilePreset,
-  ProfileProject
+  ProfileProject,
+  ProfileRadius,
+  ProfileTypography
 } from '@/lib/profile';
 
 interface ProfileInspectorProps {
@@ -40,6 +43,9 @@ interface ProfileInspectorProps {
   ) => void;
   onRemoveGalleryItem: (id: string) => void;
   onChangePreset: (preset: ProfilePreset) => void;
+  onChangeTypography: (typography: ProfileTypography) => void;
+  onChangeDensity: (density: ProfileDensity) => void;
+  onChangeRadius: (radius: ProfileRadius) => void;
 }
 
 const blockLabels: Record<ProfileBlock, string> = {
@@ -71,22 +77,31 @@ export function ProfileInspector({
   onAddGalleryItem,
   onUpdateGalleryItem,
   onRemoveGalleryItem,
-  onChangePreset
+  onChangePreset,
+  onChangeTypography,
+  onChangeDensity,
+  onChangeRadius
 }: ProfileInspectorProps) {
   if (selectedBlock === 'design') {
     return (
       <aside className='w-80 shrink-0 border-neutral-200 border-l bg-white p-6'>
         <div className='mb-8'>
-          <p className='font-medium'>Design</p>
+          <p className='font-medium'>Appearance</p>
 
           <p className='mt-1 text-neutral-500 text-sm'>
-            Choose how your profile looks.
+            Customize how your profile looks.
           </p>
         </div>
 
-        <PresetEditor
-          onChange={onChangePreset}
-          value={profile.design.preset}
+        <DesignEditor
+          density={profile.design.density}
+          onChangeDensity={onChangeDensity}
+          onChangePreset={onChangePreset}
+          onChangeRadius={onChangeRadius}
+          onChangeTypography={onChangeTypography}
+          preset={profile.design.preset}
+          radius={profile.design.radius}
+          typography={profile.design.typography}
         />
       </aside>
     );
@@ -131,6 +146,7 @@ export function ProfileInspector({
             <input
               className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
               onChange={(event) => onUpdateIdentity('name', event.target.value)}
+              type='text'
               value={profile.identity.name}
             />
           </label>
@@ -141,6 +157,7 @@ export function ProfileInspector({
             <input
               className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
               onChange={(event) => onUpdateIdentity('role', event.target.value)}
+              type='text'
               value={profile.identity.role}
             />
           </label>
@@ -220,6 +237,145 @@ export function ProfileInspector({
   );
 }
 
+interface DesignEditorProps {
+  preset: ProfilePreset;
+  typography: ProfileTypography;
+  density: ProfileDensity;
+  radius: ProfileRadius;
+  onChangePreset: (preset: ProfilePreset) => void;
+  onChangeTypography: (typography: ProfileTypography) => void;
+  onChangeDensity: (density: ProfileDensity) => void;
+  onChangeRadius: (radius: ProfileRadius) => void;
+}
+
+function DesignEditor({
+  preset,
+  typography,
+  density,
+  radius,
+  onChangePreset,
+  onChangeTypography,
+  onChangeDensity,
+  onChangeRadius
+}: DesignEditorProps) {
+  const typographyOptions: {
+    value: ProfileTypography;
+    label: string;
+  }[] = [
+    { value: 'sans', label: 'Helvetica' },
+    { value: 'arial', label: 'Arial' },
+    { value: 'system', label: 'System' },
+    { value: 'serif', label: 'Georgia' },
+    { value: 'times', label: 'Times' },
+    { value: 'mono', label: 'Mono' }
+  ];
+
+  const densityOptions: {
+    value: ProfileDensity;
+    label: string;
+  }[] = [
+    { value: 'compact', label: 'Compact' },
+    { value: 'balanced', label: 'Balanced' },
+    { value: 'airy', label: 'Airy' }
+  ];
+
+  const radiusOptions: {
+    value: ProfileRadius;
+    label: string;
+  }[] = [
+    { value: 'square', label: 'Square' },
+    { value: 'small', label: 'Small' },
+    { value: 'rounded', label: 'Rounded' }
+  ];
+
+  return (
+    <div className='space-y-8'>
+      <div>
+        <p className='mb-3 text-neutral-500 text-xs uppercase tracking-wider'>
+          Preset
+        </p>
+
+        <PresetEditor
+          onChange={onChangePreset}
+          value={preset}
+        />
+      </div>
+
+      <div>
+        <p className='mb-3 text-neutral-500 text-xs uppercase tracking-wider'>
+          Typography
+        </p>
+
+        <div className='grid grid-cols-2 gap-2'>
+          {typographyOptions.map((option) => (
+            <button
+              aria-pressed={typography === option.value}
+              className={`rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
+                typography === option.value
+                  ? 'border-neutral-950 bg-neutral-50'
+                  : 'border-neutral-200 hover:bg-neutral-50'
+              }`}
+              key={option.value}
+              onClick={() => onChangeTypography(option.value)}
+              type='button'
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <p className='mb-3 text-neutral-500 text-xs uppercase tracking-wider'>
+          Density
+        </p>
+
+        <div className='flex gap-2'>
+          {densityOptions.map((option) => (
+            <button
+              aria-pressed={density === option.value}
+              className={`flex-1 rounded-lg border px-2 py-2 text-xs transition-colors ${
+                density === option.value
+                  ? 'border-neutral-950 bg-neutral-50'
+                  : 'border-neutral-200 hover:bg-neutral-50'
+              }`}
+              key={option.value}
+              onClick={() => onChangeDensity(option.value)}
+              type='button'
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <p className='mb-3 text-neutral-500 text-xs uppercase tracking-wider'>
+          Corners
+        </p>
+
+        <div className='flex gap-2'>
+          {radiusOptions.map((option) => (
+            <button
+              aria-pressed={radius === option.value}
+              className={`flex-1 rounded-lg border px-2 py-2 text-xs transition-colors ${
+                radius === option.value
+                  ? 'border-neutral-950 bg-neutral-50'
+                  : 'border-neutral-200 hover:bg-neutral-50'
+              }`}
+              key={option.value}
+              onClick={() => onChangeRadius(option.value)}
+              type='button'
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface PresetEditorProps {
   value: ProfilePreset;
   onChange: (preset: ProfilePreset) => void;
@@ -295,6 +451,7 @@ function LinksEditor({ links, onAdd, onUpdate, onRemove }: LinksEditorProps) {
                 onChange={(event) =>
                   onUpdate(link.id, 'label', event.target.value)
                 }
+                type='text'
                 value={link.label}
               />
             </label>
@@ -323,6 +480,12 @@ function LinksEditor({ links, onAdd, onUpdate, onRemove }: LinksEditorProps) {
           </div>
         ))}
       </div>
+
+      {links.length === 0 && (
+        <p className='mb-4 text-neutral-500 text-sm'>
+          You haven't added any links yet.
+        </p>
+      )}
 
       <button
         className='mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50'
@@ -368,6 +531,7 @@ function ProjectsEditor({
                 onChange={(event) =>
                   onUpdate(project.id, 'name', event.target.value)
                 }
+                type='text'
                 value={project.name}
               />
             </label>
@@ -410,6 +574,12 @@ function ProjectsEditor({
           </div>
         ))}
       </div>
+
+      {projects.length === 0 && (
+        <p className='mb-4 text-neutral-500 text-sm'>
+          You haven't added any projects yet.
+        </p>
+      )}
 
       <button
         className='mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50'
@@ -457,6 +627,7 @@ function ExperienceEditor({
                 onChange={(event) =>
                   onUpdate(item.id, 'company', event.target.value)
                 }
+                type='text'
                 value={item.company}
               />
             </label>
@@ -469,6 +640,7 @@ function ExperienceEditor({
                 onChange={(event) =>
                   onUpdate(item.id, 'role', event.target.value)
                 }
+                type='text'
                 value={item.role}
               />
             </label>
@@ -484,6 +656,7 @@ function ExperienceEditor({
                   onUpdate(item.id, 'period', event.target.value)
                 }
                 placeholder='2025 — Present'
+                type='text'
                 value={item.period}
               />
             </label>
@@ -512,6 +685,12 @@ function ExperienceEditor({
           </div>
         ))}
       </div>
+
+      {experience.length === 0 && (
+        <p className='mb-4 text-neutral-500 text-sm'>
+          You haven't added any experience yet.
+        </p>
+      )}
 
       <button
         className='mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50'
@@ -575,6 +754,7 @@ function GalleryEditor({
                 onChange={(event) =>
                   onUpdate(item.id, 'alt', event.target.value)
                 }
+                type='text'
                 value={item.alt}
               />
             </label>
@@ -589,6 +769,7 @@ function GalleryEditor({
                 onChange={(event) =>
                   onUpdate(item.id, 'caption', event.target.value)
                 }
+                type='text'
                 value={item.caption}
               />
             </label>
@@ -603,6 +784,12 @@ function GalleryEditor({
           </div>
         ))}
       </div>
+
+      {gallery.length === 0 && (
+        <p className='mb-4 text-neutral-500 text-sm'>
+          You haven't added any images yet.
+        </p>
+      )}
 
       <button
         className='mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50'

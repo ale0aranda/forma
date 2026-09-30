@@ -110,7 +110,7 @@ export function EditorSidebar({
           onClick={() => onSelect('design')}
           type='button'
         >
-          Preset
+          Appearance
         </button>
       </nav>
     </aside>

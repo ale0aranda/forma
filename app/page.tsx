@@ -2,7 +2,10 @@
 
 import { useState } from 'react';
 
-import { EditorSidebar } from '@/components/editor-sidebar';
+import {
+  type EditorSelection,
+  EditorSidebar
+} from '@/components/editor-sidebar';
 import { ProfileInspector } from '@/components/profile-inspector';
 import { ProfilePreview } from '@/components/profile-preview';
 
@@ -10,7 +13,9 @@ import type {
   Profile,
   ProfileBlock,
   ProfileExperience,
+  ProfileGalleryItem,
   ProfileLink,
+  ProfilePreset,
   ProfileProject
 } from '@/lib/profile';
 
@@ -41,6 +46,7 @@ const initialProfile: Profile = {
     }
   ],
   experience: [],
+  gallery: [],
   blocks: {
     identity: {
       visible: true
@@ -57,16 +63,30 @@ const initialProfile: Profile = {
     experience: {
       visible: true
     },
+    gallery: {
+      visible: true
+    },
     now: {
       visible: true
     }
   },
-  blockOrder: ['identity', 'about', 'links', 'projects', 'experience', 'now']
+  blockOrder: [
+    'identity',
+    'about',
+    'links',
+    'projects',
+    'experience',
+    'gallery',
+    'now'
+  ],
+  design: {
+    preset: 'minimal'
+  }
 };
 
 export default function Home() {
   const [profile, setProfile] = useState(initialProfile);
-  const [selectedBlock, setSelectedBlock] = useState<ProfileBlock>('identity');
+  const [selected, setSelected] = useState<EditorSelection>('identity');
 
   function updateIdentity(field: keyof Profile['identity'], value: string) {
     setProfile((current) => ({
@@ -207,6 +227,55 @@ export default function Home() {
     }));
   }
 
+  function addGalleryItem() {
+    const item: ProfileGalleryItem = {
+      id: crypto.randomUUID(),
+      src: '',
+      alt: '',
+      caption: ''
+    };
+
+    setProfile((current) => ({
+      ...current,
+      gallery: [...current.gallery, item]
+    }));
+  }
+
+  function updateGalleryItem(
+    id: string,
+    field: 'src' | 'alt' | 'caption',
+    value: string
+  ) {
+    setProfile((current) => ({
+      ...current,
+      gallery: current.gallery.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              [field]: value
+            }
+          : item
+      )
+    }));
+  }
+
+  function removeGalleryItem(id: string) {
+    setProfile((current) => ({
+      ...current,
+      gallery: current.gallery.filter((item) => item.id !== id)
+    }));
+  }
+
+  function changePreset(preset: ProfilePreset) {
+    setProfile((current) => ({
+      ...current,
+      design: {
+        ...current.design,
+        preset
+      }
+    }));
+  }
+
   function toggleBlock(block: ProfileBlock) {
     setProfile((current) => ({
       ...current,
@@ -281,32 +350,36 @@ export default function Home() {
           blocks={profile.blocks}
           blockOrder={profile.blockOrder}
           onMoveBlock={moveBlock}
-          onSelectBlock={setSelectedBlock}
-          selectedBlock={selectedBlock}
+          onSelect={setSelected}
+          selected={selected}
         />
 
         <ProfilePreview
-          onSelectBlock={setSelectedBlock}
+          onSelectBlock={setSelected}
           profile={profile}
-          selectedBlock={selectedBlock}
+          selectedBlock={selected}
         />
 
         <ProfileInspector
           onAddExperience={addExperience}
+          onAddGalleryItem={addGalleryItem}
           onAddLink={addLink}
           onAddProject={addProject}
+          onChangePreset={changePreset}
           onRemoveExperience={removeExperience}
+          onRemoveGalleryItem={removeGalleryItem}
           onRemoveLink={removeLink}
           onRemoveProject={removeProject}
           onToggleBlock={toggleBlock}
           onUpdateAbout={updateAbout}
           onUpdateExperience={updateExperience}
+          onUpdateGalleryItem={updateGalleryItem}
           onUpdateIdentity={updateIdentity}
           onUpdateLink={updateLink}
           onUpdateNow={updateNow}
           onUpdateProject={updateProject}
           profile={profile}
-          selectedBlock={selectedBlock}
+          selectedBlock={selected}
         />
       </div>
     </main>

@@ -1,11 +1,13 @@
 import type { ProfileBlock, ProfileBlockSettings } from '@/lib/profile';
 
+export type EditorSelection = ProfileBlock | 'design';
+
 interface EditorSidebarProps {
   blocks: Record<ProfileBlock, ProfileBlockSettings>;
   blockOrder: ProfileBlock[];
-  selectedBlock: ProfileBlock;
+  selected: EditorSelection;
   onMoveBlock: (block: ProfileBlock, direction: 'up' | 'down') => void;
-  onSelectBlock: (block: ProfileBlock) => void;
+  onSelect: (selection: EditorSelection) => void;
 }
 
 const blockLabels: Record<ProfileBlock, string> = {
@@ -14,15 +16,16 @@ const blockLabels: Record<ProfileBlock, string> = {
   links: 'Links',
   projects: 'Projects',
   experience: 'Experience',
+  gallery: 'Gallery',
   now: 'Now'
 };
 
 export function EditorSidebar({
   blocks,
   blockOrder,
-  selectedBlock,
+  selected,
   onMoveBlock,
-  onSelectBlock
+  onSelect
 }: EditorSidebarProps) {
   return (
     <aside className='w-56 shrink-0 border-neutral-200 border-r bg-white p-4'>
@@ -40,19 +43,17 @@ export function EditorSidebar({
             return (
               <div
                 className={`flex items-center rounded-lg transition-colors ${
-                  selectedBlock === block
-                    ? 'bg-neutral-100'
-                    : 'hover:bg-neutral-50'
+                  selected === block ? 'bg-neutral-100' : 'hover:bg-neutral-50'
                 }`}
                 key={block}
               >
                 <button
                   className={`min-w-0 flex-1 px-3 py-2 text-left text-sm ${
-                    selectedBlock === block
+                    selected === block
                       ? 'font-medium text-neutral-950'
                       : 'text-neutral-600'
                   }`}
-                  onClick={() => onSelectBlock(block)}
+                  onClick={() => onSelect(block)}
                   type='button'
                 >
                   <span className='flex items-center justify-between gap-2'>
@@ -101,7 +102,12 @@ export function EditorSidebar({
         </p>
 
         <button
-          className='w-full rounded-lg px-3 py-2 text-left text-neutral-600 text-sm transition-colors hover:bg-neutral-50 hover:text-neutral-950'
+          className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+            selected === 'design'
+              ? 'bg-neutral-100 font-medium text-neutral-950'
+              : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-950'
+          }`}
+          onClick={() => onSelect('design')}
           type='button'
         >
           Preset

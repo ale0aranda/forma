@@ -4,7 +4,10 @@ export type ProfileBlock =
   | 'links'
   | 'projects'
   | 'experience'
+  | 'gallery'
   | 'now';
+
+export type ProfilePreset = 'minimal' | 'editorial' | 'blueprint';
 
 export interface ProfileLink {
   id: string;
@@ -27,8 +30,19 @@ export interface ProfileExperience {
   description: string;
 }
 
+export interface ProfileGalleryItem {
+  id: string;
+  src: string;
+  alt: string;
+  caption: string;
+}
+
 export interface ProfileBlockSettings {
   visible: boolean;
+}
+
+export interface ProfileDesign {
+  preset: ProfilePreset;
 }
 
 export interface Profile {
@@ -43,6 +57,8 @@ export interface Profile {
   links: ProfileLink[];
   projects: ProfileProject[];
   experience: ProfileExperience[];
+  gallery: ProfileGalleryItem[];
   blocks: Record<ProfileBlock, ProfileBlockSettings>;
   blockOrder: ProfileBlock[];
+  design: ProfileDesign;
 }

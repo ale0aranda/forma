@@ -2,13 +2,15 @@ import type {
   Profile,
   ProfileBlock,
   ProfileExperience,
+  ProfileGalleryItem,
   ProfileLink,
+  ProfilePreset,
   ProfileProject
 } from '@/lib/profile';
 
 interface ProfileInspectorProps {
   profile: Profile;
-  selectedBlock: ProfileBlock;
+  selectedBlock: ProfileBlock | 'design';
   onToggleBlock: (block: ProfileBlock) => void;
   onUpdateIdentity: (field: keyof Profile['identity'], value: string) => void;
   onUpdateAbout: (value: string) => void;
@@ -30,6 +32,14 @@ interface ProfileInspectorProps {
     value: string
   ) => void;
   onRemoveExperience: (id: string) => void;
+  onAddGalleryItem: () => void;
+  onUpdateGalleryItem: (
+    id: string,
+    field: 'src' | 'alt' | 'caption',
+    value: string
+  ) => void;
+  onRemoveGalleryItem: (id: string) => void;
+  onChangePreset: (preset: ProfilePreset) => void;
 }
 
 const blockLabels: Record<ProfileBlock, string> = {
@@ -38,6 +48,7 @@ const blockLabels: Record<ProfileBlock, string> = {
   links: 'Links',
   projects: 'Projects',
   experience: 'Experience',
+  gallery: 'Gallery',
   now: 'Now'
 };
 
@@ -56,8 +67,31 @@ export function ProfileInspector({
   onRemoveProject,
   onAddExperience,
   onUpdateExperience,
-  onRemoveExperience
+  onRemoveExperience,
+  onAddGalleryItem,
+  onUpdateGalleryItem,
+  onRemoveGalleryItem,
+  onChangePreset
 }: ProfileInspectorProps) {
+  if (selectedBlock === 'design') {
+    return (
+      <aside className='w-80 shrink-0 border-neutral-200 border-l bg-white p-6'>
+        <div className='mb-8'>
+          <p className='font-medium'>Design</p>
+
+          <p className='mt-1 text-neutral-500 text-sm'>
+            Choose how your profile looks.
+          </p>
+        </div>
+
+        <PresetEditor
+          onChange={onChangePreset}
+          value={profile.design.preset}
+        />
+      </aside>
+    );
+  }
+
   return (
     <aside className='w-80 shrink-0 border-neutral-200 border-l bg-white p-6'>
       <div className='mb-8'>
@@ -95,9 +129,8 @@ export function ProfileInspector({
             <span className='mb-2 block text-neutral-600 text-sm'>Name</span>
 
             <input
-              className='w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-neutral-400'
+              className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
               onChange={(event) => onUpdateIdentity('name', event.target.value)}
-              type='text'
               value={profile.identity.name}
             />
           </label>
@@ -106,9 +139,8 @@ export function ProfileInspector({
             <span className='mb-2 block text-neutral-600 text-sm'>Role</span>
 
             <input
-              className='w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-neutral-400'
+              className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
               onChange={(event) => onUpdateIdentity('role', event.target.value)}
-              type='text'
               value={profile.identity.role}
             />
           </label>
@@ -117,7 +149,7 @@ export function ProfileInspector({
             <span className='mb-2 block text-neutral-600 text-sm'>Bio</span>
 
             <textarea
-              className='min-h-28 w-full resize-none rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm outline-none transition-colors focus:border-neutral-400'
+              className='min-h-28 w-full resize-none rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
               onChange={(event) => onUpdateIdentity('bio', event.target.value)}
               value={profile.identity.bio}
             />
@@ -130,7 +162,7 @@ export function ProfileInspector({
           <span className='mb-2 block text-neutral-600 text-sm'>About</span>
 
           <textarea
-            className='min-h-40 w-full resize-none rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm leading-6 outline-none transition-colors focus:border-neutral-400'
+            className='min-h-40 w-full resize-none rounded-lg border border-neutral-200 px-3 py-2 text-sm leading-6 outline-none focus:border-neutral-400'
             onChange={(event) => onUpdateAbout(event.target.value)}
             value={profile.about}
           />
@@ -164,18 +196,78 @@ export function ProfileInspector({
         />
       )}
 
+      {selectedBlock === 'gallery' && (
+        <GalleryEditor
+          gallery={profile.gallery}
+          onAdd={onAddGalleryItem}
+          onRemove={onRemoveGalleryItem}
+          onUpdate={onUpdateGalleryItem}
+        />
+      )}
+
       {selectedBlock === 'now' && (
         <label className='block'>
           <span className='mb-2 block text-neutral-600 text-sm'>Now</span>
 
           <textarea
-            className='min-h-32 w-full resize-none rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm leading-6 outline-none transition-colors focus:border-neutral-400'
+            className='min-h-32 w-full resize-none rounded-lg border border-neutral-200 px-3 py-2 text-sm leading-6 outline-none focus:border-neutral-400'
             onChange={(event) => onUpdateNow(event.target.value)}
             value={profile.now}
           />
         </label>
       )}
     </aside>
+  );
+}
+
+interface PresetEditorProps {
+  value: ProfilePreset;
+  onChange: (preset: ProfilePreset) => void;
+}
+
+const presets: {
+  id: ProfilePreset;
+  label: string;
+  description: string;
+}[] = [
+  {
+    id: 'minimal',
+    label: 'Minimal',
+    description: 'Simple and balanced.'
+  },
+  {
+    id: 'editorial',
+    label: 'Editorial',
+    description: 'Sharper and more structured.'
+  },
+  {
+    id: 'blueprint',
+    label: 'Blueprint',
+    description: 'Strong borders and structure.'
+  }
+];
+
+function PresetEditor({ value, onChange }: PresetEditorProps) {
+  return (
+    <div className='space-y-2'>
+      {presets.map((preset) => (
+        <button
+          aria-pressed={value === preset.id}
+          className={`w-full rounded-lg border p-3 text-left transition-colors ${
+            value === preset.id
+              ? 'border-neutral-950 bg-neutral-50'
+              : 'border-neutral-200 hover:bg-neutral-50'
+          }`}
+          key={preset.id}
+          onClick={() => onChange(preset.id)}
+          type='button'
+        >
+          <p className='font-medium text-sm'>{preset.label}</p>
+
+          <p className='mt-1 text-neutral-500 text-xs'>{preset.description}</p>
+        </button>
+      ))}
+    </div>
   );
 }
 
@@ -203,7 +295,6 @@ function LinksEditor({ links, onAdd, onUpdate, onRemove }: LinksEditorProps) {
                 onChange={(event) =>
                   onUpdate(link.id, 'label', event.target.value)
                 }
-                type='text'
                 value={link.label}
               />
             </label>
@@ -277,7 +368,6 @@ function ProjectsEditor({
                 onChange={(event) =>
                   onUpdate(project.id, 'name', event.target.value)
                 }
-                type='text'
                 value={project.name}
               />
             </label>
@@ -367,7 +457,6 @@ function ExperienceEditor({
                 onChange={(event) =>
                   onUpdate(item.id, 'company', event.target.value)
                 }
-                type='text'
                 value={item.company}
               />
             </label>
@@ -380,7 +469,6 @@ function ExperienceEditor({
                 onChange={(event) =>
                   onUpdate(item.id, 'role', event.target.value)
                 }
-                type='text'
                 value={item.role}
               />
             </label>
@@ -396,7 +484,6 @@ function ExperienceEditor({
                   onUpdate(item.id, 'period', event.target.value)
                 }
                 placeholder='2025 — Present'
-                type='text'
                 value={item.period}
               />
             </label>
@@ -432,6 +519,97 @@ function ExperienceEditor({
         type='button'
       >
         + Add experience
+      </button>
+    </div>
+  );
+}
+
+interface GalleryEditorProps {
+  gallery: ProfileGalleryItem[];
+  onAdd: () => void;
+  onUpdate: (
+    id: string,
+    field: 'src' | 'alt' | 'caption',
+    value: string
+  ) => void;
+  onRemove: (id: string) => void;
+}
+
+function GalleryEditor({
+  gallery,
+  onAdd,
+  onUpdate,
+  onRemove
+}: GalleryEditorProps) {
+  return (
+    <div>
+      <div className='space-y-3'>
+        {gallery.map((item) => (
+          <div
+            className='rounded-lg border border-neutral-200 p-3'
+            key={item.id}
+          >
+            <label className='block'>
+              <span className='mb-2 block text-neutral-500 text-xs'>
+                Image URL
+              </span>
+
+              <input
+                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
+                onChange={(event) =>
+                  onUpdate(item.id, 'src', event.target.value)
+                }
+                placeholder='https://'
+                type='url'
+                value={item.src}
+              />
+            </label>
+
+            <label className='mt-3 block'>
+              <span className='mb-2 block text-neutral-500 text-xs'>
+                Alt text
+              </span>
+
+              <input
+                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
+                onChange={(event) =>
+                  onUpdate(item.id, 'alt', event.target.value)
+                }
+                value={item.alt}
+              />
+            </label>
+
+            <label className='mt-3 block'>
+              <span className='mb-2 block text-neutral-500 text-xs'>
+                Caption
+              </span>
+
+              <input
+                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
+                onChange={(event) =>
+                  onUpdate(item.id, 'caption', event.target.value)
+                }
+                value={item.caption}
+              />
+            </label>
+
+            <button
+              className='mt-3 text-neutral-500 text-xs hover:text-red-600'
+              onClick={() => onRemove(item.id)}
+              type='button'
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <button
+        className='mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50'
+        onClick={onAdd}
+        type='button'
+      >
+        + Add image
       </button>
     </div>
   );

@@ -1,9 +1,22 @@
-import type { Profile, ProfileBlock } from '@/lib/profile';
+import type { Profile, ProfileBlock, ProfilePreset } from '@/lib/profile';
 
 interface ProfilePreviewProps {
   profile: Profile;
-  selectedBlock: ProfileBlock;
+  selectedBlock: ProfileBlock | 'design';
   onSelectBlock: (block: ProfileBlock) => void;
+}
+
+const presetClasses: Record<ProfilePreset, string> = {
+  minimal: 'rounded-xl border border-neutral-200 bg-white',
+  editorial: 'border border-neutral-300 bg-white',
+  blueprint: 'rounded-2xl border-2 border-neutral-900 bg-white'
+};
+
+interface ProfilePreviewBlockProps {
+  block: ProfileBlock;
+  profile: Profile;
+  selected: boolean;
+  onSelect: () => void;
 }
 
 export function ProfilePreview({
@@ -20,7 +33,9 @@ export function ProfilePreview({
           <p className='text-neutral-400 text-xs'>/{profile.username}</p>
         </div>
 
-        <article className='overflow-hidden rounded-xl border border-neutral-200 bg-white'>
+        <article
+          className={`overflow-hidden ${presetClasses[profile.design.preset]}`}
+        >
           {profile.blockOrder.map((block) => {
             if (!profile.blocks[block].visible) {
               return null;
@@ -40,13 +55,6 @@ export function ProfilePreview({
       </div>
     </section>
   );
-}
-
-interface ProfilePreviewBlockProps {
-  block: ProfileBlock;
-  profile: Profile;
-  selected: boolean;
-  onSelect: () => void;
 }
 
 function ProfilePreviewBlock({
@@ -198,6 +206,47 @@ function ProfilePreviewBlock({
           </div>
         ) : (
           <p className='mt-3 text-neutral-400 text-sm'>No experience yet.</p>
+        )}
+      </button>
+    );
+  }
+
+  if (block === 'gallery') {
+    return (
+      <button
+        className={className}
+        onClick={onSelect}
+        type='button'
+      >
+        <h2 className='font-medium'>Gallery</h2>
+
+        {profile.gallery.length > 0 ? (
+          <div className='mt-4 grid grid-cols-2 gap-3'>
+            {profile.gallery.map((item) => (
+              <div
+                className='overflow-hidden rounded-lg border border-neutral-200'
+                key={item.id}
+              >
+                {item.src ? (
+                  <img
+                    alt={item.alt}
+                    className='aspect-square w-full object-cover'
+                    src={item.src}
+                  />
+                ) : (
+                  <div className='flex aspect-square items-center justify-center bg-neutral-100 text-neutral-400 text-xs'>
+                    No image
+                  </div>
+                )}
+
+                {item.caption && (
+                  <p className='p-3 text-neutral-500 text-xs'>{item.caption}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className='mt-3 text-neutral-400 text-sm'>No images yet.</p>
         )}
       </button>
     );

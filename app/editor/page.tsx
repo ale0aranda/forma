@@ -10,6 +10,7 @@ import {
 } from '@/components/profile/editor-sidebar';
 import { ProfileInspector } from '@/components/profile/profile-inspector';
 import { ProfilePreview } from '@/components/profile/profile-preview';
+import { ShareProfileButton } from '@/components/profile/share-profile-button';
 import { useProfileEditor } from '@/hooks/use-profile-editor';
 import { isValidProfile } from '@/lib/profile-validation';
 import { getDefaultProfile } from '@/lib/profiles';
@@ -21,6 +22,7 @@ export default function EditorPage() {
 
   const {
     profile,
+    publishedProfile,
     loaded,
     saving,
     publishing,
@@ -125,6 +127,12 @@ export default function EditorPage() {
           >
             Reset
           </button>
+
+          {isPublished && <ShareProfileButton username={profile.username} />}
+
+          {publishedProfile && (
+            <ShareProfileButton username={publishedProfile.username} />
+          )}
 
           {validProfile ? (
             <Link

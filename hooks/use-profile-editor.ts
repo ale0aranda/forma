@@ -488,6 +488,7 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
 
   return {
     profile,
+    publishedProfile,
     loaded,
     saving,
     publishing,

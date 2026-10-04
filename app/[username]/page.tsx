@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { PublicProfile } from '@/components/profile/public-profile';
-import { getPublishedProfile } from '@/lib/public-profile-repository';
+import { getPublicProfile } from '@/lib/public-profile-repository';
 
 interface ProfilePageProps {
   params: Promise<{
@@ -12,11 +12,17 @@ interface ProfilePageProps {
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const { username } = await params;
 
-  const profile = await getPublishedProfile(username);
+  const publicProfile = await getPublicProfile(username);
 
-  if (!profile) {
+  if (!publicProfile) {
     notFound();
   }
 
-  return <PublicProfile profile={profile} />;
+  return (
+    <PublicProfile
+      followers={publicProfile.followers}
+      following={publicProfile.following}
+      profile={publicProfile.profile}
+    />
+  );
 }

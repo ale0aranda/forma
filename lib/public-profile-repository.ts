@@ -2,12 +2,26 @@ import { createClient } from '@/lib/supabase/server';
 
 import type { Profile } from '@/lib/profile';
 
-export async function getPublishedProfile(
+export interface PublicProfile {
+  userId: string;
+  profile: Profile;
+  followers: number;
+  following: number;
+}
+
+interface PublicProfileRow {
+  user_id: string;
+  profile: Profile;
+  followers: number;
+  following: number;
+}
+
+export async function getPublicProfile(
   username: string
-): Promise<Profile | undefined> {
+): Promise<PublicProfile | undefined> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase.rpc('get_published_profile', {
+  const { data, error } = await supabase.rpc('get_public_profile', {
     profile_username: username
   });
 
@@ -15,9 +29,16 @@ export async function getPublishedProfile(
     throw error;
   }
 
-  if (!data) {
+  const row = (data as PublicProfileRow[] | null)?.[0];
+
+  if (!row) {
     return undefined;
   }
 
-  return data as Profile;
+  return {
+    userId: row.user_id,
+    profile: row.profile,
+    followers: Number(row.followers),
+    following: Number(row.following)
+  };
 }

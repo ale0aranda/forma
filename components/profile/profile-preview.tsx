@@ -28,8 +28,8 @@ export function ProfilePreview({ profile }: ProfilePreviewProps) {
   const { design } = profile;
 
   return (
-    <section className='min-w-0 flex-1 overflow-auto bg-neutral-100 p-10'>
-      <div className='mx-auto w-full max-w-3xl'>
+    <section className='min-w-0 flex-1 overflow-auto bg-neutral-100 p-8'>
+      <div className='mx-auto w-full max-w-5xl'>
         <div className='mb-3 flex items-center justify-between'>
           <p className='text-neutral-500 text-xs'>Preview</p>
 
@@ -37,11 +37,11 @@ export function ProfilePreview({ profile }: ProfilePreviewProps) {
         </div>
 
         <div
-          className={`min-h-screen px-12 py-16 ${
+          className={`min-h-screen px-10 py-14 ${
             previewBackgroundClasses[design.appearance][design.palette]
           }`}
         >
-          <div className='mx-auto max-w-xl'>
+          <div className='mx-auto w-full max-w-3xl'>
             <ProfileRenderer profile={profile} />
           </div>
         </div>

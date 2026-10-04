@@ -24,26 +24,26 @@ const typographyClasses: Record<ProfileTypography, string> = {
 
 const radiusClasses: Record<ProfileRadius, string> = {
   square: 'rounded-none',
-  small: 'rounded-md',
-  rounded: 'rounded-xl'
+  small: 'rounded-lg',
+  rounded: 'rounded-2xl'
 };
 
-const sectionGapClasses: Record<ProfileDensity, string> = {
-  compact: 'space-y-10',
-  balanced: 'space-y-14',
-  airy: 'space-y-20'
+const cardPaddingClasses: Record<ProfileDensity, string> = {
+  compact: 'p-5',
+  balanced: 'p-6',
+  airy: 'p-7'
 };
 
-const itemGapClasses: Record<ProfileDensity, string> = {
-  compact: 'space-y-4',
-  balanced: 'space-y-6',
-  airy: 'space-y-8'
+const cardGapClasses: Record<ProfileDensity, string> = {
+  compact: 'gap-3',
+  balanced: 'gap-4',
+  airy: 'gap-5'
 };
 
 const borderClasses: Record<ProfileBorders, string> = {
   none: 'border-transparent',
   subtle: 'border-current/10',
-  strong: 'border-current/30'
+  strong: 'border-current/25'
 };
 
 const appearanceClasses: Record<
@@ -67,284 +67,311 @@ const appearanceClasses: Record<
 export function ProfileRenderer({ profile }: ProfileRendererProps) {
   const { design } = profile;
 
+  const visible = (block: ProfileBlock) => profile.blocks[block].visible;
+
+  const contentBlocks = profile.blockOrder.filter(
+    (block) =>
+      block !== 'identity'
+      && block !== 'links'
+      && block !== 'now'
+      && visible(block)
+  );
+
   return (
     <article
       className={`${typographyClasses[design.typography]} ${
         appearanceClasses[design.appearance][design.palette]
       }`}
     >
-      <div className={sectionGapClasses[design.density]}>
-        {profile.blockOrder.map((block) => {
-          if (!profile.blocks[block].visible) {
-            return null;
-          }
+      {visible('identity') && (
+        <IdentityHero
+          profile={profile}
+          showLinks={visible('links')}
+        />
+      )}
 
-          return (
-            <ProfileBlockRenderer
+      {contentBlocks.length > 0 && (
+        <div
+          className={`mt-14 grid grid-cols-2 ${cardGapClasses[design.density]}`}
+        >
+          {contentBlocks.map((block) => (
+            <ProfileCard
               block={block}
               key={block}
               profile={profile}
             />
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
+
+      {visible('now') && (
+        <div className='mt-10'>
+          <NowBlock profile={profile} />
+        </div>
+      )}
     </article>
   );
 }
 
-interface ProfileBlockRendererProps {
+interface IdentityHeroProps {
+  profile: Profile;
+  showLinks: boolean;
+}
+
+function IdentityHero({ profile, showLinks }: IdentityHeroProps) {
+  return (
+    <header className='mx-auto max-w-2xl py-8'>
+      <div className='flex items-start gap-6'>
+        <div className='flex size-20 shrink-0 items-center justify-center rounded-full border border-current/10 bg-current/5 font-medium text-xl'>
+          {getInitials(profile.identity.name)}
+        </div>
+
+        <div className='min-w-0 pt-1'>
+          <h1 className='font-semibold text-3xl tracking-tight'>
+            {profile.identity.name || 'Your name'}
+          </h1>
+
+          <p className='mt-1 opacity-50 text-sm'>
+            {profile.identity.role || 'Your role'}
+          </p>
+
+          {profile.identity.bio && (
+            <p className='mt-4 max-w-lg opacity-70 text-sm leading-6'>
+              {profile.identity.bio}
+            </p>
+          )}
+
+          {showLinks && profile.links.length > 0 && (
+            <div className='mt-5 flex flex-wrap gap-x-4 gap-y-2'>
+              {profile.links.map((link) =>
+                link.url ? (
+                  <a
+                    className='opacity-50 text-sm transition-opacity hover:opacity-100'
+                    href={link.url}
+                    key={link.id}
+                    rel='noreferrer'
+                    target='_blank'
+                  >
+                    {link.label || 'Untitled'} ↗
+                  </a>
+                ) : (
+                  <span
+                    className='opacity-50 text-sm'
+                    key={link.id}
+                  >
+                    {link.label || 'Untitled'}
+                  </span>
+                )
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+}
+
+interface ProfileCardProps {
   block: ProfileBlock;
   profile: Profile;
 }
 
-function ProfileBlockRenderer({ block, profile }: ProfileBlockRendererProps) {
-  if (block === 'identity') {
-    return <IdentityBlock profile={profile} />;
-  }
+function ProfileCard({ block, profile }: ProfileCardProps) {
+  const { design } = profile;
+
+  const className = `border ${borderClasses[design.borders]} ${
+    radiusClasses[design.radius]
+  } ${cardPaddingClasses[design.density]}`;
 
   if (block === 'about') {
-    return <AboutBlock profile={profile} />;
-  }
-
-  if (block === 'links') {
-    return <LinksBlock profile={profile} />;
+    return (
+      <section className={className}>
+        <SectionTitle>About</SectionTitle>
+        <AboutBlock profile={profile} />
+      </section>
+    );
   }
 
   if (block === 'projects') {
-    return <ProjectsBlock profile={profile} />;
+    return (
+      <section className={className}>
+        <SectionTitle>Projects</SectionTitle>
+        <ProjectsBlock profile={profile} />
+      </section>
+    );
   }
 
   if (block === 'experience') {
-    return <ExperienceBlock profile={profile} />;
+    return (
+      <section className={className}>
+        <SectionTitle>Experience</SectionTitle>
+        <ExperienceBlock profile={profile} />
+      </section>
+    );
   }
 
   if (block === 'gallery') {
-    return <GalleryBlock profile={profile} />;
+    return (
+      <section className={className}>
+        <SectionTitle>Gallery</SectionTitle>
+        <GalleryBlock profile={profile} />
+      </section>
+    );
   }
 
-  return <NowBlock profile={profile} />;
+  return null;
 }
 
 interface BlockProps {
   profile: Profile;
 }
 
-function IdentityBlock({ profile }: BlockProps) {
-  return (
-    <header>
-      <p className='mb-3 opacity-50 text-sm'>{profile.identity.role}</p>
-
-      <h1 className='font-semibold text-4xl tracking-tight'>
-        {profile.identity.name}
-      </h1>
-
-      <p className='mt-5 max-w-xl opacity-70 leading-7'>
-        {profile.identity.bio}
-      </p>
-    </header>
-  );
-}
-
 function AboutBlock({ profile }: BlockProps) {
   return (
-    <section>
-      <SectionTitle>About</SectionTitle>
-
-      <p className='max-w-xl opacity-70 leading-7'>{profile.about}</p>
-    </section>
-  );
-}
-
-function LinksBlock({ profile }: BlockProps) {
-  return (
-    <section>
-      <SectionTitle>Links</SectionTitle>
-
-      {profile.links.length > 0 ? (
-        <div className='flex flex-wrap gap-x-5 gap-y-2'>
-          {profile.links.map((link) =>
-            link.url ? (
-              <a
-                className='border-current border-b opacity-70 transition-opacity hover:opacity-100'
-                href={link.url}
-                key={link.id}
-                rel='noreferrer'
-                target='_blank'
-              >
-                {link.label || 'Untitled'}
-              </a>
-            ) : (
-              <span
-                className='opacity-70'
-                key={link.id}
-              >
-                {link.label || 'Untitled'}
-              </span>
-            )
-          )}
-        </div>
-      ) : (
-        <EmptyState>No links yet.</EmptyState>
-      )}
-    </section>
+    <p className='opacity-65 text-sm leading-6'>
+      {profile.about || 'Nothing here yet.'}
+    </p>
   );
 }
 
 function ProjectsBlock({ profile }: BlockProps) {
-  const { design } = profile;
-  const borderClass = borderClasses[design.borders];
+  if (profile.projects.length === 0) {
+    return <EmptyState>No projects yet.</EmptyState>;
+  }
 
   return (
-    <section>
-      <SectionTitle>Projects</SectionTitle>
+    <div className='space-y-1'>
+      {profile.projects.map((project) => {
+        const content = (
+          <>
+            <div className='flex items-center justify-between gap-4'>
+              <h3 className='font-medium text-sm'>
+                {project.name || 'Untitled project'}
+              </h3>
 
-      {profile.projects.length > 0 ? (
-        <div>
-          {profile.projects.map((project) => {
-            const content = (
-              <>
-                <div className='flex items-baseline justify-between gap-6'>
-                  <h3 className='font-medium'>
-                    {project.name || 'Untitled project'}
-                  </h3>
+              {project.url && (
+                <span className='shrink-0 opacity-40 text-xs'>↗</span>
+              )}
+            </div>
 
-                  {project.url && (
-                    <span className='shrink-0 opacity-40 text-xs'>↗</span>
-                  )}
-                </div>
+            {project.description && (
+              <p className='mt-1 opacity-50 text-xs leading-5'>
+                {project.description}
+              </p>
+            )}
+          </>
+        );
 
-                {project.description && (
-                  <p className='mt-2 max-w-xl opacity-60 text-sm leading-6'>
-                    {project.description}
-                  </p>
-                )}
-              </>
-            );
+        if (project.url) {
+          return (
+            <a
+              className='block rounded-md px-2 py-3 transition-colors hover:bg-current/5'
+              href={project.url}
+              key={project.id}
+              rel='noreferrer'
+              target='_blank'
+            >
+              {content}
+            </a>
+          );
+        }
 
-            if (project.url) {
-              return (
-                <a
-                  className={`block border-b py-5 transition-opacity first:pt-0 last:border-b-0 last:pb-0 hover:opacity-60 ${borderClass}`}
-                  href={project.url}
-                  key={project.id}
-                  rel='noreferrer'
-                  target='_blank'
-                >
-                  {content}
-                </a>
-              );
-            }
-
-            return (
-              <div
-                className={`border-b py-5 first:pt-0 last:border-b-0 last:pb-0 ${borderClass}`}
-                key={project.id}
-              >
-                {content}
-              </div>
-            );
-          })}
-        </div>
-      ) : (
-        <EmptyState>No projects yet.</EmptyState>
-      )}
-    </section>
+        return (
+          <div
+            className='px-2 py-3'
+            key={project.id}
+          >
+            {content}
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
 function ExperienceBlock({ profile }: BlockProps) {
-  const { design } = profile;
+  if (profile.experience.length === 0) {
+    return <EmptyState>No experience yet.</EmptyState>;
+  }
 
   return (
-    <section>
-      <SectionTitle>Experience</SectionTitle>
+    <div className='space-y-5'>
+      {profile.experience.map((experience) => (
+        <div
+          className='relative border-current/10 border-l pl-4'
+          key={experience.id}
+        >
+          <span className='absolute top-2 -left-1 size-2 rounded-full bg-current opacity-30' />
 
-      {profile.experience.length > 0 ? (
-        <div className={itemGapClasses[design.density]}>
-          {profile.experience.map((experience) => (
-            <div key={experience.id}>
-              <div className='flex items-start justify-between gap-6'>
-                <div>
-                  <h3 className='font-medium'>
-                    {experience.role || 'Untitled role'}
-                  </h3>
+          <div className='flex items-start justify-between gap-4'>
+            <div>
+              <h3 className='font-medium text-sm'>
+                {experience.role || 'Untitled role'}
+              </h3>
 
-                  <p className='mt-1 opacity-60 text-sm'>
-                    {experience.company || 'Company'}
-                  </p>
-                </div>
-
-                {experience.period && (
-                  <p className='shrink-0 opacity-40 text-xs'>
-                    {experience.period}
-                  </p>
-                )}
-              </div>
-
-              {experience.description && (
-                <p className='mt-3 max-w-xl opacity-60 text-sm leading-6'>
-                  {experience.description}
-                </p>
-              )}
+              <p className='mt-1 opacity-50 text-xs'>
+                {experience.company || 'Company'}
+              </p>
             </div>
-          ))}
+
+            {experience.period && (
+              <p className='shrink-0 opacity-40 text-xs'>{experience.period}</p>
+            )}
+          </div>
+
+          {experience.description && (
+            <p className='mt-2 opacity-50 text-xs leading-5'>
+              {experience.description}
+            </p>
+          )}
         </div>
-      ) : (
-        <EmptyState>No experience yet.</EmptyState>
-      )}
-    </section>
+      ))}
+    </div>
   );
 }
 
 function GalleryBlock({ profile }: BlockProps) {
   const { design } = profile;
 
-  const radiusClass = radiusClasses[design.radius];
-  const borderClass = borderClasses[design.borders];
+  if (profile.gallery.length === 0) {
+    return <EmptyState>No images yet.</EmptyState>;
+  }
 
   return (
-    <section>
-      <SectionTitle>Gallery</SectionTitle>
-
-      {profile.gallery.length > 0 ? (
-        <div className='grid grid-cols-2 gap-3'>
-          {profile.gallery.map((item) => (
-            <figure key={item.id}>
-              {item.src ? (
-                <img
-                  alt={item.alt}
-                  className={`aspect-square w-full border object-cover ${borderClass} ${radiusClass}`}
-                  src={item.src}
-                />
-              ) : (
-                <div
-                  className={`flex aspect-square items-center justify-center border bg-current/5 opacity-50 text-xs ${borderClass} ${radiusClass}`}
-                >
-                  No image
-                </div>
-              )}
-
-              {item.caption && (
-                <figcaption className='mt-2 opacity-50 text-xs'>
-                  {item.caption}
-                </figcaption>
-              )}
-            </figure>
-          ))}
-        </div>
-      ) : (
-        <EmptyState>No images yet.</EmptyState>
-      )}
-    </section>
+    <div className='grid grid-cols-3 gap-2'>
+      {profile.gallery.map((item) => (
+        <figure key={item.id}>
+          {item.src ? (
+            <img
+              alt={item.alt}
+              className={`aspect-square w-full object-cover ${
+                radiusClasses[design.radius]
+              }`}
+              src={item.src}
+            />
+          ) : (
+            <div
+              className={`flex aspect-square items-center justify-center bg-current/5 opacity-50 text-xs ${
+                radiusClasses[design.radius]
+              }`}
+            >
+              Image
+            </div>
+          )}
+        </figure>
+      ))}
+    </div>
   );
 }
 
 function NowBlock({ profile }: BlockProps) {
   return (
-    <section>
-      <SectionTitle>Now</SectionTitle>
+    <section className='flex items-baseline gap-4 border-current/10 border-t pt-5'>
+      <p className='shrink-0 opacity-35 text-xs uppercase tracking-widest'>
+        Now
+      </p>
 
-      <p className='max-w-xl opacity-70 leading-7'>{profile.now}</p>
+      <p className='opacity-60 text-sm'>{profile.now || 'Nothing here yet.'}</p>
     </section>
   );
 }
@@ -354,11 +381,7 @@ interface SectionTitleProps {
 }
 
 function SectionTitle({ children }: SectionTitleProps) {
-  return (
-    <h2 className='mb-5 opacity-40 text-xs uppercase tracking-widest'>
-      {children}
-    </h2>
-  );
+  return <h2 className='mb-5 font-medium text-sm'>{children}</h2>;
 }
 
 interface EmptyStateProps {
@@ -366,5 +389,19 @@ interface EmptyStateProps {
 }
 
 function EmptyState({ children }: EmptyStateProps) {
-  return <p className='opacity-40 text-sm'>{children}</p>;
+  return <p className='opacity-35 text-sm'>{children}</p>;
+}
+
+function getInitials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+
+  if (parts.length === 0) {
+    return '?';
+  }
+
+  return parts
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase();
 }

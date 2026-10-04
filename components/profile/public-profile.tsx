@@ -72,7 +72,7 @@ export function PublicProfile({
         pageBackgroundClasses[design.appearance][design.palette]
       }`}
     >
-      <div className='mx-auto w-full max-w-xl'>
+      <div className='mx-auto w-full max-w-3xl'>
         <ProfileRenderer profile={profile} />
       </div>
     </main>

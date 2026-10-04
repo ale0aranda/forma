@@ -131,12 +131,12 @@ function IdentityHero({ profile, showLinks }: IdentityHeroProps) {
             {profile.identity.name || 'Your name'}
           </h1>
 
-          <p className='mt-1 opacity-50 text-sm'>
+          <p className='mt-1 text-sm opacity-50'>
             {profile.identity.role || 'Your role'}
           </p>
 
           {profile.identity.bio && (
-            <p className='mt-4 max-w-lg opacity-70 text-sm leading-6'>
+            <p className='mt-4 max-w-lg text-sm leading-6 opacity-70'>
               {profile.identity.bio}
             </p>
           )}
@@ -146,7 +146,7 @@ function IdentityHero({ profile, showLinks }: IdentityHeroProps) {
               {profile.links.map((link) =>
                 link.url ? (
                   <a
-                    className='opacity-50 text-sm transition-opacity hover:opacity-100'
+                    className='text-sm opacity-50 transition-opacity hover:opacity-100'
                     href={link.url}
                     key={link.id}
                     rel='noreferrer'
@@ -156,7 +156,7 @@ function IdentityHero({ profile, showLinks }: IdentityHeroProps) {
                   </a>
                 ) : (
                   <span
-                    className='opacity-50 text-sm'
+                    className='text-sm opacity-50'
                     key={link.id}
                   >
                     {link.label || 'Untitled'}
@@ -228,7 +228,7 @@ interface BlockProps {
 
 function AboutBlock({ profile }: BlockProps) {
   return (
-    <p className='opacity-65 text-sm leading-6'>
+    <p className='text-sm leading-6 opacity-65'>
       {profile.about || 'Nothing here yet.'}
     </p>
   );
@@ -250,12 +250,12 @@ function ProjectsBlock({ profile }: BlockProps) {
               </h3>
 
               {project.url && (
-                <span className='shrink-0 opacity-40 text-xs'>↗</span>
+                <span className='shrink-0 text-xs opacity-40'>↗</span>
               )}
             </div>
 
             {project.description && (
-              <p className='mt-1 opacity-50 text-xs leading-5'>
+              <p className='mt-1 text-xs leading-5 opacity-50'>
                 {project.description}
               </p>
             )}
@@ -309,18 +309,18 @@ function ExperienceBlock({ profile }: BlockProps) {
                 {experience.role || 'Untitled role'}
               </h3>
 
-              <p className='mt-1 opacity-50 text-xs'>
+              <p className='mt-1 text-xs opacity-50'>
                 {experience.company || 'Company'}
               </p>
             </div>
 
             {experience.period && (
-              <p className='shrink-0 opacity-40 text-xs'>{experience.period}</p>
+              <p className='shrink-0 text-xs opacity-40'>{experience.period}</p>
             )}
           </div>
 
           {experience.description && (
-            <p className='mt-2 opacity-50 text-xs leading-5'>
+            <p className='mt-2 text-xs leading-5 opacity-50'>
               {experience.description}
             </p>
           )}
@@ -342,16 +342,21 @@ function GalleryBlock({ profile }: BlockProps) {
       {profile.gallery.map((item) => (
         <figure key={item.id}>
           {item.src ? (
-            <img
-              alt={item.alt}
-              className={`aspect-square w-full object-cover ${
-                radiusClasses[design.radius]
-              }`}
-              src={item.src}
-            />
+            <picture>
+              <source srcSet={item.src} />
+
+              <img
+                alt={item.alt}
+                className={`aspect-square w-full object-cover ${
+                  radiusClasses[design.radius]
+                }`}
+                loading='lazy'
+                src={item.src}
+              />
+            </picture>
           ) : (
             <div
-              className={`flex aspect-square items-center justify-center bg-current/5 opacity-50 text-xs ${
+              className={`flex aspect-square items-center justify-center bg-current/5 text-xs opacity-50 ${
                 radiusClasses[design.radius]
               }`}
             >
@@ -367,11 +372,11 @@ function GalleryBlock({ profile }: BlockProps) {
 function NowBlock({ profile }: BlockProps) {
   return (
     <section className='flex items-baseline gap-4 border-current/10 border-t pt-5'>
-      <p className='shrink-0 opacity-35 text-xs uppercase tracking-widest'>
+      <p className='shrink-0 text-xs uppercase tracking-widest opacity-35'>
         Now
       </p>
 
-      <p className='opacity-60 text-sm'>{profile.now || 'Nothing here yet.'}</p>
+      <p className='text-sm opacity-60'>{profile.now || 'Nothing here yet.'}</p>
     </section>
   );
 }
@@ -389,7 +394,7 @@ interface EmptyStateProps {
 }
 
 function EmptyState({ children }: EmptyStateProps) {
-  return <p className='opacity-35 text-sm'>{children}</p>;
+  return <p className='text-sm opacity-35'>{children}</p>;
 }
 
 function getInitials(name: string) {

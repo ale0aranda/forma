@@ -8,36 +8,61 @@ interface ProfileRow {
   published: Profile | null;
 }
 
-export async function getCurrentProfile() {
+export class ProfileRepositoryError extends Error {
+  code: 'username_taken' | 'unknown';
+
+  constructor(code: 'username_taken' | 'unknown', message: string) {
+    super(message);
+
+    this.name = 'ProfileRepositoryError';
+    this.code = code;
+  }
+}
+
+function handleProfileError(error: { code?: string }) {
+  if (error.code === '23505') {
+    throw new ProfileRepositoryError(
+      'username_taken',
+      'This username is already taken.'
+    );
+  }
+
+  throw new ProfileRepositoryError('unknown', 'Something went wrong.');
+}
+
+async function getAuthenticatedUser() {
   const supabase = createClient();
 
-  const { data: userData, error: userError } = await supabase.auth.getUser();
+  const { data, error } = await supabase.auth.getUser();
 
-  if (userError || !userData.user) {
-    throw new Error('User is not authenticated');
+  if (error || !data.user) {
+    throw new ProfileRepositoryError('unknown', 'You are not authenticated.');
   }
+
+  return {
+    supabase,
+    user: data.user
+  };
+}
+
+export async function getCurrentProfile(): Promise<ProfileRow> {
+  const { supabase, user } = await getAuthenticatedUser();
 
   const { data, error } = await supabase
     .from('profiles')
     .select('username, draft, published')
-    .eq('user_id', userData.user.id)
+    .eq('user_id', user.id)
     .single();
 
   if (error) {
-    throw error;
+    handleProfileError(error);
   }
 
   return data as ProfileRow;
 }
 
 export async function saveProfile(profile: Profile) {
-  const supabase = createClient();
-
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-
-  if (userError || !userData.user) {
-    throw new Error('User is not authenticated');
-  }
+  const { supabase, user } = await getAuthenticatedUser();
 
   const { error } = await supabase
     .from('profiles')
@@ -46,21 +71,15 @@ export async function saveProfile(profile: Profile) {
       draft: profile,
       updated_at: new Date().toISOString()
     })
-    .eq('user_id', userData.user.id);
+    .eq('user_id', user.id);
 
   if (error) {
-    throw error;
+    handleProfileError(error);
   }
 }
 
 export async function publishProfile(profile: Profile) {
-  const supabase = createClient();
-
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-
-  if (userError || !userData.user) {
-    throw new Error('User is not authenticated');
-  }
+  const { supabase, user } = await getAuthenticatedUser();
 
   const now = new Date().toISOString();
 
@@ -73,9 +92,9 @@ export async function publishProfile(profile: Profile) {
       published_at: now,
       updated_at: now
     })
-    .eq('user_id', userData.user.id);
+    .eq('user_id', user.id);
 
   if (error) {
-    throw error;
+    handleProfileError(error);
   }
 }

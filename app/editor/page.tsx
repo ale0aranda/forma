@@ -130,9 +130,12 @@ export default function EditorPage() {
 
           {isPublished && <ShareProfileButton username={profile.username} />}
 
-          {publishedProfile && (
-            <ShareProfileButton username={publishedProfile.username} />
-          )}
+          <Link
+            className='rounded-lg border border-neutral-200 px-3 py-2 text-neutral-600 text-sm transition-colors hover:bg-neutral-50 hover:text-neutral-950'
+            href='/settings'
+          >
+            Settings
+          </Link>
 
           {validProfile ? (
             <Link

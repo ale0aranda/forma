@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import {
   getCurrentProfile,
+  ProfileRepositoryError,
   publishProfile,
   saveProfile
 } from '@/lib/profile-repository';
@@ -443,29 +444,26 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     []
   );
 
-  const save = useCallback(async () => {
-    if (saving || publishing) {
-      return;
-    }
-
+  async function save() {
     setSaving(true);
     setError(undefined);
 
     try {
       await saveProfile(profile);
+
       setSavedProfile(profile);
-    } catch {
-      setError('Could not save your profile.');
+    } catch (caughtError) {
+      if (caughtError instanceof ProfileRepositoryError) {
+        setError(caughtError.message);
+      } else {
+        setError('Could not save your profile.');
+      }
     } finally {
       setSaving(false);
     }
-  }, [profile, publishing, saving]);
+  }
 
-  const publish = useCallback(async () => {
-    if (saving || publishing) {
-      return;
-    }
-
+  async function publish() {
     setPublishing(true);
     setError(undefined);
 
@@ -474,12 +472,16 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
 
       setSavedProfile(profile);
       setPublishedProfile(profile);
-    } catch {
-      setError('Could not publish your profile.');
+    } catch (caughtError) {
+      if (caughtError instanceof ProfileRepositoryError) {
+        setError(caughtError.message);
+      } else {
+        setError('Could not publish your profile.');
+      }
     } finally {
       setPublishing(false);
     }
-  }, [profile, publishing, saving]);
+  }
 
   const reset = useCallback(() => {
     setProfile(savedProfile);

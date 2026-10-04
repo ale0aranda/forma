@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import { FollowButton } from '@/components/profile/follow-button';
 import { ProfileRenderer } from '@/components/profile/profile-renderer';
 import { ShareProfileButton } from '@/components/profile/share-profile-button';
@@ -36,6 +38,11 @@ const textClasses: Record<ProfileAppearance, string> = {
   dark: 'text-neutral-400'
 };
 
+const socialHoverClasses: Record<ProfileAppearance, string> = {
+  light: 'hover:text-neutral-950',
+  dark: 'hover:text-white'
+};
+
 export function PublicProfile({
   profile,
   followers,
@@ -46,6 +53,10 @@ export function PublicProfile({
 }: PublicProfileProps) {
   const { design } = profile;
 
+  const socialClassName = `text-sm transition-colors ${
+    textClasses[design.appearance]
+  } ${socialHoverClasses[design.appearance]}`;
+
   return (
     <main
       className={`min-h-screen ${
@@ -54,18 +65,20 @@ export function PublicProfile({
     >
       <div className='mx-auto w-full max-w-3xl px-6 py-8'>
         <div className='mb-8 flex items-center justify-between gap-4'>
-          <div
-            className={`flex items-center gap-4 text-sm ${
-              textClasses[design.appearance]
-            }`}
-          >
-            <span>
+          <div className='flex items-center gap-4'>
+            <Link
+              className={socialClassName}
+              href={`/${profile.username}/followers`}
+            >
               <strong className='font-medium'>{followers}</strong> followers
-            </span>
+            </Link>
 
-            <span>
+            <Link
+              className={socialClassName}
+              href={`/${profile.username}/following`}
+            >
               <strong className='font-medium'>{following}</strong> following
-            </span>
+            </Link>
           </div>
 
           <div className='flex items-center gap-2'>

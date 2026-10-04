@@ -3,12 +3,10 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import {
-  getCurrentPublishedProfile,
-  getProfileDraft,
+  getCurrentProfile,
   publishProfile,
-  removeProfileDraft,
-  saveProfileDraft
-} from '@/lib/profile-storage';
+  saveProfile
+} from '@/lib/profile-repository';
 
 import type {
   Profile,
@@ -66,19 +64,49 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     Profile | undefined
   >();
   const [loaded, setLoaded] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
-    const draft = getProfileDraft();
-    const published = getCurrentPublishedProfile();
+    let active = true;
 
-    if (draft) {
-      setProfile(draft);
-      setSavedProfile(draft);
+    async function loadProfile() {
+      try {
+        const storedProfile = await getCurrentProfile();
+
+        if (!active) {
+          return;
+        }
+
+        const draft =
+          Object.keys(storedProfile.draft).length > 0
+            ? storedProfile.draft
+            : {
+                ...initialProfile,
+                username: storedProfile.username
+              };
+
+        setProfile(draft);
+        setSavedProfile(draft);
+        setPublishedProfile(storedProfile.published ?? undefined);
+      } catch {
+        if (active) {
+          setError('Could not load your profile.');
+        }
+      } finally {
+        if (active) {
+          setLoaded(true);
+        }
+      }
     }
 
-    setPublishedProfile(published);
-    setLoaded(true);
-  }, []);
+    void loadProfile();
+
+    return () => {
+      active = false;
+    };
+  }, [initialProfile]);
 
   const hasUnsavedChanges =
     JSON.stringify(profile) !== JSON.stringify(savedProfile);
@@ -415,29 +443,55 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     []
   );
 
-  const save = useCallback(() => {
-    saveProfileDraft(profile);
-    setSavedProfile(profile);
-  }, [profile]);
+  const save = useCallback(async () => {
+    if (saving || publishing) {
+      return;
+    }
 
-  const publish = useCallback(() => {
-    saveProfileDraft(profile);
-    publishProfile(profile);
+    setSaving(true);
+    setError(undefined);
 
-    setSavedProfile(profile);
-    setPublishedProfile(profile);
-  }, [profile]);
+    try {
+      await saveProfile(profile);
+      setSavedProfile(profile);
+    } catch {
+      setError('Could not save your profile.');
+    } finally {
+      setSaving(false);
+    }
+  }, [profile, publishing, saving]);
+
+  const publish = useCallback(async () => {
+    if (saving || publishing) {
+      return;
+    }
+
+    setPublishing(true);
+    setError(undefined);
+
+    try {
+      await publishProfile(profile);
+
+      setSavedProfile(profile);
+      setPublishedProfile(profile);
+    } catch {
+      setError('Could not publish your profile.');
+    } finally {
+      setPublishing(false);
+    }
+  }, [profile, publishing, saving]);
 
   const reset = useCallback(() => {
-    removeProfileDraft();
-
-    setProfile(initialProfile);
-    setSavedProfile(initialProfile);
-  }, [initialProfile]);
+    setProfile(savedProfile);
+    setError(undefined);
+  }, [savedProfile]);
 
   return {
     profile,
     loaded,
+    saving,
+    publishing,
+    error,
     hasUnsavedChanges,
     hasUnpublishedChanges,
     isPublished,

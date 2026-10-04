@@ -22,6 +22,9 @@ export default function EditorPage() {
   const {
     profile,
     loaded,
+    saving,
+    publishing,
+    error,
     hasUnsavedChanges,
     hasUnpublishedChanges,
     isPublished,
@@ -32,19 +35,15 @@ export default function EditorPage() {
     addLink,
     updateLink,
     removeLink,
-    moveLink,
     addProject,
     updateProject,
     removeProject,
-    moveProject,
     addExperience,
     updateExperience,
     removeExperience,
-    moveExperience,
     addGalleryItem,
     updateGalleryItem,
     removeGalleryItem,
-    moveGalleryItem,
     changePreset,
     changeTypography,
     changeAppearance,
@@ -56,16 +55,25 @@ export default function EditorPage() {
     moveBlock,
     save,
     publish,
-    reset
+    reset,
+    moveLink,
+    moveProject,
+    moveExperience,
+    moveGalleryItem
   } = useProfileEditor({
     initialProfile
   });
 
   const validProfile = isValidProfile(profile);
+  const busy = saving || publishing;
 
   let status = 'Saved';
 
-  if (hasUnsavedChanges) {
+  if (saving) {
+    status = 'Saving...';
+  } else if (publishing) {
+    status = 'Publishing...';
+  } else if (hasUnsavedChanges) {
     status = 'Unsaved changes';
   } else if (isPublished) {
     status = 'Published';
@@ -100,14 +108,6 @@ export default function EditorPage() {
         </div>
 
         <div className='flex items-center gap-2'>
-          <button
-            className='rounded-lg px-3 py-2 text-neutral-500 text-sm transition-colors hover:bg-neutral-50 hover:text-neutral-950'
-            onClick={reset}
-            type='button'
-          >
-            Reset
-          </button>
-
           <form action={logout}>
             <button
               className='rounded-lg px-3 py-2 text-neutral-500 text-sm transition-colors hover:bg-neutral-50 hover:text-neutral-950'
@@ -116,6 +116,15 @@ export default function EditorPage() {
               Sign out
             </button>
           </form>
+
+          <button
+            className='rounded-lg px-3 py-2 text-neutral-500 text-sm transition-colors hover:bg-neutral-50 hover:text-neutral-950 disabled:cursor-not-allowed disabled:opacity-40'
+            disabled={!hasUnsavedChanges || busy}
+            onClick={reset}
+            type='button'
+          >
+            Reset
+          </button>
 
           {validProfile ? (
             <Link
@@ -133,25 +142,37 @@ export default function EditorPage() {
 
           <button
             className='rounded-lg border border-neutral-200 px-3 py-2 text-sm transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-40'
-            disabled={!hasUnsavedChanges || !validProfile}
-            onClick={save}
+            disabled={!hasUnsavedChanges || busy}
+            onClick={() => {
+              void save();
+            }}
             type='button'
           >
-            Save
+            {saving ? 'Saving...' : 'Save'}
           </button>
 
           <button
             className='rounded-lg bg-neutral-950 px-3 py-2 font-medium text-sm text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40'
             disabled={
-              !validProfile || (!hasUnsavedChanges && !hasUnpublishedChanges)
+              !validProfile
+              || busy
+              || (!hasUnsavedChanges && !hasUnpublishedChanges)
             }
-            onClick={publish}
+            onClick={() => {
+              void publish();
+            }}
             type='button'
           >
-            Publish
+            {publishing ? 'Publishing...' : 'Publish'}
           </button>
         </div>
       </header>
+
+      {error && (
+        <div className='border-red-100 border-b bg-red-50 px-5 py-2 text-red-600 text-sm'>
+          {error}
+        </div>
+      )}
 
       <div className='flex min-h-screen'>
         <EditorSidebar

@@ -1,5 +1,7 @@
+import { notFound } from 'next/navigation';
+
 import { PublicProfile } from '@/components/profile/public-profile';
-import { getProfile } from '@/lib/profiles';
+import { getPublishedProfile } from '@/lib/public-profile-repository';
 
 interface ProfilePageProps {
   params: Promise<{
@@ -9,16 +11,12 @@ interface ProfilePageProps {
 
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const { username } = await params;
-  const fallbackProfile = getProfile(username);
 
-  if (!fallbackProfile) {
-    return <PublicProfile username={username} />;
+  const profile = await getPublishedProfile(username);
+
+  if (!profile) {
+    notFound();
   }
 
-  return (
-    <PublicProfile
-      fallbackProfile={fallbackProfile}
-      username={username}
-    />
-  );
+  return <PublicProfile profile={profile} />;
 }

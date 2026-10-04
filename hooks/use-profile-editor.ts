@@ -29,6 +29,35 @@ interface UseProfileEditorOptions {
   initialProfile: Profile;
 }
 
+type PresetDesign = Pick<
+  Profile['design'],
+  'typography' | 'palette' | 'density' | 'radius' | 'borders'
+>;
+
+const presetDesigns: Record<ProfilePreset, PresetDesign> = {
+  minimal: {
+    typography: 'system',
+    palette: 'mono',
+    density: 'airy',
+    radius: 'small',
+    borders: 'subtle'
+  },
+  editorial: {
+    typography: 'times',
+    palette: 'paper',
+    density: 'balanced',
+    radius: 'square',
+    borders: 'none'
+  },
+  blueprint: {
+    typography: 'mono',
+    palette: 'blue',
+    density: 'compact',
+    radius: 'small',
+    borders: 'strong'
+  }
+};
+
 export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
   const [profile, setProfile] = useState(initialProfile);
   const [savedProfile, setSavedProfile] = useState(initialProfile);
@@ -100,7 +129,12 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
       setProfile((current) => ({
         ...current,
         links: current.links.map((link) =>
-          link.id === id ? { ...link, [field]: value } : link
+          link.id === id
+            ? {
+                ...link,
+                [field]: value
+              }
+            : link
         )
       }));
     },
@@ -133,7 +167,12 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
       setProfile((current) => ({
         ...current,
         projects: current.projects.map((project) =>
-          project.id === id ? { ...project, [field]: value } : project
+          project.id === id
+            ? {
+                ...project,
+                [field]: value
+              }
+            : project
         )
       }));
     },
@@ -211,7 +250,12 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
       setProfile((current) => ({
         ...current,
         gallery: current.gallery.map((item) =>
-          item.id === id ? { ...item, [field]: value } : item
+          item.id === id
+            ? {
+                ...item,
+                [field]: value
+              }
+            : item
         )
       }));
     },
@@ -241,10 +285,16 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     []
   );
 
-  const changePreset = useCallback(
-    (preset: ProfilePreset) => updateDesign('preset', preset),
-    [updateDesign]
-  );
+  const changePreset = useCallback((preset: ProfilePreset) => {
+    setProfile((current) => ({
+      ...current,
+      design: {
+        ...current.design,
+        ...presetDesigns[preset],
+        preset
+      }
+    }));
+  }, []);
 
   const changeTypography = useCallback(
     (typography: ProfileTypography) => updateDesign('typography', typography),

@@ -49,7 +49,11 @@ export default function EditorPage() {
     moveBlock,
     save,
     publish,
-    reset
+    reset,
+    moveLink,
+    moveProject,
+    moveExperience,
+    moveGalleryItem
   } = useProfileEditor({
     initialProfile
   });
@@ -165,6 +169,10 @@ export default function EditorPage() {
           onUpdateUsername={updateUsername}
           profile={profile}
           selectedBlock={selected}
+          onMoveExperience={moveExperience}
+          onMoveGalleryItem={moveGalleryItem}
+          onMoveLink={moveLink}
+          onMoveProject={moveProject}
         />
       </div>
     </main>

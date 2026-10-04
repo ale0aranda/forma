@@ -371,6 +371,37 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     []
   );
 
+  const moveLink = useCallback((id: string, direction: 'up' | 'down') => {
+    setProfile((current) => ({
+      ...current,
+      links: moveItem(current.links, id, direction)
+    }));
+  }, []);
+
+  const moveProject = useCallback((id: string, direction: 'up' | 'down') => {
+    setProfile((current) => ({
+      ...current,
+      projects: moveItem(current.projects, id, direction)
+    }));
+  }, []);
+
+  const moveExperience = useCallback((id: string, direction: 'up' | 'down') => {
+    setProfile((current) => ({
+      ...current,
+      experience: moveItem(current.experience, id, direction)
+    }));
+  }, []);
+
+  const moveGalleryItem = useCallback(
+    (id: string, direction: 'up' | 'down') => {
+      setProfile((current) => ({
+        ...current,
+        gallery: moveItem(current.gallery, id, direction)
+      }));
+    },
+    []
+  );
+
   const save = useCallback(() => {
     saveProfileDraft(profile);
     setSavedProfile(profile);
@@ -418,8 +449,39 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     changeBorders,
     toggleBlock,
     moveBlock,
+    moveLink,
+    moveProject,
+    moveExperience,
+    moveGalleryItem,
     save,
     publish,
     reset
   };
+}
+
+interface MovableItem {
+  id: string;
+}
+
+function moveItem<Item extends MovableItem>(
+  items: Item[],
+  id: string,
+  direction: 'up' | 'down'
+): Item[] {
+  const currentIndex = items.findIndex((item) => item.id === id);
+
+  const nextIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+
+  if (currentIndex === -1 || nextIndex < 0 || nextIndex >= items.length) {
+    return items;
+  }
+
+  const nextItems = [...items];
+
+  [nextItems[currentIndex], nextItems[nextIndex]] = [
+    nextItems[nextIndex],
+    nextItems[currentIndex]
+  ];
+
+  return nextItems;
 }

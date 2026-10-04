@@ -56,6 +56,13 @@ interface ProfileInspectorProps {
   onChangeDensity: (density: ProfileDensity) => void;
   onChangeRadius: (radius: ProfileRadius) => void;
   onChangeBorders: (borders: ProfileBorders) => void;
+  onMoveLink: (id: string, direction: 'up' | 'down') => void;
+
+  onMoveProject: (id: string, direction: 'up' | 'down') => void;
+
+  onMoveExperience: (id: string, direction: 'up' | 'down') => void;
+
+  onMoveGalleryItem: (id: string, direction: 'up' | 'down') => void;
 }
 
 const blockLabels: Record<ProfileBlock, string> = {
@@ -94,7 +101,11 @@ export function ProfileInspector({
   onChangePalette,
   onChangeDensity,
   onChangeRadius,
-  onChangeBorders
+  onChangeBorders,
+  onMoveLink,
+  onMoveProject,
+  onMoveExperience,
+  onMoveGalleryItem
 }: ProfileInspectorProps) {
   if (selectedBlock === 'profile') {
     return (
@@ -164,6 +175,7 @@ export function ProfileInspector({
         <LinksEditor
           links={profile.links}
           onAdd={onAddLink}
+          onMove={onMoveLink}
           onRemove={onRemoveLink}
           onUpdate={onUpdateLink}
         />
@@ -172,6 +184,7 @@ export function ProfileInspector({
       {selectedBlock === 'projects' && (
         <ProjectsEditor
           onAdd={onAddProject}
+          onMove={onMoveProject}
           onRemove={onRemoveProject}
           onUpdate={onUpdateProject}
           projects={profile.projects}
@@ -182,6 +195,7 @@ export function ProfileInspector({
         <ExperienceEditor
           experience={profile.experience}
           onAdd={onAddExperience}
+          onMove={onMoveExperience}
           onRemove={onRemoveExperience}
           onUpdate={onUpdateExperience}
         />
@@ -191,6 +205,7 @@ export function ProfileInspector({
         <GalleryEditor
           gallery={profile.gallery}
           onAdd={onAddGalleryItem}
+          onMove={onMoveGalleryItem}
           onRemove={onRemoveGalleryItem}
           onUpdate={onUpdateGalleryItem}
         />

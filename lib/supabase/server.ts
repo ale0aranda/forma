@@ -16,7 +16,10 @@ export async function createClient() {
           for (const { name, value, options } of cookiesToSet) {
             cookieStore.set(name, value, options);
           }
-        } catch {}
+        } catch {
+          // Cookie writes are handled by the proxy
+          // when called from a Server Component.
+        }
       }
     }
   });

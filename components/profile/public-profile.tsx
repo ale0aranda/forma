@@ -1,3 +1,4 @@
+import { FollowButton } from '@/components/profile/follow-button';
 import { ProfileRenderer } from '@/components/profile/profile-renderer';
 import { ShareProfileButton } from '@/components/profile/share-profile-button';
 
@@ -5,8 +6,12 @@ import type { Profile, ProfileAppearance, ProfilePalette } from '@/lib/profile';
 
 interface PublicProfileProps {
   profile: Profile;
+  userId: string;
   followers: number;
   following: number;
+  followsProfile: boolean;
+  authenticated: boolean;
+  ownProfile: boolean;
 }
 
 const backgroundClasses: Record<
@@ -34,8 +39,12 @@ const textClasses: Record<ProfileAppearance, string> = {
 
 export function PublicProfile({
   profile,
+  userId,
   followers,
-  following
+  following,
+  followsProfile,
+  authenticated,
+  ownProfile
 }: PublicProfileProps) {
   const { design } = profile;
 
@@ -46,7 +55,7 @@ export function PublicProfile({
       }`}
     >
       <div className='mx-auto w-full max-w-3xl px-6 py-8'>
-        <div className='mb-8 flex items-center justify-between'>
+        <div className='mb-8 flex items-center justify-between gap-4'>
           <div
             className={`flex items-center gap-4 text-sm ${
               textClasses[design.appearance]
@@ -61,10 +70,22 @@ export function PublicProfile({
             </span>
           </div>
 
-          <ShareProfileButton
-            appearance={design.appearance}
-            username={profile.username}
-          />
+          <div className='flex items-center gap-2'>
+            {!ownProfile && (
+              <FollowButton
+                appearance={design.appearance}
+                authenticated={authenticated}
+                following={followsProfile}
+                userId={userId}
+                username={profile.username}
+              />
+            )}
+
+            <ShareProfileButton
+              appearance={design.appearance}
+              username={profile.username}
+            />
+          </div>
         </div>
 
         <ProfileRenderer profile={profile} />

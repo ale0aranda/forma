@@ -6,7 +6,6 @@ import type { Profile, ProfileAppearance, ProfilePalette } from '@/lib/profile';
 
 interface PublicProfileProps {
   profile: Profile;
-  userId: string;
   followers: number;
   following: number;
   followsProfile: boolean;
@@ -39,7 +38,6 @@ const textClasses: Record<ProfileAppearance, string> = {
 
 export function PublicProfile({
   profile,
-  userId,
   followers,
   following,
   followsProfile,
@@ -76,7 +74,6 @@ export function PublicProfile({
                 appearance={design.appearance}
                 authenticated={authenticated}
                 following={followsProfile}
-                userId={userId}
                 username={profile.username}
               />
             )}

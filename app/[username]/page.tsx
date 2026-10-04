@@ -29,7 +29,6 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
       followsProfile={followState.following}
       ownProfile={followState.ownProfile}
       profile={publicProfile.profile}
-      userId={publicProfile.userId}
     />
   );
 }

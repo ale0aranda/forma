@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
 import { followProfile, unfollowProfile } from '@/app/[username]/actions';
@@ -8,27 +9,27 @@ import type { ProfileAppearance } from '@/lib/profile';
 
 interface FollowButtonProps {
   username: string;
-  userId: string;
-  following: boolean;
   authenticated: boolean;
+  following: boolean;
   appearance: ProfileAppearance;
 }
 
 export function FollowButton({
   username,
-  userId,
-  following: initialFollowing,
   authenticated,
+  following: initialFollowing,
   appearance
 }: FollowButtonProps) {
+  const router = useRouter();
+
   const [following, setFollowing] = useState(initialFollowing);
 
   const [error, setError] = useState<string>();
   const [pending, startTransition] = useTransition();
 
-  function handleFollow() {
+  function handleClick() {
     if (!authenticated) {
-      window.location.href = '/login';
+      router.push('/login');
 
       return;
     }
@@ -37,16 +38,18 @@ export function FollowButton({
 
     startTransition(async () => {
       const result = following
-        ? await unfollowProfile(username, userId)
-        : await followProfile(username, userId);
+        ? await unfollowProfile(username)
+        : await followProfile(username);
 
-      if (result.error) {
+      if (!result.success) {
         setError(result.error);
 
         return;
       }
 
       setFollowing((current) => !current);
+
+      router.refresh();
     });
   }
 
@@ -64,7 +67,7 @@ export function FollowButton({
       <button
         className={className}
         disabled={pending}
-        onClick={handleFollow}
+        onClick={handleClick}
         type='button'
       >
         {pending ? '...' : following ? 'Following' : 'Follow'}

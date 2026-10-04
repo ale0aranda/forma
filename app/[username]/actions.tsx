@@ -4,38 +4,23 @@ import { revalidatePath } from 'next/cache';
 
 import { createClient } from '@/lib/supabase/server';
 
-export async function followProfile(username: string, followingId: string) {
+interface FollowActionResult {
+  success: boolean;
+  error?: string;
+}
+
+export async function followProfile(
+  username: string
+): Promise<FollowActionResult> {
   const supabase = await createClient();
 
-  const { data, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !data.user) {
-    return {
-      error: 'You need to sign in to follow people.'
-    };
-  }
-
-  if (data.user.id === followingId) {
-    return {
-      error: 'You cannot follow yourself.'
-    };
-  }
-
-  const { error } = await supabase.from('follows').insert({
-    follower_id: data.user.id,
-    following_id: followingId
+  const { error } = await supabase.rpc('follow_profile', {
+    profile_username: username
   });
 
   if (error) {
-    if (error.code === '23505') {
-      revalidatePath(`/${username}`);
-
-      return {
-        success: true
-      };
-    }
-
     return {
+      success: false,
       error: 'Could not follow this profile.'
     };
   }
@@ -47,25 +32,18 @@ export async function followProfile(username: string, followingId: string) {
   };
 }
 
-export async function unfollowProfile(username: string, followingId: string) {
+export async function unfollowProfile(
+  username: string
+): Promise<FollowActionResult> {
   const supabase = await createClient();
 
-  const { data, error: authError } = await supabase.auth.getUser();
-
-  if (authError || !data.user) {
-    return {
-      error: 'You need to sign in.'
-    };
-  }
-
-  const { error } = await supabase
-    .from('follows')
-    .delete()
-    .eq('follower_id', data.user.id)
-    .eq('following_id', followingId);
+  const { error } = await supabase.rpc('unfollow_profile', {
+    profile_username: username
+  });
 
   if (error) {
     return {
+      success: false,
       error: 'Could not unfollow this profile.'
     };
   }

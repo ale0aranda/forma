@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { logout } from '@/app/editor/actions';
 import {
   type EditorSelection,
   EditorSidebar
@@ -106,6 +107,15 @@ export default function EditorPage() {
           >
             Reset
           </button>
+
+          <form action={logout}>
+            <button
+              className='rounded-lg px-3 py-2 text-neutral-500 text-sm transition-colors hover:bg-neutral-50 hover:text-neutral-950'
+              type='submit'
+            >
+              Sign out
+            </button>
+          </form>
 
           {validProfile ? (
             <Link

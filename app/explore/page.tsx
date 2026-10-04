@@ -9,6 +9,13 @@ interface ExplorePageProps {
   }>;
 }
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Explore',
+  description: 'Discover people and profiles on Forma.'
+};
+
 export default async function ExplorePage({ searchParams }: ExplorePageProps) {
   const { q } = await searchParams;
 

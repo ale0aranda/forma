@@ -4,10 +4,38 @@ import { PublicProfile } from '@/components/profile/public-profile';
 import { getFollowState } from '@/lib/follows';
 import { getPublicProfile } from '@/lib/public-profile-repository';
 
+import type { Metadata } from 'next';
+
 interface ProfilePageProps {
   params: Promise<{
     username: string;
   }>;
+}
+
+export async function generateMetadata({
+  params
+}: ProfilePageProps): Promise<Metadata> {
+  const { username } = await params;
+
+  const publicProfile = await getPublicProfile(username);
+
+  if (!publicProfile) {
+    return {
+      title: 'Profile not found'
+    };
+  }
+
+  const { profile } = publicProfile;
+
+  const description =
+    profile.identity.bio.trim()
+    || profile.identity.role.trim()
+    || `View @${profile.username} on Forma.`;
+
+  return {
+    title: profile.identity.name,
+    description
+  };
 }
 
 export default async function ProfilePage({ params }: ProfilePageProps) {

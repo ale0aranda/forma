@@ -2,6 +2,7 @@ import type { Profile } from '@/lib/profile';
 
 const DRAFT_STORAGE_KEY = 'forma:profile-draft';
 const PUBLISHED_STORAGE_KEY = 'forma:published-profiles';
+const PUBLISHED_USERNAME_STORAGE_KEY = 'forma:published-username';
 
 export function getProfileDraft(): Profile | undefined {
   const value = window.localStorage.getItem(DRAFT_STORAGE_KEY);
@@ -33,12 +34,32 @@ export function getPublishedProfile(username: string): Profile | undefined {
   return profiles[username];
 }
 
+export function getCurrentPublishedProfile(): Profile | undefined {
+  const username = window.localStorage.getItem(PUBLISHED_USERNAME_STORAGE_KEY);
+
+  if (!username) {
+    return undefined;
+  }
+
+  return getPublishedProfile(username);
+}
+
 export function publishProfile(profile: Profile) {
   const profiles = getPublishedProfiles();
+
+  const previousUsername = window.localStorage.getItem(
+    PUBLISHED_USERNAME_STORAGE_KEY
+  );
+
+  if (previousUsername && previousUsername !== profile.username) {
+    delete profiles[previousUsername];
+  }
 
   profiles[profile.username] = profile;
 
   window.localStorage.setItem(PUBLISHED_STORAGE_KEY, JSON.stringify(profiles));
+
+  window.localStorage.setItem(PUBLISHED_USERNAME_STORAGE_KEY, profile.username);
 }
 
 function getPublishedProfiles(): Record<string, Profile> {

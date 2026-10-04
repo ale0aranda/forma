@@ -1,15 +1,15 @@
+import { isValidUsername } from '@/lib/profile-validation';
+
 interface ProfileSettingsEditorProps {
   username: string;
   onUpdateUsername: (username: string) => void;
 }
 
-const usernamePattern = /^[a-z0-9_-]{3,30}$/;
-
 export function ProfileSettingsEditor({
   username,
   onUpdateUsername
 }: ProfileSettingsEditorProps) {
-  const valid = usernamePattern.test(username);
+  const valid = isValidUsername(username);
 
   return (
     <div>
@@ -44,8 +44,4 @@ export function ProfileSettingsEditor({
       </label>
     </div>
   );
-}
-
-export function isValidUsername(username: string) {
-  return usernamePattern.test(username);
 }

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import {
+  getCurrentPublishedProfile,
   getProfileDraft,
   publishProfile,
   removeProfileDraft,
@@ -61,21 +62,33 @@ const presetDesigns: Record<ProfilePreset, PresetDesign> = {
 export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
   const [profile, setProfile] = useState(initialProfile);
   const [savedProfile, setSavedProfile] = useState(initialProfile);
+  const [publishedProfile, setPublishedProfile] = useState<
+    Profile | undefined
+  >();
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     const draft = getProfileDraft();
+    const published = getCurrentPublishedProfile();
 
     if (draft) {
       setProfile(draft);
       setSavedProfile(draft);
     }
 
+    setPublishedProfile(published);
     setLoaded(true);
   }, []);
 
   const hasUnsavedChanges =
     JSON.stringify(profile) !== JSON.stringify(savedProfile);
+
+  const hasUnpublishedChanges =
+    !publishedProfile
+    || JSON.stringify(savedProfile) !== JSON.stringify(publishedProfile);
+
+  const isPublished =
+    Boolean(publishedProfile) && !hasUnsavedChanges && !hasUnpublishedChanges;
 
   const updateUsername = useCallback((username: string) => {
     setProfile((current) => ({
@@ -410,7 +423,9 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
   const publish = useCallback(() => {
     saveProfileDraft(profile);
     publishProfile(profile);
+
     setSavedProfile(profile);
+    setPublishedProfile(profile);
   }, [profile]);
 
   const reset = useCallback(() => {
@@ -424,6 +439,8 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     profile,
     loaded,
     hasUnsavedChanges,
+    hasUnpublishedChanges,
+    isPublished,
     updateUsername,
     updateIdentity,
     updateAbout,

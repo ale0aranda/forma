@@ -1,3 +1,5 @@
+import { isValidProfileUrl } from '@/lib/profile-validation';
+
 import type { ProfileLink } from '@/lib/profile';
 
 interface LinksEditorProps {
@@ -18,48 +20,65 @@ export function LinksEditor({
   return (
     <div>
       <div className='space-y-3'>
-        {links.map((link, index) => (
-          <div
-            className='rounded-lg border border-neutral-200 p-3'
-            key={link.id}
-          >
-            <ItemActions
-              first={index === 0}
-              last={index === links.length - 1}
-              label={link.label || 'Link'}
-              onMoveDown={() => onMove(link.id, 'down')}
-              onMoveUp={() => onMove(link.id, 'up')}
-              onRemove={() => onRemove(link.id)}
-            />
+        {links.map((link, index) => {
+          const validUrl = isValidProfileUrl(link.url);
 
-            <label className='mt-3 block'>
-              <span className='mb-2 block text-neutral-500 text-xs'>Label</span>
-
-              <input
-                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-                onChange={(event) =>
-                  onUpdate(link.id, 'label', event.target.value)
-                }
-                type='text'
-                value={link.label}
+          return (
+            <div
+              className='rounded-lg border border-neutral-200 p-3'
+              key={link.id}
+            >
+              <ItemActions
+                first={index === 0}
+                last={index === links.length - 1}
+                label={link.label || 'Link'}
+                onMoveDown={() => onMove(link.id, 'down')}
+                onMoveUp={() => onMove(link.id, 'up')}
+                onRemove={() => onRemove(link.id)}
               />
-            </label>
 
-            <label className='mt-3 block'>
-              <span className='mb-2 block text-neutral-500 text-xs'>URL</span>
+              <label className='mt-3 block'>
+                <span className='mb-2 block text-neutral-500 text-xs'>
+                  Label
+                </span>
 
-              <input
-                className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-                onChange={(event) =>
-                  onUpdate(link.id, 'url', event.target.value)
-                }
-                placeholder='https://'
-                type='url'
-                value={link.url}
-              />
-            </label>
-          </div>
-        ))}
+                <input
+                  className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
+                  onChange={(event) =>
+                    onUpdate(link.id, 'label', event.target.value)
+                  }
+                  type='text'
+                  value={link.label}
+                />
+              </label>
+
+              <label className='mt-3 block'>
+                <span className='mb-2 block text-neutral-500 text-xs'>URL</span>
+
+                <input
+                  aria-invalid={!validUrl}
+                  className={`w-full rounded-lg border px-3 py-2 text-sm outline-none ${
+                    validUrl
+                      ? 'border-neutral-200 focus:border-neutral-400'
+                      : 'border-red-300 focus:border-red-500'
+                  }`}
+                  onChange={(event) =>
+                    onUpdate(link.id, 'url', event.target.value)
+                  }
+                  placeholder='https://'
+                  type='url'
+                  value={link.url}
+                />
+
+                {!validUrl && (
+                  <span className='mt-2 block text-red-600 text-xs'>
+                    Enter a valid http or https URL.
+                  </span>
+                )}
+              </label>
+            </div>
+          );
+        })}
       </div>
 
       {links.length === 0 && (

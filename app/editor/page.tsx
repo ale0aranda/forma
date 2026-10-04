@@ -7,10 +7,10 @@ import {
   type EditorSelection,
   EditorSidebar
 } from '@/components/profile/editor-sidebar';
-import { isValidUsername } from '@/components/profile/editors/profile-settings-editor';
 import { ProfileInspector } from '@/components/profile/profile-inspector';
 import { ProfilePreview } from '@/components/profile/profile-preview';
 import { useProfileEditor } from '@/hooks/use-profile-editor';
+import { isValidProfile } from '@/lib/profile-validation';
 import { getDefaultProfile } from '@/lib/profiles';
 
 const initialProfile = getDefaultProfile();
@@ -22,6 +22,8 @@ export default function EditorPage() {
     profile,
     loaded,
     hasUnsavedChanges,
+    hasUnpublishedChanges,
+    isPublished,
     updateUsername,
     updateIdentity,
     updateAbout,
@@ -29,15 +31,19 @@ export default function EditorPage() {
     addLink,
     updateLink,
     removeLink,
+    moveLink,
     addProject,
     updateProject,
     removeProject,
+    moveProject,
     addExperience,
     updateExperience,
     removeExperience,
+    moveExperience,
     addGalleryItem,
     updateGalleryItem,
     removeGalleryItem,
+    moveGalleryItem,
     changePreset,
     changeTypography,
     changeAppearance,
@@ -49,16 +55,22 @@ export default function EditorPage() {
     moveBlock,
     save,
     publish,
-    reset,
-    moveLink,
-    moveProject,
-    moveExperience,
-    moveGalleryItem
+    reset
   } = useProfileEditor({
     initialProfile
   });
 
-  const validUsername = isValidUsername(profile.username);
+  const validProfile = isValidProfile(profile);
+
+  let status = 'Saved';
+
+  if (hasUnsavedChanges) {
+    status = 'Unsaved changes';
+  } else if (isPublished) {
+    status = 'Published';
+  } else if (hasUnpublishedChanges) {
+    status = 'Saved · Unpublished changes';
+  }
 
   if (!loaded) {
     return (
@@ -83,9 +95,7 @@ export default function EditorPage() {
             Editor
           </span>
 
-          <span className='text-neutral-400 text-xs'>
-            {hasUnsavedChanges ? 'Unsaved changes' : 'Saved'}
-          </span>
+          <span className='text-neutral-400 text-xs'>{status}</span>
         </div>
 
         <div className='flex items-center gap-2'>
@@ -97,7 +107,7 @@ export default function EditorPage() {
             Reset
           </button>
 
-          {validUsername ? (
+          {validProfile ? (
             <Link
               className='rounded-lg border border-neutral-200 px-3 py-2 text-sm transition-colors hover:bg-neutral-50'
               href={`/${profile.username}`}
@@ -113,7 +123,7 @@ export default function EditorPage() {
 
           <button
             className='rounded-lg border border-neutral-200 px-3 py-2 text-sm transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-40'
-            disabled={!hasUnsavedChanges || !validUsername}
+            disabled={!hasUnsavedChanges || !validProfile}
             onClick={save}
             type='button'
           >
@@ -122,7 +132,9 @@ export default function EditorPage() {
 
           <button
             className='rounded-lg bg-neutral-950 px-3 py-2 font-medium text-sm text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40'
-            disabled={!validUsername}
+            disabled={
+              !validProfile || (!hasUnsavedChanges && !hasUnpublishedChanges)
+            }
             onClick={publish}
             type='button'
           >
@@ -154,6 +166,10 @@ export default function EditorPage() {
           onChangePreset={changePreset}
           onChangeRadius={changeRadius}
           onChangeTypography={changeTypography}
+          onMoveExperience={moveExperience}
+          onMoveGalleryItem={moveGalleryItem}
+          onMoveLink={moveLink}
+          onMoveProject={moveProject}
           onRemoveExperience={removeExperience}
           onRemoveGalleryItem={removeGalleryItem}
           onRemoveLink={removeLink}
@@ -169,10 +185,6 @@ export default function EditorPage() {
           onUpdateUsername={updateUsername}
           profile={profile}
           selectedBlock={selected}
-          onMoveExperience={moveExperience}
-          onMoveGalleryItem={moveGalleryItem}
-          onMoveLink={moveLink}
-          onMoveProject={moveProject}
         />
       </div>
     </main>

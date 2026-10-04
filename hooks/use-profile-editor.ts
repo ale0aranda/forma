@@ -2,6 +2,13 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
+import {
+  getProfileDraft,
+  publishProfile,
+  removeProfileDraft,
+  saveProfileDraft
+} from '@/lib/profile-storage';
+
 import type {
   Profile,
   ProfileAppearance,
@@ -18,8 +25,6 @@ import type {
   ProfileTypography
 } from '@/lib/profile';
 
-const DRAFT_STORAGE_KEY = 'forma:profile-draft';
-
 interface UseProfileEditorOptions {
   initialProfile: Profile;
 }
@@ -30,17 +35,11 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const storedDraft = window.localStorage.getItem(DRAFT_STORAGE_KEY);
+    const draft = getProfileDraft();
 
-    if (storedDraft) {
-      try {
-        const draft = JSON.parse(storedDraft) as Profile;
-
-        setProfile(draft);
-        setSavedProfile(draft);
-      } catch {
-        window.localStorage.removeItem(DRAFT_STORAGE_KEY);
-      }
+    if (draft) {
+      setProfile(draft);
+      setSavedProfile(draft);
     }
 
     setLoaded(true);
@@ -243,51 +242,37 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
   );
 
   const changePreset = useCallback(
-    (preset: ProfilePreset) => {
-      updateDesign('preset', preset);
-    },
+    (preset: ProfilePreset) => updateDesign('preset', preset),
     [updateDesign]
   );
 
   const changeTypography = useCallback(
-    (typography: ProfileTypography) => {
-      updateDesign('typography', typography);
-    },
+    (typography: ProfileTypography) => updateDesign('typography', typography),
     [updateDesign]
   );
 
   const changeAppearance = useCallback(
-    (appearance: ProfileAppearance) => {
-      updateDesign('appearance', appearance);
-    },
+    (appearance: ProfileAppearance) => updateDesign('appearance', appearance),
     [updateDesign]
   );
 
   const changePalette = useCallback(
-    (palette: ProfilePalette) => {
-      updateDesign('palette', palette);
-    },
+    (palette: ProfilePalette) => updateDesign('palette', palette),
     [updateDesign]
   );
 
   const changeDensity = useCallback(
-    (density: ProfileDensity) => {
-      updateDesign('density', density);
-    },
+    (density: ProfileDensity) => updateDesign('density', density),
     [updateDesign]
   );
 
   const changeRadius = useCallback(
-    (radius: ProfileRadius) => {
-      updateDesign('radius', radius);
-    },
+    (radius: ProfileRadius) => updateDesign('radius', radius),
     [updateDesign]
   );
 
   const changeBorders = useCallback(
-    (borders: ProfileBorders) => {
-      updateDesign('borders', borders);
-    },
+    (borders: ProfileBorders) => updateDesign('borders', borders),
     [updateDesign]
   );
 
@@ -337,13 +322,18 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
   );
 
   const save = useCallback(() => {
-    window.localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(profile));
+    saveProfileDraft(profile);
+    setSavedProfile(profile);
+  }, [profile]);
 
+  const publish = useCallback(() => {
+    saveProfileDraft(profile);
+    publishProfile(profile);
     setSavedProfile(profile);
   }, [profile]);
 
   const reset = useCallback(() => {
-    window.localStorage.removeItem(DRAFT_STORAGE_KEY);
+    removeProfileDraft();
 
     setProfile(initialProfile);
     setSavedProfile(initialProfile);
@@ -353,8 +343,8 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     profile,
     loaded,
     hasUnsavedChanges,
-    updateIdentity,
     updateUsername,
+    updateIdentity,
     updateAbout,
     updateNow,
     addLink,
@@ -379,6 +369,7 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     toggleBlock,
     moveBlock,
     save,
+    publish,
     reset
   };
 }

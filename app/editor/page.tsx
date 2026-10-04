@@ -48,6 +48,7 @@ export default function EditorPage() {
     toggleBlock,
     moveBlock,
     save,
+    publish,
     reset
   } = useProfileEditor({
     initialProfile
@@ -98,21 +99,30 @@ export default function EditorPage() {
               href={`/${profile.username}`}
               target='_blank'
             >
-              Preview
+              View
             </Link>
           ) : (
             <span className='cursor-not-allowed rounded-lg border border-neutral-200 px-3 py-2 text-neutral-300 text-sm'>
-              Preview
+              View
             </span>
           )}
 
           <button
-            className='rounded-lg bg-neutral-950 px-3 py-2 font-medium text-sm text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40'
+            className='rounded-lg border border-neutral-200 px-3 py-2 text-sm transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-40'
             disabled={!hasUnsavedChanges || !validUsername}
             onClick={save}
             type='button'
           >
             Save
+          </button>
+
+          <button
+            className='rounded-lg bg-neutral-950 px-3 py-2 font-medium text-sm text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40'
+            disabled={!validUsername}
+            onClick={publish}
+            type='button'
+          >
+            Publish
           </button>
         </div>
       </header>

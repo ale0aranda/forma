@@ -1,4 +1,4 @@
-import { ArrowRight, BriefcaseBusiness, ImageIcon } from 'lucide-react';
+import { ArrowRight, BriefcaseBusiness, ImageIcon, Zap } from 'lucide-react';
 
 import { ProfileLink } from '@/components/profile/profile-link';
 
@@ -76,11 +76,7 @@ export function ProfileRenderer({ profile, heroAside }: ProfileRendererProps) {
   const visible = (block: ProfileBlock) => profile.blocks[block].visible;
 
   const contentBlocks = profile.blockOrder.filter(
-    (block) =>
-      block !== 'identity'
-      && block !== 'links'
-      && block !== 'now'
-      && visible(block)
+    (block) => block !== 'identity' && block !== 'links' && visible(block)
   );
 
   return (
@@ -232,6 +228,15 @@ function ProfileCard({ block, profile }: ProfileCardProps) {
     );
   }
 
+  if (block === 'now') {
+    return (
+      <section className={className}>
+        <SectionTitle>Now</SectionTitle>
+        <NowBlock profile={profile} />
+      </section>
+    );
+  }
+
   return null;
 }
 
@@ -244,6 +249,36 @@ function AboutBlock({ profile }: BlockProps) {
     <p className='max-w-lg text-sm leading-6 opacity-65'>
       {profile.about || 'Nothing here yet.'}
     </p>
+  );
+}
+
+function NowBlock({ profile }: BlockProps) {
+  if (!profile.now.trim()) {
+    return (
+      <div className='flex items-center gap-4 py-2'>
+        <Zap
+          aria-hidden='true'
+          className='opacity-35'
+          size={22}
+        />
+
+        <EmptyState>Nothing happening yet.</EmptyState>
+      </div>
+    );
+  }
+
+  return (
+    <div className='flex items-start gap-4'>
+      <div className='flex size-9 shrink-0 items-center justify-center rounded-lg bg-current/5'>
+        <Zap
+          aria-hidden='true'
+          className='opacity-55'
+          size={16}
+        />
+      </div>
+
+      <p className='pt-1 text-sm leading-6 opacity-65'>{profile.now}</p>
+    </div>
   );
 }
 
@@ -381,9 +416,12 @@ function GalleryBlock({ profile }: BlockProps) {
   }
 
   return (
-    <div className='grid grid-cols-3 gap-2'>
+    <div className='grid grid-cols-2 gap-3 sm:grid-cols-3'>
       {profile.gallery.map((item) => (
-        <figure key={item.id}>
+        <figure
+          className='min-w-0'
+          key={item.id}
+        >
           {item.src ? (
             <picture>
               <source srcSet={item.src} />
@@ -404,6 +442,12 @@ function GalleryBlock({ profile }: BlockProps) {
             >
               Image
             </div>
+          )}
+
+          {item.caption.trim() && (
+            <figcaption className='mt-2 truncate text-xs opacity-45'>
+              {item.caption}
+            </figcaption>
           )}
         </figure>
       ))}

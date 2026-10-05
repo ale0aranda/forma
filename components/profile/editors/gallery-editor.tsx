@@ -68,7 +68,7 @@ export function GalleryEditor({
       )}
 
       <button
-        className='w-full rounded-md border border-dashed border-neutral-300 px-3 py-2 text-neutral-500 text-sm transition-colors hover:border-neutral-400 hover:bg-neutral-50 hover:text-neutral-950'
+        className='w-full rounded-md border border-neutral-300 border-dashed px-3 py-2 text-neutral-500 text-sm transition-colors hover:border-neutral-400 hover:bg-neutral-50 hover:text-neutral-950'
         onClick={onAdd}
         type='button'
       >

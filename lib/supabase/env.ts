@@ -1,15 +1,15 @@
-function getEnv(name: string): string {
-  const value = process.env[name];
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-  if (!value) {
-    throw new Error(`Missing environment variable: ${name}`);
-  }
+const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-  return value;
+if (!supabaseUrl) {
+  throw new Error('Missing environment variable: NEXT_PUBLIC_SUPABASE_URL');
 }
 
-const supabaseUrl = getEnv('NEXT_PUBLIC_SUPABASE_URL');
-
-const supabasePublishableKey = getEnv('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY');
+if (!supabasePublishableKey) {
+  throw new Error(
+    'Missing environment variable: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY'
+  );
+}
 
 export { supabasePublishableKey, supabaseUrl };

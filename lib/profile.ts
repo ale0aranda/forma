@@ -75,6 +75,7 @@ export interface Profile {
     name: string;
     role: string;
     bio: string;
+    avatar?: string;
   };
   about: string;
   now: string;

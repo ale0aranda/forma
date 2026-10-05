@@ -1,3 +1,5 @@
+import { EditorField, EditorInput } from '@/components/profile/editor-field';
+import { EditorItem } from '@/components/profile/editor-item';
 import { isValidProfileUrl } from '@/lib/profile-validation';
 
 import type { ProfileLink } from '@/lib/profile';
@@ -18,136 +20,80 @@ export function LinksEditor({
   onMove
 }: LinksEditorProps) {
   return (
-    <div>
-      <div className='space-y-3'>
-        {links.map((link, index) => {
-          const validUrl = isValidProfileUrl(link.url);
+    <div className='space-y-3'>
+      {links.map((link, index) => {
+        const validUrl = isValidProfileUrl(link.url);
 
-          return (
-            <div
-              className='rounded-lg border border-neutral-200 p-3'
-              key={link.id}
-            >
-              <ItemActions
-                first={index === 0}
-                last={index === links.length - 1}
-                label={link.label || 'Link'}
-                onMoveDown={() => onMove(link.id, 'down')}
-                onMoveUp={() => onMove(link.id, 'up')}
-                onRemove={() => onRemove(link.id)}
+        return (
+          <EditorItem
+            first={index === 0}
+            key={link.id}
+            last={index === links.length - 1}
+            onMoveDown={() => onMove(link.id, 'down')}
+            onMoveUp={() => onMove(link.id, 'up')}
+            onRemove={() => onRemove(link.id)}
+            title={link.label || 'Untitled link'}
+          >
+            <EditorField label='Label'>
+              <EditorInput
+                onChange={(event) =>
+                  onUpdate(link.id, 'label', event.target.value)
+                }
+                value={link.label}
               />
+            </EditorField>
 
-              <label className='mt-3 block'>
-                <span className='mb-2 block text-neutral-500 text-xs'>
-                  Label
-                </span>
+            <EditorField
+              hint={validUrl ? undefined : 'Enter a valid http or https URL.'}
+              label='URL'
+            >
+              <EditorInput
+                aria-invalid={!validUrl}
+                className={
+                  validUrl ? '' : 'border-red-300 focus:border-red-500'
+                }
+                onChange={(event) =>
+                  onUpdate(link.id, 'url', event.target.value)
+                }
+                placeholder='https://'
+                type='url'
+                value={link.url}
+              />
+            </EditorField>
+          </EditorItem>
+        );
+      })}
 
-                <input
-                  className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-                  onChange={(event) =>
-                    onUpdate(link.id, 'label', event.target.value)
-                  }
-                  type='text'
-                  value={link.label}
-                />
-              </label>
+      {links.length === 0 && <EmptyItems>No links added yet.</EmptyItems>}
 
-              <label className='mt-3 block'>
-                <span className='mb-2 block text-neutral-500 text-xs'>URL</span>
-
-                <input
-                  aria-invalid={!validUrl}
-                  className={`w-full rounded-lg border px-3 py-2 text-sm outline-none ${
-                    validUrl
-                      ? 'border-neutral-200 focus:border-neutral-400'
-                      : 'border-red-300 focus:border-red-500'
-                  }`}
-                  onChange={(event) =>
-                    onUpdate(link.id, 'url', event.target.value)
-                  }
-                  placeholder='https://'
-                  type='url'
-                  value={link.url}
-                />
-
-                {!validUrl && (
-                  <span className='mt-2 block text-red-600 text-xs'>
-                    Enter a valid http or https URL.
-                  </span>
-                )}
-              </label>
-            </div>
-          );
-        })}
-      </div>
-
-      {links.length === 0 && (
-        <p className='mb-4 text-neutral-500 text-sm'>
-          You haven't added any links yet.
-        </p>
-      )}
-
-      <button
-        className='mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50'
-        onClick={onAdd}
-        type='button'
-      >
-        + Add link
-      </button>
+      <AddButton onClick={onAdd}>Add link</AddButton>
     </div>
   );
 }
 
-interface ItemActionsProps {
-  label: string;
-  first: boolean;
-  last: boolean;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
-  onRemove: () => void;
+interface ButtonProps {
+  children: string;
+  onClick: () => void;
 }
 
-function ItemActions({
-  label,
-  first,
-  last,
-  onMoveUp,
-  onMoveDown,
-  onRemove
-}: ItemActionsProps) {
+function AddButton({ children, onClick }: ButtonProps) {
   return (
-    <div className='flex items-center justify-between gap-3'>
-      <p className='truncate font-medium text-sm'>{label}</p>
+    <button
+      className='w-full rounded-md border border-dashed border-neutral-300 px-3 py-2 text-neutral-500 text-sm transition-colors hover:border-neutral-400 hover:bg-neutral-50 hover:text-neutral-950'
+      onClick={onClick}
+      type='button'
+    >
+      + {children}
+    </button>
+  );
+}
 
-      <div className='flex items-center gap-1'>
-        <button
-          aria-label={`Move ${label} up`}
-          className='rounded-md px-2 py-1 text-neutral-400 text-xs hover:bg-neutral-100 hover:text-neutral-950 disabled:cursor-not-allowed disabled:opacity-30'
-          disabled={first}
-          onClick={onMoveUp}
-          type='button'
-        >
-          ↑
-        </button>
+interface EmptyItemsProps {
+  children: string;
+}
 
-        <button
-          aria-label={`Move ${label} down`}
-          className='rounded-md px-2 py-1 text-neutral-400 text-xs hover:bg-neutral-100 hover:text-neutral-950 disabled:cursor-not-allowed disabled:opacity-30'
-          disabled={last}
-          onClick={onMoveDown}
-          type='button'
-        >
-          ↓
-        </button>
-
-        <button
-          className='rounded-md px-2 py-1 text-neutral-400 text-xs hover:bg-red-50 hover:text-red-600'
-          onClick={onRemove}
-          type='button'
-        >
-          Remove
-        </button>
-      </div>
-    </div>
+function EmptyItems({ children }: EmptyItemsProps) {
+  return (
+    <p className='py-3 text-center text-neutral-400 text-xs'>{children}</p>
   );
 }

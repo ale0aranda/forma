@@ -1,16 +1,14 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
 
-import { logout } from '@/app/editor/actions';
+import { EditorHeader } from '@/components/profile/editor-header';
 import {
   type EditorSelection,
   EditorSidebar
 } from '@/components/profile/editor-sidebar';
 import { ProfileInspector } from '@/components/profile/profile-inspector';
 import { ProfilePreview } from '@/components/profile/profile-preview';
-import { ShareProfileButton } from '@/components/profile/share-profile-button';
 import { useProfileEditor } from '@/hooks/use-profile-editor';
 import { isValidProfile } from '@/lib/profile-validation';
 import { getDefaultProfile } from '@/lib/profiles';
@@ -67,7 +65,6 @@ export default function EditorPage() {
   });
 
   const validProfile = isValidProfile(profile);
-  const busy = saving || publishing;
 
   let status = 'Saved';
 
@@ -76,11 +73,11 @@ export default function EditorPage() {
   } else if (publishing) {
     status = 'Publishing...';
   } else if (hasUnsavedChanges) {
-    status = 'Unsaved changes';
+    status = 'Unsaved';
   } else if (isPublished) {
     status = 'Published';
   } else if (hasUnpublishedChanges) {
-    status = 'Saved · Unpublished changes';
+    status = 'Ready to publish';
   }
 
   if (!loaded) {
@@ -92,100 +89,28 @@ export default function EditorPage() {
   }
 
   return (
-    <main className='min-h-screen bg-white text-neutral-950'>
-      <header className='flex h-16 items-center justify-between border-neutral-200 border-b px-5'>
-        <div className='flex items-center gap-3'>
-          <Link
-            className='font-semibold tracking-widest'
-            href='/'
-          >
-            FORMA
-          </Link>
-
-          <span className='rounded-md bg-neutral-100 px-2 py-1 text-neutral-500 text-xs'>
-            Editor
-          </span>
-
-          <span className='text-neutral-400 text-xs'>{status}</span>
-        </div>
-
-        <div className='flex items-center gap-2'>
-          <form action={logout}>
-            <button
-              className='rounded-lg px-3 py-2 text-neutral-500 text-sm transition-colors hover:bg-neutral-50 hover:text-neutral-950'
-              type='submit'
-            >
-              Sign out
-            </button>
-          </form>
-
-          <button
-            className='rounded-lg px-3 py-2 text-neutral-500 text-sm transition-colors hover:bg-neutral-50 hover:text-neutral-950 disabled:cursor-not-allowed disabled:opacity-40'
-            disabled={!hasUnsavedChanges || busy}
-            onClick={reset}
-            type='button'
-          >
-            Reset
-          </button>
-
-          {isPublished && <ShareProfileButton username={profile.username} />}
-
-          <Link
-            className='rounded-lg border border-neutral-200 px-3 py-2 text-neutral-600 text-sm transition-colors hover:bg-neutral-50 hover:text-neutral-950'
-            href='/settings'
-          >
-            Settings
-          </Link>
-
-          {validProfile ? (
-            <Link
-              className='rounded-lg border border-neutral-200 px-3 py-2 text-sm transition-colors hover:bg-neutral-50'
-              href={`/${profile.username}`}
-              target='_blank'
-            >
-              View
-            </Link>
-          ) : (
-            <span className='cursor-not-allowed rounded-lg border border-neutral-200 px-3 py-2 text-neutral-300 text-sm'>
-              View
-            </span>
-          )}
-
-          <button
-            className='rounded-lg border border-neutral-200 px-3 py-2 text-sm transition-colors hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-40'
-            disabled={!hasUnsavedChanges || busy}
-            onClick={() => {
-              void save();
-            }}
-            type='button'
-          >
-            {saving ? 'Saving...' : 'Save'}
-          </button>
-
-          <button
-            className='rounded-lg bg-neutral-950 px-3 py-2 font-medium text-sm text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-40'
-            disabled={
-              !validProfile
-              || busy
-              || (!hasUnsavedChanges && !hasUnpublishedChanges)
-            }
-            onClick={() => {
-              void publish();
-            }}
-            type='button'
-          >
-            {publishing ? 'Publishing...' : 'Publish'}
-          </button>
-        </div>
-      </header>
+    <main className='flex h-screen flex-col overflow-hidden bg-white text-neutral-950'>
+      <EditorHeader
+        hasUnpublishedChanges={hasUnpublishedChanges}
+        hasUnsavedChanges={hasUnsavedChanges}
+        onPublish={publish}
+        onReset={reset}
+        onSave={save}
+        publishedUsername={publishedProfile?.username}
+        publishing={publishing}
+        saving={saving}
+        status={status}
+        username={profile.username}
+        validProfile={validProfile}
+      />
 
       {error && (
-        <div className='border-red-100 border-b bg-red-50 px-5 py-2 text-red-600 text-sm'>
+        <div className='shrink-0 border-red-100 border-b bg-red-50 px-4 py-2 text-red-600 text-sm'>
           {error}
         </div>
       )}
 
-      <div className='flex min-h-screen'>
+      <div className='flex min-h-0 flex-1'>
         <EditorSidebar
           blocks={profile.blocks}
           blockOrder={profile.blockOrder}

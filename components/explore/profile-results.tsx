@@ -10,16 +10,22 @@ interface ProfileResultsProps {
 export function ProfileResults({ results, searching }: ProfileResultsProps) {
   if (results.length === 0) {
     return (
-      <div className='py-16 text-center'>
+      <div className='border-neutral-200 border-t py-12'>
         <p className='text-neutral-500 text-sm'>
-          {searching ? 'No profiles found.' : 'No published profiles yet.'}
+          {searching ? 'No profiles found.' : 'No profiles to discover yet.'}
+        </p>
+
+        <p className='mt-1 text-neutral-400 text-xs'>
+          {searching
+            ? 'Try another name or username.'
+            : 'Published profiles will appear here.'}
         </p>
       </div>
     );
   }
 
   return (
-    <div className='space-y-1'>
+    <div className='border-neutral-200 border-t'>
       {results.map((result) => (
         <ProfileResult
           key={result.username}

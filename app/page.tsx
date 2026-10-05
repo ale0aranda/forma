@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import { AppHeader } from '@/components/app-header';
-import { getCurrentUsername } from '@/lib/current-profile';
+import { getCurrentProfile } from '@/lib/current-profile';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function HomePage() {
@@ -11,13 +11,13 @@ export default async function HomePage() {
 
   const authenticated = Boolean(data.user);
 
-  const username = authenticated ? await getCurrentUsername() : undefined;
+  const profile = authenticated ? await getCurrentProfile() : undefined;
 
   return (
     <main className='min-h-screen bg-white'>
       <AppHeader
         authenticated={authenticated}
-        username={username}
+        profile={profile}
       />
 
       <section className='mx-auto flex w-full max-w-5xl flex-col px-6 py-24'>

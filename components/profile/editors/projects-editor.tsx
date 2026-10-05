@@ -1,3 +1,9 @@
+import {
+  EditorField,
+  EditorInput,
+  EditorTextarea
+} from '@/components/profile/editor-field';
+import { EditorItem } from '@/components/profile/editor-item';
 import { isValidProfileUrl } from '@/lib/profile-validation';
 
 import type { ProfileProject } from '@/lib/profile';
@@ -22,151 +28,72 @@ export function ProjectsEditor({
   onMove
 }: ProjectsEditorProps) {
   return (
-    <div>
-      <div className='space-y-3'>
-        {projects.map((project, index) => {
-          const validUrl =
-            !project.url.trim() || isValidProfileUrl(project.url);
+    <div className='space-y-3'>
+      {projects.map((project, index) => {
+        const validUrl = !project.url.trim() || isValidProfileUrl(project.url);
 
-          return (
-            <div
-              className='rounded-lg border border-neutral-200 p-3'
-              key={project.id}
-            >
-              <ItemActions
-                first={index === 0}
-                last={index === projects.length - 1}
-                label={project.name || 'Project'}
-                onMoveDown={() => onMove(project.id, 'down')}
-                onMoveUp={() => onMove(project.id, 'up')}
-                onRemove={() => onRemove(project.id)}
+        return (
+          <EditorItem
+            first={index === 0}
+            key={project.id}
+            last={index === projects.length - 1}
+            onMoveDown={() => onMove(project.id, 'down')}
+            onMoveUp={() => onMove(project.id, 'up')}
+            onRemove={() => onRemove(project.id)}
+            title={project.name || 'Untitled project'}
+          >
+            <EditorField label='Name'>
+              <EditorInput
+                onChange={(event) =>
+                  onUpdate(project.id, 'name', event.target.value)
+                }
+                value={project.name}
               />
+            </EditorField>
 
-              <label className='mt-3 block'>
-                <span className='mb-2 block text-neutral-500 text-xs'>
-                  Name
-                </span>
+            <EditorField label='Description'>
+              <EditorTextarea
+                onChange={(event) =>
+                  onUpdate(project.id, 'description', event.target.value)
+                }
+                value={project.description}
+              />
+            </EditorField>
 
-                <input
-                  className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-                  onChange={(event) =>
-                    onUpdate(project.id, 'name', event.target.value)
-                  }
-                  type='text'
-                  value={project.name}
-                />
-              </label>
-
-              <label className='mt-3 block'>
-                <span className='mb-2 block text-neutral-500 text-xs'>
-                  Description
-                </span>
-
-                <textarea
-                  className='min-h-24 w-full resize-none rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-                  onChange={(event) =>
-                    onUpdate(project.id, 'description', event.target.value)
-                  }
-                  value={project.description}
-                />
-              </label>
-
-              <label className='mt-3 block'>
-                <span className='mb-2 block text-neutral-500 text-xs'>URL</span>
-
-                <input
-                  aria-invalid={!validUrl}
-                  className={`w-full rounded-lg border px-3 py-2 text-sm outline-none ${
-                    validUrl
-                      ? 'border-neutral-200 focus:border-neutral-400'
-                      : 'border-red-300 focus:border-red-500'
-                  }`}
-                  onChange={(event) =>
-                    onUpdate(project.id, 'url', event.target.value)
-                  }
-                  placeholder='https://'
-                  type='url'
-                  value={project.url}
-                />
-
-                {!validUrl && (
-                  <span className='mt-2 block text-red-600 text-xs'>
-                    Enter a valid http or https URL.
-                  </span>
-                )}
-              </label>
-            </div>
-          );
-        })}
-      </div>
+            <EditorField
+              hint={validUrl ? undefined : 'Enter a valid http or https URL.'}
+              label='URL'
+            >
+              <EditorInput
+                aria-invalid={!validUrl}
+                className={
+                  validUrl ? '' : 'border-red-300 focus:border-red-500'
+                }
+                onChange={(event) =>
+                  onUpdate(project.id, 'url', event.target.value)
+                }
+                placeholder='https://'
+                type='url'
+                value={project.url}
+              />
+            </EditorField>
+          </EditorItem>
+        );
+      })}
 
       {projects.length === 0 && (
-        <p className='mb-4 text-neutral-500 text-sm'>
-          You haven't added any projects yet.
+        <p className='py-3 text-center text-neutral-400 text-xs'>
+          No projects added yet.
         </p>
       )}
 
       <button
-        className='mt-3 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm hover:bg-neutral-50'
+        className='w-full rounded-md border border-dashed border-neutral-300 px-3 py-2 text-neutral-500 text-sm transition-colors hover:border-neutral-400 hover:bg-neutral-50 hover:text-neutral-950'
         onClick={onAdd}
         type='button'
       >
         + Add project
       </button>
-    </div>
-  );
-}
-
-interface ItemActionsProps {
-  label: string;
-  first: boolean;
-  last: boolean;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
-  onRemove: () => void;
-}
-
-function ItemActions({
-  label,
-  first,
-  last,
-  onMoveUp,
-  onMoveDown,
-  onRemove
-}: ItemActionsProps) {
-  return (
-    <div className='flex items-center justify-between gap-3'>
-      <p className='truncate font-medium text-sm'>{label}</p>
-
-      <div className='flex items-center gap-1'>
-        <button
-          aria-label={`Move ${label} up`}
-          className='rounded-md px-2 py-1 text-neutral-400 text-xs hover:bg-neutral-100 hover:text-neutral-950 disabled:cursor-not-allowed disabled:opacity-30'
-          disabled={first}
-          onClick={onMoveUp}
-          type='button'
-        >
-          ↑
-        </button>
-
-        <button
-          aria-label={`Move ${label} down`}
-          className='rounded-md px-2 py-1 text-neutral-400 text-xs hover:bg-neutral-100 hover:text-neutral-950 disabled:cursor-not-allowed disabled:opacity-30'
-          disabled={last}
-          onClick={onMoveDown}
-          type='button'
-        >
-          ↓
-        </button>
-
-        <button
-          className='rounded-md px-2 py-1 text-neutral-400 text-xs hover:bg-red-50 hover:text-red-600'
-          onClick={onRemove}
-          type='button'
-        >
-          Remove
-        </button>
-      </div>
     </div>
   );
 }

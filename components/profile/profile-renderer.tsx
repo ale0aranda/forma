@@ -1,3 +1,8 @@
+import { ArrowRight, BriefcaseBusiness, ImageIcon } from 'lucide-react';
+
+import { ProfileLink } from '@/components/profile/profile-link';
+
+import type { ReactNode } from 'react';
 import type {
   Profile,
   ProfileAppearance,
@@ -11,6 +16,7 @@ import type {
 
 interface ProfileRendererProps {
   profile: Profile;
+  heroAside?: ReactNode;
 }
 
 const typographyClasses: Record<ProfileTypography, string> = {
@@ -64,7 +70,7 @@ const appearanceClasses: Record<
   }
 };
 
-export function ProfileRenderer({ profile }: ProfileRendererProps) {
+export function ProfileRenderer({ profile, heroAside }: ProfileRendererProps) {
   const { design } = profile;
 
   const visible = (block: ProfileBlock) => profile.blocks[block].visible;
@@ -85,6 +91,7 @@ export function ProfileRenderer({ profile }: ProfileRendererProps) {
     >
       {visible('identity') && (
         <IdentityHero
+          aside={heroAside}
           profile={profile}
           showLinks={visible('links')}
         />
@@ -92,7 +99,9 @@ export function ProfileRenderer({ profile }: ProfileRendererProps) {
 
       {contentBlocks.length > 0 && (
         <div
-          className={`mt-14 grid grid-cols-2 ${cardGapClasses[design.density]}`}
+          className={`mt-16 grid grid-cols-1 sm:grid-cols-2 ${
+            cardGapClasses[design.density]
+          }`}
         >
           {contentBlocks.map((block) => (
             <ProfileCard
@@ -103,12 +112,6 @@ export function ProfileRenderer({ profile }: ProfileRendererProps) {
           ))}
         </div>
       )}
-
-      {visible('now') && (
-        <div className='mt-10'>
-          <NowBlock profile={profile} />
-        </div>
-      )}
     </article>
   );
 }
@@ -116,57 +119,67 @@ export function ProfileRenderer({ profile }: ProfileRendererProps) {
 interface IdentityHeroProps {
   profile: Profile;
   showLinks: boolean;
+  aside?: ReactNode;
 }
 
-function IdentityHero({ profile, showLinks }: IdentityHeroProps) {
+function IdentityHero({ profile, showLinks, aside }: IdentityHeroProps) {
+  const { design } = profile;
+
   return (
-    <header className='mx-auto max-w-2xl py-8'>
-      <div className='flex items-start gap-6'>
-        <div className='flex size-20 shrink-0 items-center justify-center rounded-full border border-current/10 bg-current/5 font-medium text-xl'>
-          {getInitials(profile.identity.name)}
+    <header className='grid gap-12 md:grid-cols-2'>
+      <div className='flex min-w-0 gap-6'>
+        <div
+          className={`flex size-24 shrink-0 items-center justify-center overflow-hidden bg-current/5 font-medium text-lg ${
+            radiusClasses[design.radius]
+          }`}
+        >
+          {profile.identity.avatar ? (
+            <picture>
+              <source srcSet={profile.identity.avatar} />
+              <img
+                alt=''
+                className='size-full object-cover'
+                height={96}
+                src={profile.identity.avatar}
+                width={96}
+              />
+            </picture>
+          ) : (
+            getInitials(profile.identity.name)
+          )}
         </div>
 
-        <div className='min-w-0 pt-1'>
-          <h1 className='font-semibold text-3xl tracking-tight'>
+        <div className='min-w-0 flex-1'>
+          <p className='text-sm opacity-40'>@{profile.username}</p>
+
+          <h1 className='mt-2 font-semibold text-4xl tracking-tight'>
             {profile.identity.name || 'Your name'}
           </h1>
 
-          <p className='mt-1 text-sm opacity-50'>
+          <p className='mt-2 text-sm opacity-50'>
             {profile.identity.role || 'Your role'}
           </p>
 
           {profile.identity.bio && (
-            <p className='mt-4 max-w-lg text-sm leading-6 opacity-70'>
+            <p className='mt-7 max-w-lg text-base leading-7 opacity-70'>
               {profile.identity.bio}
             </p>
           )}
 
           {showLinks && profile.links.length > 0 && (
-            <div className='mt-5 flex flex-wrap gap-x-4 gap-y-2'>
-              {profile.links.map((link) =>
-                link.url ? (
-                  <a
-                    className='text-sm opacity-50 transition-opacity hover:opacity-100'
-                    href={link.url}
-                    key={link.id}
-                    rel='noreferrer'
-                    target='_blank'
-                  >
-                    {link.label || 'Untitled'} ↗
-                  </a>
-                ) : (
-                  <span
-                    className='text-sm opacity-50'
-                    key={link.id}
-                  >
-                    {link.label || 'Untitled'}
-                  </span>
-                )
-              )}
+            <div className='mt-7 flex flex-wrap items-center gap-2'>
+              {profile.links.map((link) => (
+                <ProfileLink
+                  key={link.id}
+                  link={link}
+                />
+              ))}
             </div>
           )}
         </div>
       </div>
+
+      {aside && <div className='md:pl-12'>{aside}</div>}
     </header>
   );
 }
@@ -179,9 +192,9 @@ interface ProfileCardProps {
 function ProfileCard({ block, profile }: ProfileCardProps) {
   const { design } = profile;
 
-  const className = `border ${borderClasses[design.borders]} ${
-    radiusClasses[design.radius]
-  } ${cardPaddingClasses[design.density]}`;
+  const className = `border ${
+    borderClasses[design.borders]
+  } ${radiusClasses[design.radius]} ${cardPaddingClasses[design.density]}`;
 
   if (block === 'about') {
     return (
@@ -228,7 +241,7 @@ interface BlockProps {
 
 function AboutBlock({ profile }: BlockProps) {
   return (
-    <p className='text-sm leading-6 opacity-65'>
+    <p className='max-w-lg text-sm leading-6 opacity-65'>
       {profile.about || 'Nothing here yet.'}
     </p>
   );
@@ -240,32 +253,42 @@ function ProjectsBlock({ profile }: BlockProps) {
   }
 
   return (
-    <div className='space-y-1'>
+    <div className='space-y-2'>
       {profile.projects.map((project) => {
         const content = (
-          <>
-            <div className='flex items-center justify-between gap-4'>
+          <div className='flex items-center gap-4'>
+            <div className='flex size-10 shrink-0 items-center justify-center rounded-lg bg-current/5'>
+              <span className='text-sm opacity-60'>
+                {project.name.trim().charAt(0).toUpperCase() || '?'}
+              </span>
+            </div>
+
+            <div className='min-w-0 flex-1'>
               <h3 className='font-medium text-sm'>
                 {project.name || 'Untitled project'}
               </h3>
 
-              {project.url && (
-                <span className='shrink-0 text-xs opacity-40'>↗</span>
+              {project.description && (
+                <p className='mt-1 truncate text-xs opacity-50'>
+                  {project.description}
+                </p>
               )}
             </div>
 
-            {project.description && (
-              <p className='mt-1 text-xs leading-5 opacity-50'>
-                {project.description}
-              </p>
+            {project.url && (
+              <ArrowRight
+                aria-hidden='true'
+                className='shrink-0 opacity-35'
+                size={15}
+              />
             )}
-          </>
+          </div>
         );
 
         if (project.url) {
           return (
             <a
-              className='block rounded-md px-2 py-3 transition-colors hover:bg-current/5'
+              className='block rounded-lg px-2 py-3 transition-colors hover:bg-current/5'
               href={project.url}
               key={project.id}
               rel='noreferrer'
@@ -291,7 +314,17 @@ function ProjectsBlock({ profile }: BlockProps) {
 
 function ExperienceBlock({ profile }: BlockProps) {
   if (profile.experience.length === 0) {
-    return <EmptyState>No experience yet.</EmptyState>;
+    return (
+      <div className='flex items-center gap-4 py-2'>
+        <BriefcaseBusiness
+          aria-hidden='true'
+          className='opacity-35'
+          size={22}
+        />
+
+        <EmptyState>No experience yet.</EmptyState>
+      </div>
+    );
   }
 
   return (
@@ -334,7 +367,17 @@ function GalleryBlock({ profile }: BlockProps) {
   const { design } = profile;
 
   if (profile.gallery.length === 0) {
-    return <EmptyState>No images yet.</EmptyState>;
+    return (
+      <div className='flex items-center gap-4 py-2'>
+        <ImageIcon
+          aria-hidden='true'
+          className='opacity-35'
+          size={22}
+        />
+
+        <EmptyState>No images yet.</EmptyState>
+      </div>
+    );
   }
 
   return (
@@ -344,7 +387,6 @@ function GalleryBlock({ profile }: BlockProps) {
           {item.src ? (
             <picture>
               <source srcSet={item.src} />
-
               <img
                 alt={item.alt}
                 className={`aspect-square w-full object-cover ${
@@ -369,24 +411,12 @@ function GalleryBlock({ profile }: BlockProps) {
   );
 }
 
-function NowBlock({ profile }: BlockProps) {
-  return (
-    <section className='flex items-baseline gap-4 border-current/10 border-t pt-5'>
-      <p className='shrink-0 text-xs uppercase tracking-widest opacity-35'>
-        Now
-      </p>
-
-      <p className='text-sm opacity-60'>{profile.now || 'Nothing here yet.'}</p>
-    </section>
-  );
-}
-
 interface SectionTitleProps {
   children: string;
 }
 
 function SectionTitle({ children }: SectionTitleProps) {
-  return <h2 className='mb-5 font-medium text-sm'>{children}</h2>;
+  return <h2 className='mb-6 font-medium text-sm'>{children}</h2>;
 }
 
 interface EmptyStateProps {

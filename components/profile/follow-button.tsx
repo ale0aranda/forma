@@ -23,7 +23,6 @@ export function FollowButton({
   const router = useRouter();
 
   const [following, setFollowing] = useState(initialFollowing);
-
   const [error, setError] = useState<string>();
   const [pending, startTransition] = useTransition();
 
@@ -48,7 +47,6 @@ export function FollowButton({
       }
 
       setFollowing((current) => !current);
-
       router.refresh();
     });
   }
@@ -56,11 +54,11 @@ export function FollowButton({
   const className =
     appearance === 'dark'
       ? following
-        ? 'rounded-lg border border-white/10 px-4 py-2 text-neutral-300 text-sm transition-colors hover:bg-white/5 disabled:opacity-50'
-        : 'rounded-lg bg-white px-4 py-2 font-medium text-neutral-950 text-sm transition-colors hover:bg-neutral-200 disabled:opacity-50'
+        ? 'h-9 rounded-lg border border-white/10 px-3 text-neutral-300 text-sm transition-colors hover:bg-white/5 hover:text-white disabled:opacity-50'
+        : 'h-9 rounded-lg bg-white px-3 font-medium text-neutral-950 text-sm transition-colors hover:bg-neutral-200 disabled:opacity-50'
       : following
-        ? 'rounded-lg border border-neutral-200 px-4 py-2 text-neutral-600 text-sm transition-colors hover:bg-neutral-50 disabled:opacity-50'
-        : 'rounded-lg bg-neutral-950 px-4 py-2 font-medium text-sm text-white transition-colors hover:bg-neutral-800 disabled:opacity-50';
+        ? 'h-9 rounded-lg border border-neutral-200 px-3 text-neutral-600 text-sm transition-colors hover:bg-neutral-50 hover:text-neutral-950 disabled:opacity-50'
+        : 'h-9 rounded-lg bg-neutral-950 px-3 font-medium text-sm text-white transition-colors hover:bg-neutral-800 disabled:opacity-50';
 
   return (
     <div>
@@ -70,7 +68,7 @@ export function FollowButton({
         onClick={handleClick}
         type='button'
       >
-        {pending ? '...' : following ? 'Following' : 'Follow'}
+        {pending ? 'Updating...' : following ? 'Following' : 'Follow'}
       </button>
 
       {error && <p className='mt-2 text-red-500 text-xs'>{error}</p>}

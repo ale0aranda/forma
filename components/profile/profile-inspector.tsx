@@ -1,6 +1,7 @@
 import { DesignEditor } from '@/components/profile/editors/design-editor';
 import { ExperienceEditor } from '@/components/profile/editors/experience-editor';
 import { GalleryEditor } from '@/components/profile/editors/gallery-editor';
+import { IdentityEditor } from '@/components/profile/editors/identity-editor';
 import { LinksEditor } from '@/components/profile/editors/links-editor';
 import { ProfileSettingsEditor } from '@/components/profile/editors/profile-settings-editor';
 import { ProjectsEditor } from '@/components/profile/editors/projects-editor';
@@ -229,14 +230,14 @@ interface InspectorShellProps {
 
 function InspectorShell({ title, description, children }: InspectorShellProps) {
   return (
-    <aside className='w-80 shrink-0 border-neutral-200 border-l bg-white p-6'>
-      <div className='mb-8'>
-        <p className='font-medium'>{title}</p>
+    <aside className='flex w-80 shrink-0 flex-col border-neutral-200 border-l bg-white'>
+      <div className='shrink-0 border-neutral-100 border-b px-5 py-4'>
+        <p className='font-medium text-sm'>{title}</p>
 
-        <p className='mt-1 text-neutral-500 text-sm'>{description}</p>
+        <p className='mt-1 text-neutral-400 text-xs'>{description}</p>
       </div>
 
-      {children}
+      <div className='flex-1 overflow-y-auto p-5'>{children}</div>
     </aside>
   );
 }
@@ -248,70 +249,34 @@ interface VisibilityControlProps {
 
 function VisibilityControl({ visible, onToggle }: VisibilityControlProps) {
   return (
-    <div className='mb-6 flex items-center justify-between rounded-lg border border-neutral-200 p-3'>
+    <div className='mb-5 flex items-center justify-between rounded-lg border border-neutral-200 px-3 py-2.5'>
       <div>
-        <p className='text-sm'>Visible</p>
+        <p className='font-medium text-neutral-700 text-xs'>
+          Visible on profile
+        </p>
 
-        <p className='mt-1 text-neutral-500 text-xs'>
-          Show this block on your profile.
+        <p className='mt-0.5 text-neutral-400 text-xs'>
+          Show this block publicly.
         </p>
       </div>
 
       <button
+        aria-label={
+          visible ? 'Hide block from profile' : 'Show block on profile'
+        }
         aria-pressed={visible}
-        className={`rounded-full px-3 py-1 font-medium text-xs transition-colors ${
-          visible
-            ? 'bg-neutral-950 text-white'
-            : 'bg-neutral-100 text-neutral-500'
+        className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${
+          visible ? 'bg-neutral-950' : 'bg-neutral-200'
         }`}
         onClick={onToggle}
         type='button'
       >
-        {visible ? 'On' : 'Off'}
+        <span
+          className={`absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform ${
+            visible ? 'translate-x-4' : 'translate-x-0'
+          }`}
+        />
       </button>
-    </div>
-  );
-}
-
-interface IdentityEditorProps {
-  identity: Profile['identity'];
-  onUpdate: (field: keyof Profile['identity'], value: string) => void;
-}
-
-function IdentityEditor({ identity, onUpdate }: IdentityEditorProps) {
-  return (
-    <div className='space-y-5'>
-      <label className='block'>
-        <span className='mb-2 block text-neutral-600 text-sm'>Name</span>
-
-        <input
-          className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-          onChange={(event) => onUpdate('name', event.target.value)}
-          type='text'
-          value={identity.name}
-        />
-      </label>
-
-      <label className='block'>
-        <span className='mb-2 block text-neutral-600 text-sm'>Role</span>
-
-        <input
-          className='w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-          onChange={(event) => onUpdate('role', event.target.value)}
-          type='text'
-          value={identity.role}
-        />
-      </label>
-
-      <label className='block'>
-        <span className='mb-2 block text-neutral-600 text-sm'>Bio</span>
-
-        <textarea
-          className='min-h-28 w-full resize-none rounded-lg border border-neutral-200 px-3 py-2 text-sm outline-none focus:border-neutral-400'
-          onChange={(event) => onUpdate('bio', event.target.value)}
-          value={identity.bio}
-        />
-      </label>
     </div>
   );
 }

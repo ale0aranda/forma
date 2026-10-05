@@ -43,8 +43,8 @@ export function ShareProfileButton({
 
   const className =
     appearance === 'dark'
-      ? 'flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-neutral-300 text-sm transition-colors hover:bg-white/5 hover:text-white'
-      : 'flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 text-neutral-600 text-sm transition-colors hover:bg-neutral-50 hover:text-neutral-950';
+      ? 'flex h-9 items-center gap-2 rounded-lg border border-white/10 px-3 text-neutral-300 text-sm transition-colors hover:bg-white/5 hover:text-white'
+      : 'flex h-9 items-center gap-2 rounded-lg border border-neutral-200 px-3 text-neutral-600 text-sm transition-colors hover:bg-neutral-50 hover:text-neutral-950';
 
   return (
     <button

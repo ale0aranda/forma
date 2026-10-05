@@ -62,8 +62,7 @@ interface ProfileInspectorProps {
 
   onRemoveExperience: (id: string) => void;
 
-  onAddGalleryItem: () => void;
-
+  onAddGalleryItem: (src: string) => void;
   onUpdateGalleryItem: (
     id: string,
     field: 'src' | 'alt' | 'caption',

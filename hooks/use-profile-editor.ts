@@ -312,19 +312,22 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     [updateProfile]
   );
 
-  const addGalleryItem = useCallback(() => {
-    const item: ProfileGalleryItem = {
-      id: crypto.randomUUID(),
-      src: '',
-      alt: '',
-      caption: ''
-    };
+  const addGalleryItem = useCallback(
+    (src: string) => {
+      const item: ProfileGalleryItem = {
+        id: crypto.randomUUID(),
+        src,
+        alt: '',
+        caption: ''
+      };
 
-    updateProfile((current) => ({
-      ...current,
-      gallery: [...current.gallery, item]
-    }));
-  }, [updateProfile]);
+      updateProfile((current) => ({
+        ...current,
+        gallery: [...current.gallery, item]
+      }));
+    },
+    [updateProfile]
+  );
 
   const updateGalleryItem = useCallback(
     (id: string, field: 'src' | 'alt' | 'caption', value: string) => {

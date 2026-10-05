@@ -183,6 +183,7 @@ export default function EditorPage() {
           onReorderBlock={reorderBlock}
           onSelect={setSelected}
           selected={selected}
+          onToggleBlock={toggleBlock}
         />
 
         <ProfilePreview

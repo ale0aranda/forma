@@ -236,6 +236,7 @@ export default function EditorPage() {
           blockOrder={profile.blockOrder}
           onReorderBlock={reorderBlock}
           onSelect={setSelected}
+          onToggleBlock={toggleBlock}
           selected={selected}
         />
 
@@ -280,6 +281,7 @@ export default function EditorPage() {
                 mobile
                 onReorderBlock={reorderBlock}
                 onSelect={selectFromSidebar}
+                onToggleBlock={toggleBlock}
                 selected={selected}
               />
             </div>

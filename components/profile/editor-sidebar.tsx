@@ -19,6 +19,8 @@ import { CSS } from '@dnd-kit/utilities';
 import {
   BriefcaseBusiness,
   CircleUserRound,
+  Eye,
+  EyeOff,
   GalleryHorizontal,
   GripVertical,
   Link2,
@@ -42,6 +44,7 @@ interface EditorSidebarProps {
   mobile?: boolean;
   onReorderBlock: (active: ProfileBlock, over: ProfileBlock) => void;
   onSelect: (selection: EditorSelection) => void;
+  onToggleBlock: (block: ProfileBlock) => void;
 }
 
 const blockLabels: Record<ProfileBlock, string> = {
@@ -70,7 +73,8 @@ export function EditorSidebar({
   selected,
   mobile = false,
   onReorderBlock,
-  onSelect
+  onSelect,
+  onToggleBlock
 }: EditorSidebarProps) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -129,6 +133,7 @@ export function EditorSidebar({
                     block={block}
                     key={block}
                     onSelect={onSelect}
+                    onToggle={() => onToggleBlock(block)}
                     selected={selected === block}
                     visible={blocks[block].visible}
                   />
@@ -171,13 +176,15 @@ interface SortableBlockProps {
   selected: boolean;
   visible: boolean;
   onSelect: (selection: EditorSelection) => void;
+  onToggle: () => void;
 }
 
 function SortableBlock({
   block,
   selected,
   visible,
-  onSelect
+  onSelect,
+  onToggle
 }: SortableBlockProps) {
   const {
     attributes,
@@ -219,7 +226,7 @@ function SortableBlock({
       </button>
 
       <button
-        className='flex min-w-0 flex-1 items-center gap-2.5 py-2 pr-2 text-left'
+        className='flex min-w-0 flex-1 items-center gap-2.5 py-2 text-left'
         onClick={() => onSelect(block)}
         type='button'
       >
@@ -231,14 +238,41 @@ function SortableBlock({
 
         <span
           className={`min-w-0 flex-1 truncate text-sm ${
-            selected ? 'font-medium text-neutral-950' : 'text-neutral-600'
+            selected
+              ? 'font-medium text-neutral-950'
+              : visible
+                ? 'text-neutral-600'
+                : 'text-neutral-400'
           }`}
         >
           {blockLabels[block]}
         </span>
+      </button>
 
-        {!visible && (
-          <span className='size-1.5 shrink-0 rounded-full bg-neutral-300' />
+      <button
+        aria-label={
+          visible ? `Hide ${blockLabels[block]}` : `Show ${blockLabels[block]}`
+        }
+        aria-pressed={visible}
+        className={`mr-1 flex size-7 shrink-0 items-center justify-center rounded text-neutral-400 transition-colors hover:bg-neutral-200 hover:text-neutral-700 ${
+          visible
+            ? 'opacity-0 group-hover:opacity-100 focus:opacity-100'
+            : 'opacity-100'
+        }`}
+        onClick={onToggle}
+        title={visible ? 'Hide block' : 'Show block'}
+        type='button'
+      >
+        {visible ? (
+          <Eye
+            aria-hidden='true'
+            size={14}
+          />
+        ) : (
+          <EyeOff
+            aria-hidden='true'
+            size={14}
+          />
         )}
       </button>
     </div>

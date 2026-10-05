@@ -2,10 +2,17 @@ import { Monitor } from 'lucide-react';
 
 import { ProfileRenderer } from '@/components/profile/profile-renderer';
 
-import type { Profile, ProfileAppearance, ProfilePalette } from '@/lib/profile';
+import type {
+  Profile,
+  ProfileAppearance,
+  ProfileBlock,
+  ProfilePalette
+} from '@/lib/profile';
 
 interface ProfilePreviewProps {
   profile: Profile;
+  selectedBlock?: ProfileBlock | undefined;
+  onSelectBlock?: ((block: ProfileBlock) => void) | undefined;
 }
 
 const previewBackgroundClasses: Record<
@@ -26,7 +33,11 @@ const previewBackgroundClasses: Record<
   }
 };
 
-export function ProfilePreview({ profile }: ProfilePreviewProps) {
+export function ProfilePreview({
+  profile,
+  selectedBlock,
+  onSelectBlock
+}: ProfilePreviewProps) {
   const { design } = profile;
 
   return (
@@ -37,6 +48,7 @@ export function ProfilePreview({ profile }: ProfilePreviewProps) {
             aria-hidden='true'
             size={13}
           />
+
           <span className='text-xs'>Preview</span>
         </div>
 
@@ -51,7 +63,11 @@ export function ProfilePreview({ profile }: ProfilePreviewProps) {
             }`}
           >
             <div className='mx-auto w-full max-w-3xl'>
-              <ProfileRenderer profile={profile} />
+              <ProfileRenderer
+                onSelectBlock={onSelectBlock}
+                profile={profile}
+                selectedBlock={selectedBlock}
+              />
             </div>
           </div>
         </div>

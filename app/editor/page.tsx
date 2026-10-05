@@ -119,8 +119,15 @@ export default function EditorPage() {
           selected={selected}
         />
 
-        <ProfilePreview profile={profile} />
-
+        <ProfilePreview
+          onSelectBlock={setSelected}
+          profile={profile}
+          selectedBlock={
+            selected === 'profile' || selected === 'design'
+              ? undefined
+              : selected
+          }
+        />
         <ProfileInspector
           onAddExperience={addExperience}
           onAddGalleryItem={addGalleryItem}

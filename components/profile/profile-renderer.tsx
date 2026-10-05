@@ -17,6 +17,8 @@ import type {
 interface ProfileRendererProps {
   profile: Profile;
   heroAside?: ReactNode;
+  selectedBlock?: ProfileBlock | undefined;
+  onSelectBlock?: ((block: ProfileBlock) => void) | undefined;
 }
 
 const typographyClasses: Record<ProfileTypography, string> = {
@@ -70,7 +72,12 @@ const appearanceClasses: Record<
   }
 };
 
-export function ProfileRenderer({ profile, heroAside }: ProfileRendererProps) {
+export function ProfileRenderer({
+  profile,
+  heroAside,
+  selectedBlock,
+  onSelectBlock
+}: ProfileRendererProps) {
   const { design } = profile;
 
   const visible = (block: ProfileBlock) => profile.blocks[block].visible;
@@ -88,7 +95,9 @@ export function ProfileRenderer({ profile, heroAside }: ProfileRendererProps) {
       {visible('identity') && (
         <IdentityHero
           aside={heroAside}
+          onSelectBlock={onSelectBlock}
           profile={profile}
+          selectedBlock={selectedBlock}
           showLinks={visible('links')}
         />
       )}
@@ -103,7 +112,9 @@ export function ProfileRenderer({ profile, heroAside }: ProfileRendererProps) {
             <ProfileCard
               block={block}
               key={block}
+              onSelectBlock={onSelectBlock}
               profile={profile}
+              selected={selectedBlock === block}
             />
           ))}
         </div>
@@ -116,13 +127,38 @@ interface IdentityHeroProps {
   profile: Profile;
   showLinks: boolean;
   aside?: ReactNode;
+  selectedBlock?: ProfileBlock | undefined;
+  onSelectBlock?: ((block: ProfileBlock) => void) | undefined;
 }
 
-function IdentityHero({ profile, showLinks, aside }: IdentityHeroProps) {
+function IdentityHero({
+  profile,
+  showLinks,
+  aside,
+  selectedBlock,
+  onSelectBlock
+}: IdentityHeroProps) {
   const { design } = profile;
 
   return (
-    <header className='grid gap-12 md:grid-cols-2'>
+    <header
+      className={`relative grid gap-12 md:grid-cols-2 ${
+        onSelectBlock
+          ? selectedBlock === 'identity'
+            ? 'rounded-lg outline outline-neutral-300 outline-offset-4'
+            : 'rounded-lg outline outline-transparent outline-offset-4 transition-colors hover:outline-neutral-200'
+          : ''
+      }`}
+    >
+      {onSelectBlock && (
+        <button
+          aria-label='Edit identity'
+          className='absolute inset-0 z-10 cursor-pointer rounded-lg'
+          onClick={() => onSelectBlock('identity')}
+          type='button'
+        />
+      )}
+
       <div className='flex min-w-0 gap-6'>
         <div
           className={`flex size-24 shrink-0 items-center justify-center overflow-hidden bg-current/5 font-medium text-lg ${
@@ -132,6 +168,7 @@ function IdentityHero({ profile, showLinks, aside }: IdentityHeroProps) {
           {profile.identity.avatar ? (
             <picture>
               <source srcSet={profile.identity.avatar} />
+
               <img
                 alt=''
                 className='size-full object-cover'
@@ -163,7 +200,16 @@ function IdentityHero({ profile, showLinks, aside }: IdentityHeroProps) {
           )}
 
           {showLinks && profile.links.length > 0 && (
-            <div className='mt-7 flex flex-wrap items-center gap-2'>
+            <div className='relative z-20 mt-7 flex flex-wrap items-center gap-2'>
+              {onSelectBlock && (
+                <button
+                  aria-label='Edit links'
+                  className='absolute inset-0 cursor-pointer rounded-lg'
+                  onClick={() => onSelectBlock('links')}
+                  type='button'
+                />
+              )}
+
               {profile.links.map((link) => (
                 <ProfileLink
                   key={link.id}
@@ -175,7 +221,7 @@ function IdentityHero({ profile, showLinks, aside }: IdentityHeroProps) {
         </div>
       </div>
 
-      {aside && <div className='md:pl-12'>{aside}</div>}
+      {aside && <div className='relative z-20 md:pl-12'>{aside}</div>}
     </header>
   );
 }
@@ -183,65 +229,99 @@ function IdentityHero({ profile, showLinks, aside }: IdentityHeroProps) {
 interface ProfileCardProps {
   block: ProfileBlock;
   profile: Profile;
+  selected: boolean;
+  onSelectBlock?: ((block: ProfileBlock) => void) | undefined;
 }
 
-function ProfileCard({ block, profile }: ProfileCardProps) {
+function ProfileCard({
+  block,
+  profile,
+  selected,
+  onSelectBlock
+}: ProfileCardProps) {
   const { design } = profile;
 
-  const className = `border ${
-    borderClasses[design.borders]
-  } ${radiusClasses[design.radius]} ${cardPaddingClasses[design.density]}`;
+  const className = `relative ${getSelectableCardClassName(
+    Boolean(onSelectBlock),
+    selected
+  )} border ${borderClasses[design.borders]} ${
+    radiusClasses[design.radius]
+  } ${cardPaddingClasses[design.density]}`;
+
+  let content: ReactNode = null;
 
   if (block === 'about') {
-    return (
-      <section className={className}>
+    content = (
+      <>
         <SectionTitle>About</SectionTitle>
         <AboutBlock profile={profile} />
-      </section>
+      </>
     );
   }
 
   if (block === 'projects') {
-    return (
-      <section className={className}>
+    content = (
+      <>
         <SectionTitle>Projects</SectionTitle>
-        <ProjectsBlock profile={profile} />
-      </section>
+
+        <ProjectsBlock
+          editing={Boolean(onSelectBlock)}
+          profile={profile}
+        />
+      </>
     );
   }
 
   if (block === 'experience') {
-    return (
-      <section className={className}>
+    content = (
+      <>
         <SectionTitle>Experience</SectionTitle>
         <ExperienceBlock profile={profile} />
-      </section>
+      </>
     );
   }
 
   if (block === 'gallery') {
-    return (
-      <section className={className}>
+    content = (
+      <>
         <SectionTitle>Gallery</SectionTitle>
         <GalleryBlock profile={profile} />
-      </section>
+      </>
     );
   }
 
   if (block === 'now') {
-    return (
-      <section className={className}>
+    content = (
+      <>
         <SectionTitle>Now</SectionTitle>
         <NowBlock profile={profile} />
-      </section>
+      </>
     );
   }
 
-  return null;
+  if (!content) {
+    return null;
+  }
+
+  return (
+    <section className={className}>
+      {onSelectBlock && (
+        <button
+          aria-label={`Edit ${block}`}
+          className='absolute inset-0 z-10 cursor-pointer'
+          onClick={() => onSelectBlock(block)}
+          type='button'
+        />
+      )}
+
+      {content}
+    </section>
+  );
 }
 
 interface BlockProps {
   profile: Profile;
+  editing?: boolean;
 }
 
 function AboutBlock({ profile }: BlockProps) {
@@ -282,7 +362,7 @@ function NowBlock({ profile }: BlockProps) {
   );
 }
 
-function ProjectsBlock({ profile }: BlockProps) {
+function ProjectsBlock({ profile, editing = false }: BlockProps) {
   if (profile.projects.length === 0) {
     return <EmptyState>No projects yet.</EmptyState>;
   }
@@ -320,7 +400,7 @@ function ProjectsBlock({ profile }: BlockProps) {
           </div>
         );
 
-        if (project.url) {
+        if (project.url && !editing) {
           return (
             <a
               className='block rounded-lg px-2 py-3 transition-colors hover:bg-current/5'
@@ -425,6 +505,7 @@ function GalleryBlock({ profile }: BlockProps) {
           {item.src ? (
             <picture>
               <source srcSet={item.src} />
+
               <img
                 alt={item.alt}
                 className={`aspect-square w-full object-cover ${
@@ -471,6 +552,17 @@ function EmptyState({ children }: EmptyStateProps) {
   return <p className='text-sm opacity-35'>{children}</p>;
 }
 
+function getSelectableCardClassName(editable: boolean, selected: boolean) {
+  if (!editable) {
+    return '';
+  }
+
+  if (selected) {
+    return 'outline outline-1 outline-neutral-400 outline-offset-2';
+  }
+
+  return 'outline outline-1 outline-transparent outline-offset-2 transition-colors hover:outline-neutral-300';
+}
 function getInitials(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
 

@@ -1,173 +1,233 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+
+import { EditorHeader } from '@/components/profile/editor-header';
 import {
-  ArrowRight,
-  Blocks,
-  LayoutPanelLeft,
-  Palette,
-  UsersRound
-} from 'lucide-react';
-import Link from 'next/link';
+  type EditorSelection,
+  EditorSidebar
+} from '@/components/profile/editor-sidebar';
+import { ProfileInspector } from '@/components/profile/profile-inspector';
+import { ProfilePreview } from '@/components/profile/profile-preview';
+import { useProfileEditor } from '@/hooks/use-profile-editor';
+import { isValidProfile } from '@/lib/profile-validation';
+import { getDefaultProfile } from '@/lib/profiles';
 
-import { LandingEditorPreview } from '@/components/landing/editor-preview';
-import { LandingProfilePreview } from '@/components/landing/profile-preview';
+const initialProfile = getDefaultProfile();
 
-const features = [
-  {
-    icon: LayoutPanelLeft,
-    title: 'Visual editor',
-    description: 'Customize your profile and see every change in real time.'
-  },
-  {
-    icon: Blocks,
-    title: 'Multiple blocks',
-    description: 'Projects, experience, links, gallery, now and more.'
-  },
-  {
-    icon: UsersRound,
-    title: 'Follow creators',
-    description: 'Discover and follow other people building on Forma.'
-  },
-  {
-    icon: Palette,
-    title: 'Make it yours',
-    description: 'Change typography, colors, density and appearance.'
+export default function EditorPage() {
+  const [selected, setSelected] = useState<EditorSelection>('profile');
+
+  const {
+    profile,
+    publishedProfile,
+    loaded,
+    saving,
+    publishing,
+    error,
+    hasUnsavedChanges,
+    hasUnpublishedChanges,
+    isPublished,
+    canUndo,
+    canRedo,
+    undo,
+    redo,
+    updateUsername,
+    updateIdentity,
+    updateAbout,
+    updateNow,
+    addLink,
+    updateLink,
+    removeLink,
+    addProject,
+    updateProject,
+    removeProject,
+    addExperience,
+    updateExperience,
+    removeExperience,
+    addGalleryItem,
+    updateGalleryItem,
+    removeGalleryItem,
+    changePreset,
+    changeTypography,
+    changeAppearance,
+    changePalette,
+    changeDensity,
+    changeRadius,
+    changeBorders,
+    toggleBlock,
+    reorderBlock,
+    reorderLink,
+    reorderProject,
+    reorderExperience,
+    reorderGalleryItem,
+    save,
+    publish,
+    reset
+  } = useProfileEditor({
+    initialProfile
+  });
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      const target = event.target;
+
+      if (
+        target instanceof HTMLInputElement
+        || target instanceof HTMLTextAreaElement
+        || target instanceof HTMLSelectElement
+        || (target instanceof HTMLElement && target.isContentEditable)
+      ) {
+        return;
+      }
+
+      const modifier = event.metaKey || event.ctrlKey;
+
+      if (!modifier) {
+        return;
+      }
+
+      const key = event.key.toLowerCase();
+
+      if (key === 'z' && event.shiftKey) {
+        if (!canRedo) {
+          return;
+        }
+
+        event.preventDefault();
+        redo();
+        return;
+      }
+
+      if (key === 'y') {
+        if (!canRedo) {
+          return;
+        }
+
+        event.preventDefault();
+        redo();
+        return;
+      }
+
+      if (key === 'z') {
+        if (!canUndo) {
+          return;
+        }
+
+        event.preventDefault();
+        undo();
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [canRedo, canUndo, redo, undo]);
+
+  const validProfile = isValidProfile(profile);
+
+  let status = 'Saved';
+
+  if (saving) {
+    status = 'Saving...';
+  } else if (publishing) {
+    status = 'Publishing...';
+  } else if (hasUnsavedChanges) {
+    status = 'Unsaved';
+  } else if (isPublished) {
+    status = 'Published';
+  } else if (hasUnpublishedChanges) {
+    status = 'Ready to publish';
   }
-];
 
-export default function HomePage() {
+  if (!loaded) {
+    return (
+      <main className='flex min-h-screen items-center justify-center bg-white text-neutral-950'>
+        <p className='text-neutral-400 text-sm'>Loading editor...</p>
+      </main>
+    );
+  }
+
   return (
-    <main className='min-h-screen bg-white text-neutral-950'>
-      <header className='border-neutral-200 border-b'>
-        <div className='mx-auto flex h-16 w-full max-w-5xl items-center justify-between px-6'>
-          <Link
-            className='font-semibold text-sm tracking-widest'
-            href='/'
-          >
-            FORMA
-          </Link>
+    <main className='flex h-screen flex-col overflow-hidden bg-white text-neutral-950'>
+      <EditorHeader
+        canRedo={canRedo}
+        canUndo={canUndo}
+        hasUnpublishedChanges={hasUnpublishedChanges}
+        hasUnsavedChanges={hasUnsavedChanges}
+        onPublish={publish}
+        onRedo={redo}
+        onReset={reset}
+        onSave={save}
+        onUndo={undo}
+        publishedUsername={publishedProfile?.username}
+        publishing={publishing}
+        saving={saving}
+        status={status}
+        username={profile.username}
+        validProfile={validProfile}
+      />
 
-          <nav className='hidden items-center gap-8 text-neutral-500 text-sm sm:flex'>
-            <Link
-              className='transition-colors hover:text-neutral-950'
-              href='/explore'
-            >
-              Explore
-            </Link>
-
-            <Link
-              className='transition-colors hover:text-neutral-950'
-              href='/editor'
-            >
-              Editor
-            </Link>
-          </nav>
-
-          <Link
-            className='flex h-9 items-center gap-2 rounded-lg bg-neutral-950 px-4 font-medium text-sm text-white transition-colors hover:bg-neutral-800'
-            href='/signup'
-          >
-            Get started
-            <ArrowRight
-              aria-hidden='true'
-              size={14}
-            />
-          </Link>
+      {error && (
+        <div className='shrink-0 border-red-100 border-b bg-red-50 px-4 py-2 text-red-600 text-sm'>
+          {error}
         </div>
-      </header>
+      )}
 
-      <div className='mx-auto w-full max-w-5xl px-6'>
-        <section className='flex flex-col items-center pt-20 text-center sm:pt-24'>
-          <h1 className='mt-5 max-w-xl font-semibold text-5xl tracking-tight sm:text-6xl'>
-            Your profile,
-            <span className='block text-neutral-400'>your way.</span>
-          </h1>
+      <div className='flex min-h-0 flex-1'>
+        <EditorSidebar
+          blocks={profile.blocks}
+          blockOrder={profile.blockOrder}
+          onReorderBlock={reorderBlock}
+          onSelect={setSelected}
+          selected={selected}
+        />
 
-          <p className='mt-6 max-w-lg text-neutral-500 leading-7'>
-            Build a profile that feels like you. Share your work, projects and
-            ideas, then discover people building theirs.
-          </p>
+        <ProfilePreview
+          onSelectBlock={setSelected}
+          profile={profile}
+          selectedBlock={
+            selected === 'profile' || selected === 'design'
+              ? undefined
+              : selected
+          }
+        />
 
-          <div className='mt-8 flex flex-wrap items-center justify-center gap-3'>
-            <Link
-              className='flex h-11 items-center gap-2 rounded-lg bg-neutral-950 px-5 font-medium text-sm text-white transition-colors hover:bg-neutral-800'
-              href='/signup'
-            >
-              Get started
-              <ArrowRight
-                aria-hidden='true'
-                size={15}
-              />
-            </Link>
-          </div>
-        </section>
-
-        <section className='mt-16 overflow-hidden rounded-xl border border-neutral-200 bg-neutral-50 shadow-sm sm:mt-20'>
-          <div className='grid lg:grid-cols-2'>
-            <LandingEditorPreview />
-            <LandingProfilePreview />
-          </div>
-        </section>
-
-        <section className='grid gap-10 border-neutral-200 border-y py-14 text-center sm:grid-cols-2 lg:grid-cols-4'>
-          {features.map((feature) => {
-            const Icon = feature.icon;
-
-            return (
-              <div
-                className='flex flex-col items-center'
-                key={feature.title}
-              >
-                <div className='flex size-10 items-center justify-center rounded-lg border border-neutral-200 bg-white'>
-                  <Icon
-                    aria-hidden='true'
-                    size={17}
-                  />
-                </div>
-
-                <h3 className='mt-4 font-medium text-sm'>{feature.title}</h3>
-
-                <p className='mt-1.5 max-w-48 text-neutral-500 text-sm leading-5'>
-                  {feature.description}
-                </p>
-              </div>
-            );
-          })}
-        </section>
+        <ProfileInspector
+          onAddExperience={addExperience}
+          onAddGalleryItem={addGalleryItem}
+          onAddLink={addLink}
+          onAddProject={addProject}
+          onChangeAppearance={changeAppearance}
+          onChangeBorders={changeBorders}
+          onChangeDensity={changeDensity}
+          onChangePalette={changePalette}
+          onChangePreset={changePreset}
+          onChangeRadius={changeRadius}
+          onChangeTypography={changeTypography}
+          onReorderExperience={reorderExperience}
+          onReorderGalleryItem={reorderGalleryItem}
+          onReorderLink={reorderLink}
+          onReorderProject={reorderProject}
+          onRemoveExperience={removeExperience}
+          onRemoveGalleryItem={removeGalleryItem}
+          onRemoveLink={removeLink}
+          onRemoveProject={removeProject}
+          onToggleBlock={toggleBlock}
+          onUpdateAbout={updateAbout}
+          onUpdateExperience={updateExperience}
+          onUpdateGalleryItem={updateGalleryItem}
+          onUpdateIdentity={updateIdentity}
+          onUpdateLink={updateLink}
+          onUpdateNow={updateNow}
+          onUpdateProject={updateProject}
+          onUpdateUsername={updateUsername}
+          profile={profile}
+          selectedBlock={selected}
+        />
       </div>
-
-      <footer className='border-neutral-200 border-t'>
-        <div className='mx-auto flex w-full max-w-5xl flex-col gap-5 px-6 py-8 sm:flex-row sm:items-center sm:justify-between'>
-          <div>
-            <p className='font-semibold text-xs tracking-widest'>FORMA</p>
-
-            <p className='mt-1 text-neutral-400 text-xs'>
-              Make your corner of the web.
-            </p>
-          </div>
-
-          <div className='flex items-center gap-5 text-neutral-400 text-xs'>
-            <Link
-              className='transition-colors hover:text-neutral-950'
-              href='/explore'
-            >
-              Explore
-            </Link>
-
-            <Link
-              className='transition-colors hover:text-neutral-950'
-              href='/login'
-            >
-              Sign in
-            </Link>
-
-            <Link
-              className='transition-colors hover:text-neutral-950'
-              href='/editor'
-            >
-              Editor
-            </Link>
-          </div>
-        </div>
-      </footer>
     </main>
   );
 }

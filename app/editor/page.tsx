@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { EditorHeader } from '@/components/profile/editor-header';
 import {
@@ -28,6 +28,10 @@ export default function EditorPage() {
     hasUnsavedChanges,
     hasUnpublishedChanges,
     isPublished,
+    canUndo,
+    canRedo,
+    undo,
+    redo,
     updateUsername,
     updateIdentity,
     updateAbout,
@@ -53,16 +57,76 @@ export default function EditorPage() {
     changeBorders,
     toggleBlock,
     reorderBlock,
-    save,
-    publish,
-    reset,
     reorderLink,
     reorderProject,
     reorderExperience,
-    reorderGalleryItem
+    reorderGalleryItem,
+    save,
+    publish,
+    reset
   } = useProfileEditor({
     initialProfile
   });
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      const target = event.target;
+
+      if (
+        target instanceof HTMLInputElement
+        || target instanceof HTMLTextAreaElement
+        || target instanceof HTMLSelectElement
+        || (target instanceof HTMLElement && target.isContentEditable)
+      ) {
+        return;
+      }
+
+      const modifier = event.metaKey || event.ctrlKey;
+
+      if (!modifier) {
+        return;
+      }
+
+      const key = event.key.toLowerCase();
+
+      if (key === 'z' && event.shiftKey) {
+        if (!canRedo) {
+          return;
+        }
+
+        event.preventDefault();
+        redo();
+
+        return;
+      }
+
+      if (key === 'y') {
+        if (!canRedo) {
+          return;
+        }
+
+        event.preventDefault();
+        redo();
+
+        return;
+      }
+
+      if (key === 'z') {
+        if (!canUndo) {
+          return;
+        }
+
+        event.preventDefault();
+        undo();
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [canRedo, canUndo, redo, undo]);
 
   const validProfile = isValidProfile(profile);
 
@@ -91,11 +155,15 @@ export default function EditorPage() {
   return (
     <main className='flex h-screen flex-col overflow-hidden bg-white text-neutral-950'>
       <EditorHeader
+        canRedo={canRedo}
+        canUndo={canUndo}
         hasUnpublishedChanges={hasUnpublishedChanges}
         hasUnsavedChanges={hasUnsavedChanges}
         onPublish={publish}
+        onRedo={redo}
         onReset={reset}
         onSave={save}
+        onUndo={undo}
         publishedUsername={publishedProfile?.username}
         publishing={publishing}
         saving={saving}
@@ -128,6 +196,7 @@ export default function EditorPage() {
               : selected
           }
         />
+
         <ProfileInspector
           onAddExperience={addExperience}
           onAddGalleryItem={addGalleryItem}

@@ -1,6 +1,13 @@
 'use client';
 
-import { Check, ChevronDown, ExternalLink, RotateCcw } from 'lucide-react';
+import {
+  Check,
+  ChevronDown,
+  ExternalLink,
+  Redo2,
+  RotateCcw,
+  Undo2
+} from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
@@ -15,6 +22,10 @@ interface EditorHeaderProps {
   hasUnpublishedChanges: boolean;
   saving: boolean;
   publishing: boolean;
+  canUndo: boolean;
+  canRedo: boolean;
+  onUndo: () => void;
+  onRedo: () => void;
   onReset: () => void;
   onSave: () => Promise<void>;
   onPublish: () => Promise<void>;
@@ -29,6 +40,10 @@ export function EditorHeader({
   hasUnpublishedChanges,
   saving,
   publishing,
+  canUndo,
+  canRedo,
+  onUndo,
+  onRedo,
   onReset,
   onSave,
   onPublish
@@ -102,6 +117,30 @@ export function EditorHeader({
       </div>
 
       <div className='ml-auto flex shrink-0 items-center gap-2'>
+        <div className='hidden items-center sm:flex'>
+          <HistoryButton
+            disabled={!canUndo || busy}
+            label='Undo'
+            onClick={onUndo}
+          >
+            <Undo2
+              aria-hidden='true'
+              size={16}
+            />
+          </HistoryButton>
+
+          <HistoryButton
+            disabled={!canRedo || busy}
+            label='Redo'
+            onClick={onRedo}
+          >
+            <Redo2
+              aria-hidden='true'
+              size={16}
+            />
+          </HistoryButton>
+        </div>
+
         {publishedUsername && (
           <Link
             aria-label='Open public profile'
@@ -206,6 +245,33 @@ export function EditorHeader({
         </button>
       </div>
     </header>
+  );
+}
+
+interface HistoryButtonProps {
+  label: string;
+  disabled: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}
+
+function HistoryButton({
+  label,
+  disabled,
+  onClick,
+  children
+}: HistoryButtonProps) {
+  return (
+    <button
+      aria-label={label}
+      className='flex size-9 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-950 disabled:cursor-not-allowed disabled:opacity-30'
+      disabled={disabled}
+      onClick={onClick}
+      title={label}
+      type='button'
+    >
+      {children}
+    </button>
   );
 }
 

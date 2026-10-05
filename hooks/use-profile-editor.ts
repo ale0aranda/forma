@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
+import { useProfileHistory } from '@/hooks/use-profile-history';
 import {
   getCurrentProfile,
   ProfileRepositoryError,
@@ -59,11 +60,24 @@ const presetDesigns: Record<ProfilePreset, PresetDesign> = {
 };
 
 export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
-  const [profile, setProfile] = useState(initialProfile);
+  const {
+    value: profile,
+    canUndo,
+    canRedo,
+    update: updateProfile,
+    replace: replaceProfile,
+    undo,
+    redo
+  } = useProfileHistory({
+    initialValue: initialProfile
+  });
+
   const [savedProfile, setSavedProfile] = useState(initialProfile);
+
   const [publishedProfile, setPublishedProfile] = useState<
     Profile | undefined
   >();
+
   const [loaded, setLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
@@ -88,7 +102,7 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
                 username: storedProfile.username
               };
 
-        setProfile(draft);
+        replaceProfile(draft);
         setSavedProfile(draft);
         setPublishedProfile(storedProfile.published ?? undefined);
       } catch {
@@ -107,7 +121,7 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     return () => {
       active = false;
     };
-  }, [initialProfile]);
+  }, [initialProfile, replaceProfile]);
 
   const hasUnsavedChanges =
     JSON.stringify(profile) !== JSON.stringify(savedProfile);
@@ -119,16 +133,19 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
   const isPublished =
     Boolean(publishedProfile) && !hasUnsavedChanges && !hasUnpublishedChanges;
 
-  const updateUsername = useCallback((username: string) => {
-    setProfile((current) => ({
-      ...current,
-      username
-    }));
-  }, []);
+  const updateUsername = useCallback(
+    (username: string) => {
+      updateProfile((current) => ({
+        ...current,
+        username
+      }));
+    },
+    [updateProfile]
+  );
 
   const updateIdentity = useCallback(
     (field: keyof Profile['identity'], value: string) => {
-      setProfile((current) => ({
+      updateProfile((current) => ({
         ...current,
         identity: {
           ...current.identity,
@@ -136,22 +153,28 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
         }
       }));
     },
-    []
+    [updateProfile]
   );
 
-  const updateAbout = useCallback((value: string) => {
-    setProfile((current) => ({
-      ...current,
-      about: value
-    }));
-  }, []);
+  const updateAbout = useCallback(
+    (value: string) => {
+      updateProfile((current) => ({
+        ...current,
+        about: value
+      }));
+    },
+    [updateProfile]
+  );
 
-  const updateNow = useCallback((value: string) => {
-    setProfile((current) => ({
-      ...current,
-      now: value
-    }));
-  }, []);
+  const updateNow = useCallback(
+    (value: string) => {
+      updateProfile((current) => ({
+        ...current,
+        now: value
+      }));
+    },
+    [updateProfile]
+  );
 
   const addLink = useCallback(() => {
     const link: ProfileLink = {
@@ -160,15 +183,15 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
       url: ''
     };
 
-    setProfile((current) => ({
+    updateProfile((current) => ({
       ...current,
       links: [...current.links, link]
     }));
-  }, []);
+  }, [updateProfile]);
 
   const updateLink = useCallback(
     (id: string, field: 'label' | 'url', value: string) => {
-      setProfile((current) => ({
+      updateProfile((current) => ({
         ...current,
         links: current.links.map((link) =>
           link.id === id
@@ -180,15 +203,18 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
         )
       }));
     },
-    []
+    [updateProfile]
   );
 
-  const removeLink = useCallback((id: string) => {
-    setProfile((current) => ({
-      ...current,
-      links: current.links.filter((link) => link.id !== id)
-    }));
-  }, []);
+  const removeLink = useCallback(
+    (id: string) => {
+      updateProfile((current) => ({
+        ...current,
+        links: current.links.filter((link) => link.id !== id)
+      }));
+    },
+    [updateProfile]
+  );
 
   const addProject = useCallback(() => {
     const project: ProfileProject = {
@@ -198,15 +224,15 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
       url: ''
     };
 
-    setProfile((current) => ({
+    updateProfile((current) => ({
       ...current,
       projects: [...current.projects, project]
     }));
-  }, []);
+  }, [updateProfile]);
 
   const updateProject = useCallback(
     (id: string, field: 'name' | 'description' | 'url', value: string) => {
-      setProfile((current) => ({
+      updateProfile((current) => ({
         ...current,
         projects: current.projects.map((project) =>
           project.id === id
@@ -218,15 +244,18 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
         )
       }));
     },
-    []
+    [updateProfile]
   );
 
-  const removeProject = useCallback((id: string) => {
-    setProfile((current) => ({
-      ...current,
-      projects: current.projects.filter((project) => project.id !== id)
-    }));
-  }, []);
+  const removeProject = useCallback(
+    (id: string) => {
+      updateProfile((current) => ({
+        ...current,
+        projects: current.projects.filter((project) => project.id !== id)
+      }));
+    },
+    [updateProfile]
+  );
 
   const addExperience = useCallback(() => {
     const experience: ProfileExperience = {
@@ -237,11 +266,11 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
       description: ''
     };
 
-    setProfile((current) => ({
+    updateProfile((current) => ({
       ...current,
       experience: [...current.experience, experience]
     }));
-  }, []);
+  }, [updateProfile]);
 
   const updateExperience = useCallback(
     (
@@ -249,7 +278,7 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
       field: 'company' | 'role' | 'period' | 'description',
       value: string
     ) => {
-      setProfile((current) => ({
+      updateProfile((current) => ({
         ...current,
         experience: current.experience.map((experience) =>
           experience.id === id
@@ -261,17 +290,20 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
         )
       }));
     },
-    []
+    [updateProfile]
   );
 
-  const removeExperience = useCallback((id: string) => {
-    setProfile((current) => ({
-      ...current,
-      experience: current.experience.filter(
-        (experience) => experience.id !== id
-      )
-    }));
-  }, []);
+  const removeExperience = useCallback(
+    (id: string) => {
+      updateProfile((current) => ({
+        ...current,
+        experience: current.experience.filter(
+          (experience) => experience.id !== id
+        )
+      }));
+    },
+    [updateProfile]
+  );
 
   const addGalleryItem = useCallback(() => {
     const item: ProfileGalleryItem = {
@@ -281,15 +313,15 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
       caption: ''
     };
 
-    setProfile((current) => ({
+    updateProfile((current) => ({
       ...current,
       gallery: [...current.gallery, item]
     }));
-  }, []);
+  }, [updateProfile]);
 
   const updateGalleryItem = useCallback(
     (id: string, field: 'src' | 'alt' | 'caption', value: string) => {
-      setProfile((current) => ({
+      updateProfile((current) => ({
         ...current,
         gallery: current.gallery.map((item) =>
           item.id === id
@@ -301,22 +333,25 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
         )
       }));
     },
-    []
+    [updateProfile]
   );
 
-  const removeGalleryItem = useCallback((id: string) => {
-    setProfile((current) => ({
-      ...current,
-      gallery: current.gallery.filter((item) => item.id !== id)
-    }));
-  }, []);
+  const removeGalleryItem = useCallback(
+    (id: string) => {
+      updateProfile((current) => ({
+        ...current,
+        gallery: current.gallery.filter((item) => item.id !== id)
+      }));
+    },
+    [updateProfile]
+  );
 
   const updateDesign = useCallback(
     <Key extends keyof Profile['design']>(
       field: Key,
       value: Profile['design'][Key]
     ) => {
-      setProfile((current) => ({
+      updateProfile((current) => ({
         ...current,
         design: {
           ...current.design,
@@ -324,19 +359,22 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
         }
       }));
     },
-    []
+    [updateProfile]
   );
 
-  const changePreset = useCallback((preset: ProfilePreset) => {
-    setProfile((current) => ({
-      ...current,
-      design: {
-        ...current.design,
-        ...presetDesigns[preset],
-        preset
-      }
-    }));
-  }, []);
+  const changePreset = useCallback(
+    (preset: ProfilePreset) => {
+      updateProfile((current) => ({
+        ...current,
+        design: {
+          ...current.design,
+          ...presetDesigns[preset],
+          preset
+        }
+      }));
+    },
+    [updateProfile]
+  );
 
   const changeTypography = useCallback(
     (typography: ProfileTypography) => updateDesign('typography', typography),
@@ -368,23 +406,27 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     [updateDesign]
   );
 
-  const toggleBlock = useCallback((block: ProfileBlock) => {
-    setProfile((current) => ({
-      ...current,
-      blocks: {
-        ...current.blocks,
-        [block]: {
-          ...current.blocks[block],
-          visible: !current.blocks[block].visible
+  const toggleBlock = useCallback(
+    (block: ProfileBlock) => {
+      updateProfile((current) => ({
+        ...current,
+        blocks: {
+          ...current.blocks,
+          [block]: {
+            ...current.blocks[block],
+            visible: !current.blocks[block].visible
+          }
         }
-      }
-    }));
-  }, []);
+      }));
+    },
+    [updateProfile]
+  );
 
   const reorderBlock = useCallback(
     (activeBlock: ProfileBlock, overBlock: ProfileBlock) => {
-      setProfile((current) => {
+      updateProfile((current) => {
         const oldIndex = current.blockOrder.indexOf(activeBlock);
+
         const newIndex = current.blockOrder.indexOf(overBlock);
 
         if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) {
@@ -392,6 +434,7 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
         }
 
         const blockOrder = [...current.blockOrder];
+
         const [movedBlock] = blockOrder.splice(oldIndex, 1);
 
         if (!movedBlock) {
@@ -406,36 +449,80 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
         };
       });
     },
-    []
+    [updateProfile]
   );
 
-  const reorderLink = useCallback((activeId: string, overId: string) => {
-    setProfile((current) => ({
-      ...current,
-      links: reorderItems(current.links, activeId, overId)
-    }));
-  }, []);
+  const reorderLink = useCallback(
+    (activeId: string, overId: string) => {
+      updateProfile((current) => {
+        const links = reorderItems(current.links, activeId, overId);
 
-  const reorderProject = useCallback((activeId: string, overId: string) => {
-    setProfile((current) => ({
-      ...current,
-      projects: reorderItems(current.projects, activeId, overId)
-    }));
-  }, []);
+        if (links === current.links) {
+          return current;
+        }
 
-  const reorderExperience = useCallback((activeId: string, overId: string) => {
-    setProfile((current) => ({
-      ...current,
-      experience: reorderItems(current.experience, activeId, overId)
-    }));
-  }, []);
+        return {
+          ...current,
+          links
+        };
+      });
+    },
+    [updateProfile]
+  );
 
-  const reorderGalleryItem = useCallback((activeId: string, overId: string) => {
-    setProfile((current) => ({
-      ...current,
-      gallery: reorderItems(current.gallery, activeId, overId)
-    }));
-  }, []);
+  const reorderProject = useCallback(
+    (activeId: string, overId: string) => {
+      updateProfile((current) => {
+        const projects = reorderItems(current.projects, activeId, overId);
+
+        if (projects === current.projects) {
+          return current;
+        }
+
+        return {
+          ...current,
+          projects
+        };
+      });
+    },
+    [updateProfile]
+  );
+
+  const reorderExperience = useCallback(
+    (activeId: string, overId: string) => {
+      updateProfile((current) => {
+        const experience = reorderItems(current.experience, activeId, overId);
+
+        if (experience === current.experience) {
+          return current;
+        }
+
+        return {
+          ...current,
+          experience
+        };
+      });
+    },
+    [updateProfile]
+  );
+
+  const reorderGalleryItem = useCallback(
+    (activeId: string, overId: string) => {
+      updateProfile((current) => {
+        const gallery = reorderItems(current.gallery, activeId, overId);
+
+        if (gallery === current.gallery) {
+          return current;
+        }
+
+        return {
+          ...current,
+          gallery
+        };
+      });
+    },
+    [updateProfile]
+  );
 
   async function save() {
     setSaving(true);
@@ -477,9 +564,9 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
   }
 
   const reset = useCallback(() => {
-    setProfile(savedProfile);
+    replaceProfile(savedProfile);
     setError(undefined);
-  }, [savedProfile]);
+  }, [replaceProfile, savedProfile]);
 
   return {
     profile,
@@ -491,6 +578,10 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     hasUnsavedChanges,
     hasUnpublishedChanges,
     isPublished,
+    canUndo,
+    canRedo,
+    undo,
+    redo,
     updateUsername,
     updateIdentity,
     updateAbout,
@@ -536,6 +627,7 @@ function reorderItems<Item extends ReorderableItem>(
   overId: string
 ): Item[] {
   const oldIndex = items.findIndex((item) => item.id === activeId);
+
   const newIndex = items.findIndex((item) => item.id === overId);
 
   if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) {
@@ -543,6 +635,7 @@ function reorderItems<Item extends ReorderableItem>(
   }
 
   const nextItems = [...items];
+
   const [movedItem] = nextItems.splice(oldIndex, 1);
 
   if (!movedItem) {

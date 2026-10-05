@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
+import { useProfileAutosave } from '@/hooks/use-profile-autosave';
 import { useProfileHistory } from '@/hooks/use-profile-history';
 import {
   getCurrentProfile,
@@ -524,14 +525,14 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     [updateProfile]
   );
 
-  async function save() {
+  const autosave = useCallback(async (nextProfile: Profile) => {
     setSaving(true);
     setError(undefined);
 
     try {
-      await saveProfile(profile);
+      await saveProfile(nextProfile);
 
-      setSavedProfile(profile);
+      setSavedProfile(nextProfile);
     } catch (caughtError) {
       if (caughtError instanceof ProfileRepositoryError) {
         setError(caughtError.message);
@@ -541,6 +542,16 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     } finally {
       setSaving(false);
     }
+  }, []);
+
+  useProfileAutosave({
+    value: profile,
+    enabled: loaded && hasUnsavedChanges && !publishing,
+    onSave: autosave
+  });
+
+  async function save() {
+    await autosave(profile);
   }
 
   async function publish() {

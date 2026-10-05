@@ -1,11 +1,26 @@
 'use client';
 
 import {
-  ArrowDown,
-  ArrowUp,
+  closestCenter,
+  DndContext,
+  type DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import {
   BriefcaseBusiness,
   CircleUserRound,
   GalleryHorizontal,
+  GripVertical,
   Link2,
   Palette,
   PanelsTopLeft,
@@ -23,7 +38,7 @@ interface EditorSidebarProps {
   blocks: Record<ProfileBlock, ProfileBlockSettings>;
   blockOrder: ProfileBlock[];
   selected: EditorSelection;
-  onMoveBlock: (block: ProfileBlock, direction: 'up' | 'down') => void;
+  onReorderBlock: (active: ProfileBlock, over: ProfileBlock) => void;
   onSelect: (selection: EditorSelection) => void;
 }
 
@@ -51,9 +66,30 @@ export function EditorSidebar({
   blocks,
   blockOrder,
   selected,
-  onMoveBlock,
+  onReorderBlock,
   onSelect
 }: EditorSidebarProps) {
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 4
+      }
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates
+    })
+  );
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    onReorderBlock(active.id as ProfileBlock, over.id as ProfileBlock);
+  }
+
   return (
     <aside className='flex w-56 shrink-0 flex-col border-neutral-200 border-r bg-white'>
       <div className='flex-1 overflow-y-auto p-3'>
@@ -67,81 +103,28 @@ export function EditorSidebar({
         </SidebarSection>
 
         <SidebarSection label='Content'>
-          <div className='space-y-0.5'>
-            {blockOrder.map((block, index) => {
-              const Icon = blockIcons[block];
-              const visible = blocks[block].visible;
-
-              return (
-                <div
-                  className={`group flex items-center rounded-md ${
-                    selected === block
-                      ? 'bg-neutral-100'
-                      : 'hover:bg-neutral-50'
-                  }`}
-                  key={block}
-                >
-                  <button
-                    className='flex min-w-0 flex-1 items-center gap-2.5 px-2 py-2 text-left'
-                    onClick={() => onSelect(block)}
-                    type='button'
-                  >
-                    <Icon
-                      aria-hidden='true'
-                      className={
-                        selected === block
-                          ? 'text-neutral-800'
-                          : 'text-neutral-400'
-                      }
-                      size={15}
-                    />
-
-                    <span
-                      className={`min-w-0 flex-1 truncate text-sm ${
-                        selected === block
-                          ? 'font-medium text-neutral-950'
-                          : 'text-neutral-600'
-                      }`}
-                    >
-                      {blockLabels[block]}
-                    </span>
-
-                    {!visible && (
-                      <span className='size-1.5 shrink-0 rounded-full bg-neutral-300' />
-                    )}
-                  </button>
-
-                  <div className='hidden items-center pr-1 group-hover:flex'>
-                    <button
-                      aria-label={`Move ${blockLabels[block]} up`}
-                      className='flex size-6 items-center justify-center rounded text-neutral-400 hover:bg-white hover:text-neutral-950 disabled:opacity-20'
-                      disabled={index === 0}
-                      onClick={() => onMoveBlock(block, 'up')}
-                      type='button'
-                    >
-                      <ArrowUp
-                        aria-hidden='true'
-                        size={12}
-                      />
-                    </button>
-
-                    <button
-                      aria-label={`Move ${blockLabels[block]} down`}
-                      className='flex size-6 items-center justify-center rounded text-neutral-400 hover:bg-white hover:text-neutral-950 disabled:opacity-20'
-                      disabled={index === blockOrder.length - 1}
-                      onClick={() => onMoveBlock(block, 'down')}
-                      type='button'
-                    >
-                      <ArrowDown
-                        aria-hidden='true'
-                        size={12}
-                      />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <DndContext
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+            sensors={sensors}
+          >
+            <SortableContext
+              items={blockOrder}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className='space-y-0.5'>
+                {blockOrder.map((block) => (
+                  <SortableBlock
+                    block={block}
+                    key={block}
+                    onSelect={onSelect}
+                    selected={selected === block}
+                    visible={blocks[block].visible}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
         </SidebarSection>
 
         <SidebarSection label='Design'>
@@ -164,6 +147,85 @@ export function EditorSidebar({
         </div>
       </div>
     </aside>
+  );
+}
+
+interface SortableBlockProps {
+  block: ProfileBlock;
+  selected: boolean;
+  visible: boolean;
+  onSelect: (selection: EditorSelection) => void;
+}
+
+function SortableBlock({
+  block,
+  selected,
+  visible,
+  onSelect
+}: SortableBlockProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({
+    id: block
+  });
+
+  const Icon = blockIcons[block];
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition
+  };
+
+  return (
+    <div
+      className={`group flex items-center rounded-md ${
+        selected ? 'bg-neutral-100' : 'hover:bg-neutral-50'
+      } ${isDragging ? 'z-10 opacity-50' : ''}`}
+      ref={setNodeRef}
+      style={style}
+    >
+      <button
+        aria-label={`Reorder ${blockLabels[block]}`}
+        className='flex size-8 shrink-0 cursor-grab touch-none items-center justify-center text-neutral-300 transition-colors hover:text-neutral-600 active:cursor-grabbing'
+        type='button'
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical
+          aria-hidden='true'
+          size={14}
+        />
+      </button>
+
+      <button
+        className='flex min-w-0 flex-1 items-center gap-2.5 py-2 pr-2 text-left'
+        onClick={() => onSelect(block)}
+        type='button'
+      >
+        <Icon
+          aria-hidden='true'
+          className={selected ? 'text-neutral-800' : 'text-neutral-400'}
+          size={15}
+        />
+
+        <span
+          className={`min-w-0 flex-1 truncate text-sm ${
+            selected ? 'font-medium text-neutral-950' : 'text-neutral-600'
+          }`}
+        >
+          {blockLabels[block]}
+        </span>
+
+        {!visible && (
+          <span className='size-1.5 shrink-0 rounded-full bg-neutral-300' />
+        )}
+      </button>
+    </div>
   );
 }
 

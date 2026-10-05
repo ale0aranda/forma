@@ -52,7 +52,7 @@ export default function EditorPage() {
     changeRadius,
     changeBorders,
     toggleBlock,
-    moveBlock,
+    reorderBlock,
     save,
     publish,
     reset,
@@ -114,7 +114,7 @@ export default function EditorPage() {
         <EditorSidebar
           blocks={profile.blocks}
           blockOrder={profile.blockOrder}
-          onMoveBlock={moveBlock}
+          onReorderBlock={reorderBlock}
           onSelect={setSelected}
           selected={selected}
         />

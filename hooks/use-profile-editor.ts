@@ -381,28 +381,24 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     }));
   }, []);
 
-  const moveBlock = useCallback(
-    (block: ProfileBlock, direction: 'up' | 'down') => {
+  const reorderBlock = useCallback(
+    (activeBlock: ProfileBlock, overBlock: ProfileBlock) => {
       setProfile((current) => {
-        const currentIndex = current.blockOrder.indexOf(block);
+        const oldIndex = current.blockOrder.indexOf(activeBlock);
+        const newIndex = current.blockOrder.indexOf(overBlock);
 
-        const nextIndex =
-          direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-
-        if (
-          currentIndex === -1
-          || nextIndex < 0
-          || nextIndex >= current.blockOrder.length
-        ) {
+        if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) {
           return current;
         }
 
         const blockOrder = [...current.blockOrder];
+        const [movedBlock] = blockOrder.splice(oldIndex, 1);
 
-        [blockOrder[currentIndex], blockOrder[nextIndex]] = [
-          blockOrder[nextIndex],
-          blockOrder[currentIndex]
-        ];
+        if (!movedBlock) {
+          return current;
+        }
+
+        blockOrder.splice(newIndex, 0, movedBlock);
 
         return {
           ...current,
@@ -522,7 +518,7 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     changeRadius,
     changeBorders,
     toggleBlock,
-    moveBlock,
+    reorderBlock,
     moveLink,
     moveProject,
     moveExperience,

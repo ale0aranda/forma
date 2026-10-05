@@ -33,24 +33,6 @@ const features = [
   }
 ];
 
-const templates = [
-  {
-    name: 'Blueprint',
-    description: 'Clean and structured.',
-    typography: 'font-profile-sans'
-  },
-  {
-    name: 'Editorial',
-    description: 'Elegant and focused.',
-    typography: 'font-profile-serif'
-  },
-  {
-    name: 'Minimal',
-    description: 'Simple and compact.',
-    typography: 'font-profile-mono'
-  }
-];
-
 export default function HomePage() {
   return (
     <main className='min-h-screen bg-white text-neutral-950'>

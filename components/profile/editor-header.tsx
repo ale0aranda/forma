@@ -79,7 +79,7 @@ export function EditorHeader({
   }, []);
 
   return (
-    <header className='flex h-16 shrink-0 items-center border-neutral-200 border-b bg-white px-4'>
+    <header className='flex h-14 shrink-0 items-center border-neutral-200 border-b bg-white px-3 sm:h-16 sm:px-4'>
       <div className='flex min-w-0 items-center gap-6'>
         <Link
           className='shrink-0 font-semibold text-lg text-neutral-950 tracking-tight'
@@ -230,7 +230,7 @@ export function EditorHeader({
         </button>
 
         <button
-          className='h-9 rounded-lg bg-neutral-950 px-4 font-medium text-sm text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:bg-neutral-300'
+          className='h-9 rounded-lg bg-neutral-950 px-3 font-medium text-sm text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:bg-neutral-300 sm:px-4'
           disabled={
             !validProfile
             || busy

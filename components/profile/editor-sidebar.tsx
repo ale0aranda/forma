@@ -30,6 +30,7 @@ import {
   Zap
 } from 'lucide-react';
 
+import type { ReactNode } from 'react';
 import type { ProfileBlock, ProfileBlockSettings } from '@/lib/profile';
 
 export type EditorSelection = ProfileBlock | 'profile' | 'design';
@@ -38,6 +39,7 @@ interface EditorSidebarProps {
   blocks: Record<ProfileBlock, ProfileBlockSettings>;
   blockOrder: ProfileBlock[];
   selected: EditorSelection;
+  mobile?: boolean;
   onReorderBlock: (active: ProfileBlock, over: ProfileBlock) => void;
   onSelect: (selection: EditorSelection) => void;
 }
@@ -66,6 +68,7 @@ export function EditorSidebar({
   blocks,
   blockOrder,
   selected,
+  mobile = false,
   onReorderBlock,
   onSelect
 }: EditorSidebarProps) {
@@ -91,16 +94,24 @@ export function EditorSidebar({
   }
 
   return (
-    <aside className='flex w-56 shrink-0 flex-col border-neutral-200 border-r bg-white'>
-      <div className='flex-1 overflow-y-auto p-3'>
-        <SidebarSection label='Profile'>
-          <SidebarButton
-            active={selected === 'profile'}
-            icon={Settings2}
-            label='Settings'
-            onClick={() => onSelect('profile')}
-          />
-        </SidebarSection>
+    <aside
+      className={
+        mobile
+          ? 'w-full bg-white'
+          : 'flex w-56 shrink-0 flex-col border-neutral-200 border-r bg-white'
+      }
+    >
+      <div className={mobile ? 'p-4' : 'flex-1 overflow-y-auto p-3'}>
+        {!mobile && (
+          <SidebarSection label='Profile'>
+            <SidebarButton
+              active={selected === 'profile'}
+              icon={Settings2}
+              label='Settings'
+              onClick={() => onSelect('profile')}
+            />
+          </SidebarSection>
+        )}
 
         <SidebarSection label='Content'>
           <DndContext
@@ -127,25 +138,30 @@ export function EditorSidebar({
           </DndContext>
         </SidebarSection>
 
-        <SidebarSection label='Design'>
-          <SidebarButton
-            active={selected === 'design'}
-            icon={Palette}
-            label='Appearance'
-            onClick={() => onSelect('design')}
-          />
-        </SidebarSection>
+        {!mobile && (
+          <SidebarSection label='Design'>
+            <SidebarButton
+              active={selected === 'design'}
+              icon={Palette}
+              label='Appearance'
+              onClick={() => onSelect('design')}
+            />
+          </SidebarSection>
+        )}
       </div>
 
-      <div className='border-neutral-200 border-t p-3'>
-        <div className='flex items-center gap-2 px-2 py-1.5 text-neutral-400'>
-          <Text
-            aria-hidden='true'
-            size={13}
-          />
-          <span className='text-xs'>Forma editor</span>
+      {!mobile && (
+        <div className='border-neutral-200 border-t p-3'>
+          <div className='flex items-center gap-2 px-2 py-1.5 text-neutral-400'>
+            <Text
+              aria-hidden='true'
+              size={13}
+            />
+
+            <span className='text-xs'>Forma editor</span>
+          </div>
         </div>
-      </div>
+      )}
     </aside>
   );
 }
@@ -231,7 +247,7 @@ function SortableBlock({
 
 interface SidebarSectionProps {
   label: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 function SidebarSection({ label, children }: SidebarSectionProps) {

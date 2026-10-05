@@ -227,14 +227,14 @@ interface InspectorShellProps {
 
 function InspectorShell({ title, description, children }: InspectorShellProps) {
   return (
-    <aside className='flex w-80 shrink-0 flex-col border-neutral-200 border-l bg-white'>
+    <aside className='flex h-full w-full min-w-0 flex-col bg-white lg:w-80 lg:shrink-0 lg:border-neutral-200 lg:border-l'>
       <div className='shrink-0 border-neutral-100 border-b px-5 py-4'>
         <p className='font-medium text-sm'>{title}</p>
 
         <p className='mt-1 text-neutral-400 text-xs'>{description}</p>
       </div>
 
-      <div className='flex-1 overflow-y-auto p-5'>{children}</div>
+      <div className='min-h-0 flex-1 overflow-y-auto p-5'>{children}</div>
     </aside>
   );
 }

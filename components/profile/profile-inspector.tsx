@@ -57,13 +57,10 @@ interface ProfileInspectorProps {
   onChangeDensity: (density: ProfileDensity) => void;
   onChangeRadius: (radius: ProfileRadius) => void;
   onChangeBorders: (borders: ProfileBorders) => void;
-  onMoveLink: (id: string, direction: 'up' | 'down') => void;
-
-  onMoveProject: (id: string, direction: 'up' | 'down') => void;
-
-  onMoveExperience: (id: string, direction: 'up' | 'down') => void;
-
-  onMoveGalleryItem: (id: string, direction: 'up' | 'down') => void;
+  onReorderLink: (activeId: string, overId: string) => void;
+  onReorderProject: (activeId: string, overId: string) => void;
+  onReorderExperience: (activeId: string, overId: string) => void;
+  onReorderGalleryItem: (activeId: string, overId: string) => void;
 }
 
 const blockLabels: Record<ProfileBlock, string> = {
@@ -103,10 +100,10 @@ export function ProfileInspector({
   onChangeDensity,
   onChangeRadius,
   onChangeBorders,
-  onMoveLink,
-  onMoveProject,
-  onMoveExperience,
-  onMoveGalleryItem
+  onReorderLink,
+  onReorderProject,
+  onReorderExperience,
+  onReorderGalleryItem
 }: ProfileInspectorProps) {
   if (selectedBlock === 'profile') {
     return (
@@ -176,8 +173,8 @@ export function ProfileInspector({
         <LinksEditor
           links={profile.links}
           onAdd={onAddLink}
-          onMove={onMoveLink}
           onRemove={onRemoveLink}
+          onReorder={onReorderLink}
           onUpdate={onUpdateLink}
         />
       )}
@@ -185,8 +182,8 @@ export function ProfileInspector({
       {selectedBlock === 'projects' && (
         <ProjectsEditor
           onAdd={onAddProject}
-          onMove={onMoveProject}
           onRemove={onRemoveProject}
+          onReorder={onReorderProject}
           onUpdate={onUpdateProject}
           projects={profile.projects}
         />
@@ -196,8 +193,8 @@ export function ProfileInspector({
         <ExperienceEditor
           experience={profile.experience}
           onAdd={onAddExperience}
-          onMove={onMoveExperience}
           onRemove={onRemoveExperience}
+          onReorder={onReorderExperience}
           onUpdate={onUpdateExperience}
         />
       )}
@@ -206,8 +203,8 @@ export function ProfileInspector({
         <GalleryEditor
           gallery={profile.gallery}
           onAdd={onAddGalleryItem}
-          onMove={onMoveGalleryItem}
           onRemove={onRemoveGalleryItem}
+          onReorder={onReorderGalleryItem}
           onUpdate={onUpdateGalleryItem}
         />
       )}

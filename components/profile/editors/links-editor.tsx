@@ -1,5 +1,6 @@
 import { EditorField, EditorInput } from '@/components/profile/editor-field';
 import { EditorItem } from '@/components/profile/editor-item';
+import { SortableEditorList } from '@/components/profile/sortable-editor-list';
 import { isValidProfileUrl } from '@/lib/profile-validation';
 
 import type { ProfileLink } from '@/lib/profile';
@@ -9,7 +10,7 @@ interface LinksEditorProps {
   onAdd: () => void;
   onUpdate: (id: string, field: 'label' | 'url', value: string) => void;
   onRemove: (id: string) => void;
-  onMove: (id: string, direction: 'up' | 'down') => void;
+  onReorder: (activeId: string, overId: string) => void;
 }
 
 export function LinksEditor({
@@ -17,52 +18,58 @@ export function LinksEditor({
   onAdd,
   onUpdate,
   onRemove,
-  onMove
+  onReorder
 }: LinksEditorProps) {
   return (
     <div className='space-y-3'>
-      {links.map((link, index) => {
-        const validUrl = isValidProfileUrl(link.url);
+      <SortableEditorList
+        ids={links.map((link) => link.id)}
+        onReorder={onReorder}
+      >
+        <div className='space-y-3'>
+          {links.map((link) => {
+            const validUrl = isValidProfileUrl(link.url);
 
-        return (
-          <EditorItem
-            first={index === 0}
-            key={link.id}
-            last={index === links.length - 1}
-            onMoveDown={() => onMove(link.id, 'down')}
-            onMoveUp={() => onMove(link.id, 'up')}
-            onRemove={() => onRemove(link.id)}
-            title={link.label || 'Untitled link'}
-          >
-            <EditorField label='Label'>
-              <EditorInput
-                onChange={(event) =>
-                  onUpdate(link.id, 'label', event.target.value)
-                }
-                value={link.label}
-              />
-            </EditorField>
+            return (
+              <EditorItem
+                id={link.id}
+                key={link.id}
+                onRemove={() => onRemove(link.id)}
+                title={link.label || 'Untitled link'}
+              >
+                <EditorField label='Label'>
+                  <EditorInput
+                    onChange={(event) =>
+                      onUpdate(link.id, 'label', event.target.value)
+                    }
+                    value={link.label}
+                  />
+                </EditorField>
 
-            <EditorField
-              hint={validUrl ? undefined : 'Enter a valid http or https URL.'}
-              label='URL'
-            >
-              <EditorInput
-                aria-invalid={!validUrl}
-                className={
-                  validUrl ? '' : 'border-red-300 focus:border-red-500'
-                }
-                onChange={(event) =>
-                  onUpdate(link.id, 'url', event.target.value)
-                }
-                placeholder='https://'
-                type='url'
-                value={link.url}
-              />
-            </EditorField>
-          </EditorItem>
-        );
-      })}
+                <EditorField
+                  hint={
+                    validUrl ? undefined : 'Enter a valid http or https URL.'
+                  }
+                  label='URL'
+                >
+                  <EditorInput
+                    aria-invalid={!validUrl}
+                    className={
+                      validUrl ? '' : 'border-red-300 focus:border-red-500'
+                    }
+                    onChange={(event) =>
+                      onUpdate(link.id, 'url', event.target.value)
+                    }
+                    placeholder='https://'
+                    type='url'
+                    value={link.url}
+                  />
+                </EditorField>
+              </EditorItem>
+            );
+          })}
+        </div>
+      </SortableEditorList>
 
       {links.length === 0 && <EmptyItems>No links added yet.</EmptyItems>}
 

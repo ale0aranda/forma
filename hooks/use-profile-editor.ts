@@ -409,36 +409,33 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     []
   );
 
-  const moveLink = useCallback((id: string, direction: 'up' | 'down') => {
+  const reorderLink = useCallback((activeId: string, overId: string) => {
     setProfile((current) => ({
       ...current,
-      links: moveItem(current.links, id, direction)
+      links: reorderItems(current.links, activeId, overId)
     }));
   }, []);
 
-  const moveProject = useCallback((id: string, direction: 'up' | 'down') => {
+  const reorderProject = useCallback((activeId: string, overId: string) => {
     setProfile((current) => ({
       ...current,
-      projects: moveItem(current.projects, id, direction)
+      projects: reorderItems(current.projects, activeId, overId)
     }));
   }, []);
 
-  const moveExperience = useCallback((id: string, direction: 'up' | 'down') => {
+  const reorderExperience = useCallback((activeId: string, overId: string) => {
     setProfile((current) => ({
       ...current,
-      experience: moveItem(current.experience, id, direction)
+      experience: reorderItems(current.experience, activeId, overId)
     }));
   }, []);
 
-  const moveGalleryItem = useCallback(
-    (id: string, direction: 'up' | 'down') => {
-      setProfile((current) => ({
-        ...current,
-        gallery: moveItem(current.gallery, id, direction)
-      }));
-    },
-    []
-  );
+  const reorderGalleryItem = useCallback((activeId: string, overId: string) => {
+    setProfile((current) => ({
+      ...current,
+      gallery: reorderItems(current.gallery, activeId, overId)
+    }));
+  }, []);
 
   async function save() {
     setSaving(true);
@@ -519,39 +516,40 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     changeBorders,
     toggleBlock,
     reorderBlock,
-    moveLink,
-    moveProject,
-    moveExperience,
-    moveGalleryItem,
+    reorderLink,
+    reorderProject,
+    reorderExperience,
+    reorderGalleryItem,
     save,
     publish,
     reset
   };
 }
 
-interface MovableItem {
+interface ReorderableItem {
   id: string;
 }
 
-function moveItem<Item extends MovableItem>(
+function reorderItems<Item extends ReorderableItem>(
   items: Item[],
-  id: string,
-  direction: 'up' | 'down'
+  activeId: string,
+  overId: string
 ): Item[] {
-  const currentIndex = items.findIndex((item) => item.id === id);
+  const oldIndex = items.findIndex((item) => item.id === activeId);
+  const newIndex = items.findIndex((item) => item.id === overId);
 
-  const nextIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
-
-  if (currentIndex === -1 || nextIndex < 0 || nextIndex >= items.length) {
+  if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) {
     return items;
   }
 
   const nextItems = [...items];
+  const [movedItem] = nextItems.splice(oldIndex, 1);
 
-  [nextItems[currentIndex], nextItems[nextIndex]] = [
-    nextItems[nextIndex],
-    nextItems[currentIndex]
-  ];
+  if (!movedItem) {
+    return items;
+  }
+
+  nextItems.splice(newIndex, 0, movedItem);
 
   return nextItems;
 }

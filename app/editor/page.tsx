@@ -56,10 +56,10 @@ export default function EditorPage() {
     save,
     publish,
     reset,
-    moveLink,
-    moveProject,
-    moveExperience,
-    moveGalleryItem
+    reorderLink,
+    reorderProject,
+    reorderExperience,
+    reorderGalleryItem
   } = useProfileEditor({
     initialProfile
   });
@@ -133,10 +133,10 @@ export default function EditorPage() {
           onChangePreset={changePreset}
           onChangeRadius={changeRadius}
           onChangeTypography={changeTypography}
-          onMoveExperience={moveExperience}
-          onMoveGalleryItem={moveGalleryItem}
-          onMoveLink={moveLink}
-          onMoveProject={moveProject}
+          onReorderExperience={reorderExperience}
+          onReorderGalleryItem={reorderGalleryItem}
+          onReorderLink={reorderLink}
+          onReorderProject={reorderProject}
           onRemoveExperience={removeExperience}
           onRemoveGalleryItem={removeGalleryItem}
           onRemoveLink={removeLink}

@@ -1,5 +1,6 @@
 import { EditorField, EditorInput } from '@/components/profile/editor-field';
 import { EditorItem } from '@/components/profile/editor-item';
+import { SortableEditorList } from '@/components/profile/sortable-editor-list';
 
 import type { ProfileGalleryItem } from '@/lib/profile';
 
@@ -12,7 +13,7 @@ interface GalleryEditorProps {
     value: string
   ) => void;
   onRemove: (id: string) => void;
-  onMove: (id: string, direction: 'up' | 'down') => void;
+  onReorder: (activeId: string, overId: string) => void;
 }
 
 export function GalleryEditor({
@@ -20,46 +21,54 @@ export function GalleryEditor({
   onAdd,
   onUpdate,
   onRemove,
-  onMove
+  onReorder
 }: GalleryEditorProps) {
   return (
     <div className='space-y-3'>
-      {gallery.map((item, index) => (
-        <EditorItem
-          first={index === 0}
-          key={item.id}
-          last={index === gallery.length - 1}
-          onMoveDown={() => onMove(item.id, 'down')}
-          onMoveUp={() => onMove(item.id, 'up')}
-          onRemove={() => onRemove(item.id)}
-          title={item.caption || `Image ${index + 1}`}
-        >
-          <EditorField label='Image URL'>
-            <EditorInput
-              onChange={(event) => onUpdate(item.id, 'src', event.target.value)}
-              placeholder='https://'
-              type='url'
-              value={item.src}
-            />
-          </EditorField>
+      <SortableEditorList
+        ids={gallery.map((item) => item.id)}
+        onReorder={onReorder}
+      >
+        <div className='space-y-3'>
+          {gallery.map((item, index) => (
+            <EditorItem
+              id={item.id}
+              key={item.id}
+              onRemove={() => onRemove(item.id)}
+              title={item.caption || `Image ${index + 1}`}
+            >
+              <EditorField label='Image URL'>
+                <EditorInput
+                  onChange={(event) =>
+                    onUpdate(item.id, 'src', event.target.value)
+                  }
+                  placeholder='https://'
+                  type='url'
+                  value={item.src}
+                />
+              </EditorField>
 
-          <EditorField label='Alt text'>
-            <EditorInput
-              onChange={(event) => onUpdate(item.id, 'alt', event.target.value)}
-              value={item.alt}
-            />
-          </EditorField>
+              <EditorField label='Alt text'>
+                <EditorInput
+                  onChange={(event) =>
+                    onUpdate(item.id, 'alt', event.target.value)
+                  }
+                  value={item.alt}
+                />
+              </EditorField>
 
-          <EditorField label='Caption'>
-            <EditorInput
-              onChange={(event) =>
-                onUpdate(item.id, 'caption', event.target.value)
-              }
-              value={item.caption}
-            />
-          </EditorField>
-        </EditorItem>
-      ))}
+              <EditorField label='Caption'>
+                <EditorInput
+                  onChange={(event) =>
+                    onUpdate(item.id, 'caption', event.target.value)
+                  }
+                  value={item.caption}
+                />
+              </EditorField>
+            </EditorItem>
+          ))}
+        </div>
+      </SortableEditorList>
 
       {gallery.length === 0 && (
         <p className='py-3 text-center text-neutral-400 text-xs'>

@@ -4,6 +4,7 @@ import {
   EditorTextarea
 } from '@/components/profile/editor-field';
 import { EditorItem } from '@/components/profile/editor-item';
+import { SortableEditorList } from '@/components/profile/sortable-editor-list';
 import { isValidProfileUrl } from '@/lib/profile-validation';
 
 import type { ProfileProject } from '@/lib/profile';
@@ -17,7 +18,7 @@ interface ProjectsEditorProps {
     value: string
   ) => void;
   onRemove: (id: string) => void;
-  onMove: (id: string, direction: 'up' | 'down') => void;
+  onReorder: (activeId: string, overId: string) => void;
 }
 
 export function ProjectsEditor({
@@ -25,61 +26,68 @@ export function ProjectsEditor({
   onAdd,
   onUpdate,
   onRemove,
-  onMove
+  onReorder
 }: ProjectsEditorProps) {
   return (
     <div className='space-y-3'>
-      {projects.map((project, index) => {
-        const validUrl = !project.url.trim() || isValidProfileUrl(project.url);
+      <SortableEditorList
+        ids={projects.map((project) => project.id)}
+        onReorder={onReorder}
+      >
+        <div className='space-y-3'>
+          {projects.map((project) => {
+            const validUrl =
+              !project.url.trim() || isValidProfileUrl(project.url);
 
-        return (
-          <EditorItem
-            first={index === 0}
-            key={project.id}
-            last={index === projects.length - 1}
-            onMoveDown={() => onMove(project.id, 'down')}
-            onMoveUp={() => onMove(project.id, 'up')}
-            onRemove={() => onRemove(project.id)}
-            title={project.name || 'Untitled project'}
-          >
-            <EditorField label='Name'>
-              <EditorInput
-                onChange={(event) =>
-                  onUpdate(project.id, 'name', event.target.value)
-                }
-                value={project.name}
-              />
-            </EditorField>
+            return (
+              <EditorItem
+                id={project.id}
+                key={project.id}
+                onRemove={() => onRemove(project.id)}
+                title={project.name || 'Untitled project'}
+              >
+                <EditorField label='Name'>
+                  <EditorInput
+                    onChange={(event) =>
+                      onUpdate(project.id, 'name', event.target.value)
+                    }
+                    value={project.name}
+                  />
+                </EditorField>
 
-            <EditorField label='Description'>
-              <EditorTextarea
-                onChange={(event) =>
-                  onUpdate(project.id, 'description', event.target.value)
-                }
-                value={project.description}
-              />
-            </EditorField>
+                <EditorField label='Description'>
+                  <EditorTextarea
+                    onChange={(event) =>
+                      onUpdate(project.id, 'description', event.target.value)
+                    }
+                    value={project.description}
+                  />
+                </EditorField>
 
-            <EditorField
-              hint={validUrl ? undefined : 'Enter a valid http or https URL.'}
-              label='URL'
-            >
-              <EditorInput
-                aria-invalid={!validUrl}
-                className={
-                  validUrl ? '' : 'border-red-300 focus:border-red-500'
-                }
-                onChange={(event) =>
-                  onUpdate(project.id, 'url', event.target.value)
-                }
-                placeholder='https://'
-                type='url'
-                value={project.url}
-              />
-            </EditorField>
-          </EditorItem>
-        );
-      })}
+                <EditorField
+                  hint={
+                    validUrl ? undefined : 'Enter a valid http or https URL.'
+                  }
+                  label='URL'
+                >
+                  <EditorInput
+                    aria-invalid={!validUrl}
+                    className={
+                      validUrl ? '' : 'border-red-300 focus:border-red-500'
+                    }
+                    onChange={(event) =>
+                      onUpdate(project.id, 'url', event.target.value)
+                    }
+                    placeholder='https://'
+                    type='url'
+                    value={project.url}
+                  />
+                </EditorField>
+              </EditorItem>
+            );
+          })}
+        </div>
+      </SortableEditorList>
 
       {projects.length === 0 && (
         <p className='py-3 text-center text-neutral-400 text-xs'>

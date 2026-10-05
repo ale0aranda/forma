@@ -1,5 +1,6 @@
 import { ProfileLink } from '@/components/profile/profile-link';
 import { radiusClasses } from '@/components/profile/renderer/styles';
+import { getProfileLayouts } from '@/lib/profiles';
 
 import type { ReactNode } from 'react';
 import type { Profile, ProfileBlock } from '@/lib/profile';
@@ -23,6 +24,8 @@ export function IdentityHero({
   onSelectBlock
 }: IdentityHeroProps) {
   const { design } = profile;
+  const layouts = getProfileLayouts(profile);
+  const centered = layouts.identity === 'centered';
 
   const mobile = viewport === 'mobile';
   const fixedViewport = viewport !== 'responsive';
@@ -33,11 +36,15 @@ export function IdentityHero({
       : 'grid grid-cols-2 gap-12'
     : 'grid gap-8 md:grid-cols-2 md:gap-12';
 
-  const identityLayoutClassName = fixedViewport
+  const leftIdentityLayoutClassName = fixedViewport
     ? mobile
       ? 'flex min-w-0 flex-col gap-4'
       : 'flex min-w-0 gap-6'
     : 'flex min-w-0 flex-col gap-4 sm:flex-row sm:gap-6';
+
+  const identityLayoutClassName = centered
+    ? 'flex min-w-0 flex-col items-center gap-4 text-center'
+    : leftIdentityLayoutClassName;
 
   const avatarSizeClassName = fixedViewport
     ? mobile
@@ -78,7 +85,9 @@ export function IdentityHero({
 
       <div className={identityLayoutClassName}>
         <div
-          className={`flex shrink-0 items-center justify-center overflow-hidden bg-current/5 font-medium text-lg ${avatarSizeClassName} ${radiusClasses[design.radius]}`}
+          className={`flex shrink-0 items-center justify-center overflow-hidden bg-current/5 font-medium text-lg ${avatarSizeClassName} ${
+            radiusClasses[design.radius]
+          }`}
         >
           {profile.identity.avatar ? (
             <picture>
@@ -111,13 +120,21 @@ export function IdentityHero({
           </p>
 
           {profile.identity.bio && (
-            <p className='wrap-break-word mt-6 max-w-lg text-base leading-7 opacity-70 sm:mt-7'>
+            <p
+              className={`wrap-break-word mt-6 max-w-lg text-base leading-7 opacity-70 sm:mt-7 ${
+                centered ? 'mx-auto' : ''
+              }`}
+            >
               {profile.identity.bio}
             </p>
           )}
 
           {showLinks && profile.links.length > 0 && (
-            <div className='relative z-20 mt-6 flex flex-wrap items-center gap-2 sm:mt-7'>
+            <div
+              className={`relative z-20 mt-6 flex flex-wrap items-center gap-2 sm:mt-7 ${
+                centered ? 'justify-center' : ''
+              }`}
+            >
               {onSelectBlock && (
                 <button
                   aria-label='Edit links'

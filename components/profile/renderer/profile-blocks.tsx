@@ -1,6 +1,7 @@
 import { ArrowRight, BriefcaseBusiness, ImageIcon, Zap } from 'lucide-react';
 
 import { radiusClasses } from '@/components/profile/renderer/styles';
+import { getProfileLayouts } from '@/lib/profiles';
 
 import type { Profile } from '@/lib/profile';
 import type { ProfileViewport } from './styles';
@@ -52,14 +53,45 @@ export function NowBlock({ profile }: BlockProps) {
 }
 
 export function ProjectsBlock({ profile, editing = false }: BlockProps) {
+  const layouts = getProfileLayouts(profile);
+  const grid = layouts.projects === 'grid';
+
   if (profile.projects.length === 0) {
     return <EmptyState>No projects yet.</EmptyState>;
   }
 
   return (
-    <div className='space-y-2'>
+    <div className={grid ? 'grid grid-cols-2 gap-2' : 'space-y-2'}>
       {profile.projects.map((project) => {
-        const content = (
+        const content = grid ? (
+          <div className='flex h-full min-w-0 flex-col'>
+            <div className='flex size-10 shrink-0 items-center justify-center rounded-lg bg-current/5'>
+              <span className='text-sm opacity-60'>
+                {project.name.trim().charAt(0).toUpperCase() || '?'}
+              </span>
+            </div>
+
+            <div className='mt-4 min-w-0 flex-1'>
+              <h3 className='wrap-break-word font-medium text-sm'>
+                {project.name || 'Untitled project'}
+              </h3>
+
+              {project.description && (
+                <p className='wrap-break-word mt-1 text-xs leading-5 opacity-50'>
+                  {project.description}
+                </p>
+              )}
+            </div>
+
+            {project.url && (
+              <ArrowRight
+                aria-hidden='true'
+                className='mt-4 shrink-0 opacity-35'
+                size={15}
+              />
+            )}
+          </div>
+        ) : (
           <div className='flex min-w-0 items-center gap-4'>
             <div className='flex size-10 shrink-0 items-center justify-center rounded-lg bg-current/5'>
               <span className='text-sm opacity-60'>
@@ -89,10 +121,18 @@ export function ProjectsBlock({ profile, editing = false }: BlockProps) {
           </div>
         );
 
+        const itemClassName = grid
+          ? 'block h-full rounded-lg border border-current/10 p-4 transition-colors hover:bg-current/5'
+          : 'block rounded-lg px-2 py-3 transition-colors hover:bg-current/5';
+
+        const editingClassName = grid
+          ? 'h-full rounded-lg border border-current/10 p-4'
+          : 'px-2 py-3';
+
         if (project.url && !editing) {
           return (
             <a
-              className='block rounded-lg px-2 py-3 transition-colors hover:bg-current/5'
+              className={itemClassName}
               href={project.url}
               key={project.id}
               rel='noreferrer'
@@ -105,7 +145,7 @@ export function ProjectsBlock({ profile, editing = false }: BlockProps) {
 
         return (
           <div
-            className='px-2 py-3'
+            className={editingClassName}
             key={project.id}
           >
             {content}
@@ -178,6 +218,8 @@ export function ExperienceBlock({ profile, viewport }: BlockProps) {
 
 export function GalleryBlock({ profile, viewport }: BlockProps) {
   const { design } = profile;
+  const layouts = getProfileLayouts(profile);
+  const featured = layouts.gallery === 'featured';
 
   if (profile.gallery.length === 0) {
     return (
@@ -189,6 +231,48 @@ export function GalleryBlock({ profile, viewport }: BlockProps) {
         />
 
         <EmptyState>No images yet.</EmptyState>
+      </div>
+    );
+  }
+
+  if (featured) {
+    return (
+      <div className='space-y-3'>
+        {profile.gallery.map((item, index) => (
+          <figure
+            className='min-w-0'
+            key={item.id}
+          >
+            {item.src ? (
+              <picture>
+                <source srcSet={item.src} />
+
+                <img
+                  alt={item.alt}
+                  className={`w-full object-cover ${
+                    index === 0 ? 'aspect-video' : 'aspect-square'
+                  } ${radiusClasses[design.radius]}`}
+                  loading='lazy'
+                  src={item.src}
+                />
+              </picture>
+            ) : (
+              <div
+                className={`flex w-full items-center justify-center bg-current/5 text-xs opacity-50 ${
+                  index === 0 ? 'aspect-video' : 'aspect-square'
+                } ${radiusClasses[design.radius]}`}
+              >
+                Image
+              </div>
+            )}
+
+            {item.caption.trim() && (
+              <figcaption className='wrap-break-word mt-2 text-xs opacity-45'>
+                {item.caption}
+              </figcaption>
+            )}
+          </figure>
+        ))}
       </div>
     );
   }
@@ -217,14 +301,18 @@ export function GalleryBlock({ profile, viewport }: BlockProps) {
 
               <img
                 alt={item.alt}
-                className={`aspect-square w-full object-cover ${radiusClasses[design.radius]}`}
+                className={`aspect-square w-full object-cover ${
+                  radiusClasses[design.radius]
+                }`}
                 loading='lazy'
                 src={item.src}
               />
             </picture>
           ) : (
             <div
-              className={`flex aspect-square items-center justify-center bg-current/5 text-xs opacity-50 ${radiusClasses[design.radius]}`}
+              className={`flex aspect-square items-center justify-center bg-current/5 text-xs opacity-50 ${
+                radiusClasses[design.radius]
+              }`}
             >
               Image
             </div>

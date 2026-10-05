@@ -6,14 +6,18 @@ import { LinksEditor } from '@/components/profile/editors/links-editor';
 import { ProfileSettingsEditor } from '@/components/profile/editors/profile-settings-editor';
 import { ProjectsEditor } from '@/components/profile/editors/projects-editor';
 
+import type { ReactNode } from 'react';
 import type {
   Profile,
   ProfileAppearance,
   ProfileBlock,
   ProfileBorders,
   ProfileDensity,
+  ProfileGalleryLayout,
+  ProfileIdentityLayout,
   ProfilePalette,
   ProfilePreset,
+  ProfileProjectsLayout,
   ProfileRadius,
   ProfileTypography
 } from '@/lib/profile';
@@ -21,45 +25,79 @@ import type {
 interface ProfileInspectorProps {
   profile: Profile;
   selectedBlock: ProfileBlock | 'profile' | 'design';
+
   onUpdateUsername: (username: string) => void;
+
   onToggleBlock: (block: ProfileBlock) => void;
+
   onUpdateIdentity: (field: keyof Profile['identity'], value: string) => void;
+
   onUpdateAbout: (value: string) => void;
+
   onUpdateNow: (value: string) => void;
+
   onAddLink: () => void;
+
   onUpdateLink: (id: string, field: 'label' | 'url', value: string) => void;
+
   onRemoveLink: (id: string) => void;
+
   onAddProject: () => void;
+
   onUpdateProject: (
     id: string,
     field: 'name' | 'description' | 'url',
     value: string
   ) => void;
+
   onRemoveProject: (id: string) => void;
+
   onAddExperience: () => void;
+
   onUpdateExperience: (
     id: string,
     field: 'company' | 'role' | 'period' | 'description',
     value: string
   ) => void;
+
   onRemoveExperience: (id: string) => void;
+
   onAddGalleryItem: () => void;
+
   onUpdateGalleryItem: (
     id: string,
     field: 'src' | 'alt' | 'caption',
     value: string
   ) => void;
+
   onRemoveGalleryItem: (id: string) => void;
+
   onChangePreset: (preset: ProfilePreset) => void;
+
   onChangeTypography: (typography: ProfileTypography) => void;
+
   onChangeAppearance: (appearance: ProfileAppearance) => void;
+
   onChangePalette: (palette: ProfilePalette) => void;
+
   onChangeDensity: (density: ProfileDensity) => void;
+
   onChangeRadius: (radius: ProfileRadius) => void;
+
   onChangeBorders: (borders: ProfileBorders) => void;
+
+  onChangeIdentityLayout: (layout: ProfileIdentityLayout) => void;
+
+  onChangeProjectsLayout: (layout: ProfileProjectsLayout) => void;
+
+  onChangeGalleryLayout: (layout: ProfileGalleryLayout) => void;
+
   onReorderLink: (activeId: string, overId: string) => void;
+
   onReorderProject: (activeId: string, overId: string) => void;
+
   onReorderExperience: (activeId: string, overId: string) => void;
+
   onReorderGalleryItem: (activeId: string, overId: string) => void;
 }
 
@@ -100,6 +138,9 @@ export function ProfileInspector({
   onChangeDensity,
   onChangeRadius,
   onChangeBorders,
+  onChangeIdentityLayout,
+  onChangeProjectsLayout,
+  onChangeGalleryLayout,
   onReorderLink,
   onReorderProject,
   onReorderExperience,
@@ -145,6 +186,12 @@ export function ProfileInspector({
     );
   }
 
+  const identityLayout = profile.layouts?.identity ?? 'left';
+
+  const projectsLayout = profile.layouts?.projects ?? 'list';
+
+  const galleryLayout = profile.layouts?.gallery ?? 'grid';
+
   return (
     <InspectorShell
       description='Edit this block.'
@@ -158,6 +205,8 @@ export function ProfileInspector({
       {selectedBlock === 'identity' && (
         <IdentityEditor
           identity={profile.identity}
+          layout={identityLayout}
+          onChangeLayout={onChangeIdentityLayout}
           onUpdate={onUpdateIdentity}
         />
       )}
@@ -181,7 +230,9 @@ export function ProfileInspector({
 
       {selectedBlock === 'projects' && (
         <ProjectsEditor
+          layout={projectsLayout}
           onAdd={onAddProject}
+          onChangeLayout={onChangeProjectsLayout}
           onRemove={onRemoveProject}
           onReorder={onReorderProject}
           onUpdate={onUpdateProject}
@@ -202,7 +253,9 @@ export function ProfileInspector({
       {selectedBlock === 'gallery' && (
         <GalleryEditor
           gallery={profile.gallery}
+          layout={galleryLayout}
           onAdd={onAddGalleryItem}
+          onChangeLayout={onChangeGalleryLayout}
           onRemove={onRemoveGalleryItem}
           onReorder={onReorderGalleryItem}
           onUpdate={onUpdateGalleryItem}
@@ -222,7 +275,7 @@ export function ProfileInspector({
 interface InspectorShellProps {
   title: string;
   description: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 function InspectorShell({ title, description, children }: InspectorShellProps) {

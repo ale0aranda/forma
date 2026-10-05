@@ -53,6 +53,9 @@ export default function EditorPage() {
     changeAppearance,
     changePalette,
     changeDensity,
+    changeGalleryLayout,
+    changeIdentityLayout,
+    changeProjectsLayout,
     changeRadius,
     changeBorders,
     toggleBlock,
@@ -204,8 +207,11 @@ export default function EditorPage() {
           onChangeAppearance={changeAppearance}
           onChangeBorders={changeBorders}
           onChangeDensity={changeDensity}
+          onChangeGalleryLayout={changeGalleryLayout}
+          onChangeIdentityLayout={changeIdentityLayout}
           onChangePalette={changePalette}
           onChangePreset={changePreset}
+          onChangeProjectsLayout={changeProjectsLayout}
           onChangeRadius={changeRadius}
           onChangeTypography={changeTypography}
           onReorderExperience={reorderExperience}

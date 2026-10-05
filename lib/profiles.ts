@@ -1,4 +1,10 @@
-import type { Profile } from '@/lib/profile';
+import type { Profile, ProfileLayouts } from '@/lib/profile';
+
+export const defaultProfileLayouts: ProfileLayouts = {
+  identity: 'left',
+  projects: 'list',
+  gallery: 'grid'
+};
 
 const profiles: Profile[] = [
   {
@@ -30,13 +36,27 @@ const profiles: Profile[] = [
     experience: [],
     gallery: [],
     blocks: {
-      identity: { visible: true },
-      about: { visible: true },
-      links: { visible: true },
-      projects: { visible: true },
-      experience: { visible: true },
-      gallery: { visible: true },
-      now: { visible: true }
+      identity: {
+        visible: true
+      },
+      about: {
+        visible: true
+      },
+      links: {
+        visible: true
+      },
+      projects: {
+        visible: true
+      },
+      experience: {
+        visible: true
+      },
+      gallery: {
+        visible: true
+      },
+      now: {
+        visible: true
+      }
     },
     blockOrder: [
       'identity',
@@ -55,6 +75,9 @@ const profiles: Profile[] = [
       density: 'airy',
       radius: 'small',
       borders: 'subtle'
+    },
+    layouts: {
+      ...defaultProfileLayouts
     }
   }
 ];
@@ -70,5 +93,12 @@ export function getDefaultProfile(): Profile {
     throw new Error('Default profile not found');
   }
 
-  return profile;
+  return structuredClone(profile);
+}
+
+export function getProfileLayouts(profile: Profile): ProfileLayouts {
+  return {
+    ...defaultProfileLayouts,
+    ...profile.layouts
+  };
 }

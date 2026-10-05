@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { useProfileAutosave } from '@/hooks/use-profile-autosave';
 import { useProfileHistory } from '@/hooks/use-profile-history';
 import {
   getCurrentProfile,
@@ -10,6 +9,7 @@ import {
   publishProfile,
   saveProfile
 } from '@/lib/profile-repository';
+import { defaultProfileLayouts } from '@/lib/profiles';
 
 import type {
   Profile,
@@ -19,10 +19,13 @@ import type {
   ProfileDensity,
   ProfileExperience,
   ProfileGalleryItem,
+  ProfileGalleryLayout,
+  ProfileIdentityLayout,
   ProfileLink,
   ProfilePalette,
   ProfilePreset,
   ProfileProject,
+  ProfileProjectsLayout,
   ProfileRadius,
   ProfileTypography
 } from '@/lib/profile';
@@ -80,8 +83,11 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
   >();
 
   const [loaded, setLoaded] = useState(false);
+
   const [saving, setSaving] = useState(false);
+
   const [publishing, setPublishing] = useState(false);
+
   const [error, setError] = useState<string>();
 
   useEffect(() => {
@@ -407,6 +413,48 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     [updateDesign]
   );
 
+  const changeIdentityLayout = useCallback(
+    (layout: ProfileIdentityLayout) => {
+      updateProfile((current) => ({
+        ...current,
+        layouts: {
+          ...defaultProfileLayouts,
+          ...current.layouts,
+          identity: layout
+        }
+      }));
+    },
+    [updateProfile]
+  );
+
+  const changeProjectsLayout = useCallback(
+    (layout: ProfileProjectsLayout) => {
+      updateProfile((current) => ({
+        ...current,
+        layouts: {
+          ...defaultProfileLayouts,
+          ...current.layouts,
+          projects: layout
+        }
+      }));
+    },
+    [updateProfile]
+  );
+
+  const changeGalleryLayout = useCallback(
+    (layout: ProfileGalleryLayout) => {
+      updateProfile((current) => ({
+        ...current,
+        layouts: {
+          ...defaultProfileLayouts,
+          ...current.layouts,
+          gallery: layout
+        }
+      }));
+    },
+    [updateProfile]
+  );
+
   const toggleBlock = useCallback(
     (block: ProfileBlock) => {
       updateProfile((current) => ({
@@ -525,14 +573,14 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     [updateProfile]
   );
 
-  const autosave = useCallback(async (nextProfile: Profile) => {
+  async function save() {
     setSaving(true);
     setError(undefined);
 
     try {
-      await saveProfile(nextProfile);
+      await saveProfile(profile);
 
-      setSavedProfile(nextProfile);
+      setSavedProfile(profile);
     } catch (caughtError) {
       if (caughtError instanceof ProfileRepositoryError) {
         setError(caughtError.message);
@@ -542,16 +590,6 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     } finally {
       setSaving(false);
     }
-  }, []);
-
-  useProfileAutosave({
-    value: profile,
-    enabled: loaded && hasUnsavedChanges && !publishing,
-    onSave: autosave
-  });
-
-  async function save() {
-    await autosave(profile);
   }
 
   async function publish() {
@@ -616,6 +654,9 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     changeDensity,
     changeRadius,
     changeBorders,
+    changeIdentityLayout,
+    changeProjectsLayout,
+    changeGalleryLayout,
     toggleBlock,
     reorderBlock,
     reorderLink,

@@ -27,6 +27,12 @@ export type ProfileRadius = 'square' | 'small' | 'rounded';
 
 export type ProfileBorders = 'none' | 'subtle' | 'strong';
 
+export type ProfileIdentityLayout = 'left' | 'centered';
+
+export type ProfileProjectsLayout = 'list' | 'grid';
+
+export type ProfileGalleryLayout = 'grid' | 'featured';
+
 export interface ProfileLink {
   id: string;
   label: string;
@@ -69,6 +75,12 @@ export interface ProfileDesign {
   borders: ProfileBorders;
 }
 
+export interface ProfileLayouts {
+  identity: ProfileIdentityLayout;
+  projects: ProfileProjectsLayout;
+  gallery: ProfileGalleryLayout;
+}
+
 export interface Profile {
   username: string;
   identity: {
@@ -86,4 +98,6 @@ export interface Profile {
   blocks: Record<ProfileBlock, ProfileBlockSettings>;
   blockOrder: ProfileBlock[];
   design: ProfileDesign;
+
+  layouts?: ProfileLayouts;
 }

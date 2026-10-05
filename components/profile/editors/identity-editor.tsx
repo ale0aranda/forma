@@ -8,17 +8,25 @@ import {
   EditorInput,
   EditorTextarea
 } from '@/components/profile/editor-field';
+import { EditorSegmentedControl } from '@/components/profile/editor-segmented-control';
 import { AvatarError, removeAvatar, uploadAvatar } from '@/lib/avatar';
 
 import type { ChangeEvent } from 'react';
-import type { Profile } from '@/lib/profile';
+import type { Profile, ProfileIdentityLayout } from '@/lib/profile';
 
 interface IdentityEditorProps {
   identity: Profile['identity'];
+  layout: ProfileIdentityLayout;
+  onChangeLayout: (layout: ProfileIdentityLayout) => void;
   onUpdate: (field: keyof Profile['identity'], value: string) => void;
 }
 
-export function IdentityEditor({ identity, onUpdate }: IdentityEditorProps) {
+export function IdentityEditor({
+  identity,
+  layout,
+  onChangeLayout,
+  onUpdate
+}: IdentityEditorProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [uploading, setUploading] = useState(false);
@@ -77,6 +85,22 @@ export function IdentityEditor({ identity, onUpdate }: IdentityEditorProps) {
 
   return (
     <div className='space-y-5'>
+      <EditorSegmentedControl
+        label='Layout'
+        onChange={onChangeLayout}
+        options={[
+          {
+            label: 'Left',
+            value: 'left'
+          },
+          {
+            label: 'Centered',
+            value: 'centered'
+          }
+        ]}
+        value={layout}
+      />
+
       <div>
         <p className='mb-2 font-medium text-neutral-600 text-xs'>Avatar</p>
 

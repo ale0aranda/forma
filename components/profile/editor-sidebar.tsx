@@ -256,7 +256,7 @@ function SortableBlock({
         aria-pressed={visible}
         className={`mr-1 flex size-7 shrink-0 items-center justify-center rounded text-neutral-400 transition-colors hover:bg-neutral-200 hover:text-neutral-700 ${
           visible
-            ? 'opacity-0 group-hover:opacity-100 focus:opacity-100'
+            ? 'opacity-0 focus:opacity-100 group-hover:opacity-100'
             : 'opacity-100'
         }`}
         onClick={onToggle}

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { LoginForm } from '@/components/auth/login-form';
+import { SocialLogin } from '@/components/auth/social-login';
 import { createClient } from '@/lib/supabase/server';
 
 interface LoginPageProps {
@@ -24,24 +25,35 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <main className='flex min-h-screen items-center justify-center bg-white px-6 py-12'>
       <div className='w-full max-w-md'>
-        <Link
-          className='inline-block font-semibold text-lg text-neutral-950 tracking-tight'
-          href='/'
-        >
-          Forma
-        </Link>
+        <div className='text-center'>
+          <Link
+            className='inline-block font-semibold text-2xl text-neutral-950 tracking-tight transition-opacity hover:opacity-60'
+            href='/'
+          >
+            Forma
+          </Link>
 
-        <div className='mt-14'>
-          <h1 className='font-semibold text-3xl text-neutral-950 tracking-tight'>
+          <h1 className='mt-12 font-semibold text-4xl text-neutral-950 tracking-tight'>
             Welcome back
           </h1>
 
-          <p className='mt-2 text-base text-neutral-500'>
+          <p className='mt-3 text-neutral-500 text-sm'>
             Log in to continue editing your profile.
           </p>
         </div>
 
-        <LoginForm error={error} />
+        {error === 'oauth' && (
+          <div
+            className='mt-6 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-red-600 text-sm'
+            role='alert'
+          >
+            Could not complete sign in. Please try again.
+          </div>
+        )}
+
+        <LoginForm error={error === 'oauth' ? undefined : error} />
+
+        <SocialLogin />
 
         <p className='mt-8 text-center text-neutral-500 text-sm'>
           New to Forma?{' '}

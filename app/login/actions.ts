@@ -24,6 +24,21 @@ function getCredentials(formData: FormData) {
   };
 }
 
+function getSignupCredentials(formData: FormData) {
+  const credentials = getCredentials(formData);
+  const confirmation = formData.get('passwordConfirmation');
+
+  if (
+    !credentials
+    || typeof confirmation !== 'string'
+    || credentials.password !== confirmation
+  ) {
+    return undefined;
+  }
+
+  return credentials;
+}
+
 export async function login(formData: FormData) {
   const credentials = getCredentials(formData);
 
@@ -43,7 +58,7 @@ export async function login(formData: FormData) {
 }
 
 export async function signup(formData: FormData) {
-  const credentials = getCredentials(formData);
+  const credentials = getSignupCredentials(formData);
 
   if (!credentials) {
     redirect('/signup?error=invalid');

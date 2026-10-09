@@ -2,10 +2,10 @@
 
 import { useCallback } from 'react';
 
-import { useProfileHistory } from '@/hooks/use-profile-history';
 import { defaultProfileLayouts } from '@/src/features/profile/domain/profile-defaults';
 import { presetDesigns } from '@/src/features/profile/domain/profile-presets';
 import { useProfileEditorPersistence } from '@/src/features/profile/presentation/hooks/use-profile-editor-persistence';
+import { useProfileHistory } from '@/src/shared/hooks/use-profile-history';
 
 import type {
   Profile,

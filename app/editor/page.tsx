@@ -10,10 +10,10 @@ import {
 } from '@/components/profile/editor-sidebar';
 import { ProfileInspector } from '@/components/profile/profile-inspector';
 import { ProfilePreview } from '@/components/profile/profile-preview';
-import { useProfileAutosave } from '@/hooks/use-profile-autosave';
-import { useProfileEditor } from '@/hooks/use-profile-editor';
 import { getDefaultProfile } from '@/src/features/profile/domain/profile-defaults';
 import { isValidProfile } from '@/src/features/profile/domain/profile-validation';
+import { useProfileEditor } from '@/src/features/profile/presentation/hooks/use-profile-editor';
+import { useProfileAutosave } from '@/src/shared/hooks/use-profile-autosave';
 
 const initialProfile = getDefaultProfile();
 

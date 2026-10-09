@@ -1,6 +1,6 @@
 import { ProfileResult } from '@/components/explore/profile-result';
 
-import type { ProfileSearchResult } from '@/lib/profile-search-repository';
+import type { ProfileSearchResult } from '@/src/features/profile/application/ports/profile-search-repository';
 
 interface ProfileResultsProps {
   results: ProfileSearchResult[];

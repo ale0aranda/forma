@@ -1,12 +1,10 @@
 import { createClient } from '@/lib/supabase/server';
 
 import type { Profile } from '@/src/features/profile/domain/profile';
-
-export interface ProfileSearchResult {
-  username: string;
-  profile: Profile;
-  followers: number;
-}
+import type {
+  ProfileSearchRepository,
+  ProfileSearchResult
+} from '../../application/ports/profile-search-repository';
 
 interface ProfileSearchRow {
   username: string;
@@ -38,3 +36,7 @@ export async function searchProfiles(
     followers: Number(row.followers)
   }));
 }
+
+export const supabaseProfileSearchRepository: ProfileSearchRepository = {
+  searchProfiles
+};

@@ -1,7 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
-import type { ProfileSearchResult } from '@/lib/profile-search-repository';
+import type { ProfileSearchResult } from '@/src/features/profile/application/ports/profile-search-repository';
 
 interface ProfileResultProps {
   result: ProfileSearchResult;

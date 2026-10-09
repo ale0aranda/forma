@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { PublicProfile } from '@/components/profile/public-profile';
-import { getFollowState } from '@/lib/follows';
+import { loadFollowState } from '@/src/composition/follows';
 import { loadPublicProfile } from '@/src/composition/public-profile';
 
 import type { Metadata } from 'next';
@@ -47,7 +47,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     notFound();
   }
 
-  const followState = await getFollowState(publicProfile.userId);
+  const followState = await loadFollowState(publicProfile.userId);
 
   return (
     <PublicProfile

@@ -3,12 +3,8 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { useProfileHistory } from '@/hooks/use-profile-history';
-import {
-  getCurrentProfile,
-  ProfileRepositoryError,
-  publishProfile,
-  saveProfile
-} from '@/lib/profile-repository';
+import { profileEditorUseCases } from '@/src/composition/profile-editor';
+import { ProfileRepositoryError } from '@/src/features/profile/application/profile-repository-error';
 import { defaultProfileLayouts } from '@/src/features/profile/domain/profile-defaults';
 
 import type {
@@ -95,19 +91,13 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
 
     async function loadProfile() {
       try {
-        const storedProfile = await getCurrentProfile();
+        const storedProfile = await profileEditorUseCases.load(initialProfile);
 
         if (!active) {
           return;
         }
 
-        const draft =
-          Object.keys(storedProfile.draft).length > 0
-            ? storedProfile.draft
-            : {
-                ...initialProfile,
-                username: storedProfile.username
-              };
+        const draft = storedProfile.draft;
 
         replaceProfile(draft);
         setSavedProfile(draft);
@@ -581,7 +571,7 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     setError(undefined);
 
     try {
-      await saveProfile(profile);
+      await profileEditorUseCases.save(profile);
 
       setSavedProfile(profile);
     } catch (caughtError) {
@@ -600,7 +590,7 @@ export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
     setError(undefined);
 
     try {
-      await publishProfile(profile);
+      await profileEditorUseCases.publish(profile);
 
       setSavedProfile(profile);
       setPublishedProfile(profile);

@@ -10,6 +10,7 @@ import {
 } from '@/components/profile/editor-sidebar';
 import { ProfileInspector } from '@/components/profile/profile-inspector';
 import { ProfilePreview } from '@/components/profile/profile-preview';
+import { useProfileAutosave } from '@/hooks/use-profile-autosave';
 import { useProfileEditor } from '@/hooks/use-profile-editor';
 import { getDefaultProfile } from '@/src/features/profile/domain/profile-defaults';
 import { isValidProfile } from '@/src/features/profile/domain/profile-validation';
@@ -137,6 +138,18 @@ export default function EditorPage() {
   }, [canRedo, canUndo, redo, undo]);
 
   const validProfile = isValidProfile(profile);
+
+  useProfileAutosave({
+    value: profile,
+    enabled:
+      loaded
+      && hasUnsavedChanges
+      && validProfile
+      && !saving
+      && !publishing
+      && !error,
+    onSave: save
+  });
 
   let status = 'Saved';
 

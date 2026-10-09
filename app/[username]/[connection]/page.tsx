@@ -5,12 +5,11 @@ import { notFound } from 'next/navigation';
 import { AppHeader } from '@/components/app-header';
 import { ProfileConnectionList } from '@/components/profile/profile-connection-list';
 import { getCurrentProfile } from '@/lib/current-profile';
-import {
-  getProfileConnections,
-  type ProfileConnectionType
-} from '@/lib/profile-social-repository';
-import { getPublicProfile } from '@/lib/public-profile-repository';
 import { createClient } from '@/lib/supabase/server';
+import { loadProfileConnections } from '@/src/composition/profile-connections';
+import { loadPublicProfile } from '@/src/composition/public-profile';
+
+import type { ProfileConnectionType } from '@/src/features/follows/application/ports/profile-connections-repository';
 
 interface ProfileConnectionsPageProps {
   params: Promise<{
@@ -33,8 +32,8 @@ export default async function ProfileConnectionsPage({
   }
 
   const [publicProfile, connections, supabase] = await Promise.all([
-    getPublicProfile(username),
-    getProfileConnections(username, connection),
+    loadPublicProfile(username),
+    loadProfileConnections(username, connection),
     createClient()
   ]);
 

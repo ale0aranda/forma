@@ -4,7 +4,7 @@ import Link from 'next/link';
 import type {
   ProfileConnection,
   ProfileConnectionType
-} from '@/lib/profile-social-repository';
+} from '@/src/features/follows/application/ports/profile-connections-repository';
 
 interface ProfileConnectionListProps {
   connections: ProfileConnection[];

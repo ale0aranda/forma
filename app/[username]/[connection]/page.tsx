@@ -4,10 +4,10 @@ import { notFound } from 'next/navigation';
 
 import { AppHeader } from '@/components/app-header';
 import { ProfileConnectionList } from '@/components/profile/profile-connection-list';
-import { getCurrentProfile } from '@/lib/current-profile';
-import { createClient } from '@/lib/supabase/server';
+import { loadCurrentProfile } from '@/src/composition/current-profile';
 import { loadProfileConnections } from '@/src/composition/profile-connections';
 import { loadPublicProfile } from '@/src/composition/public-profile';
+import { loadAuthenticationState } from '@/src/composition/session';
 
 import type { ProfileConnectionType } from '@/src/features/follows/application/ports/profile-connections-repository';
 
@@ -31,21 +31,17 @@ export default async function ProfileConnectionsPage({
     notFound();
   }
 
-  const [publicProfile, connections, supabase] = await Promise.all([
+  const [publicProfile, connections, authenticated] = await Promise.all([
     loadPublicProfile(username),
     loadProfileConnections(username, connection),
-    createClient()
+    loadAuthenticationState()
   ]);
 
   if (!publicProfile) {
     notFound();
   }
 
-  const { data } = await supabase.auth.getUser();
-
-  const authenticated = Boolean(data.user);
-
-  const currentProfile = authenticated ? await getCurrentProfile() : undefined;
+  const currentProfile = authenticated ? await loadCurrentProfile() : undefined;
 
   const { profile } = publicProfile;
 

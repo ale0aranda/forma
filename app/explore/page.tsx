@@ -2,9 +2,9 @@ import { Search } from 'lucide-react';
 
 import { AppHeader } from '@/components/app-header';
 import { ProfileResults } from '@/components/explore/profile-results';
-import { getCurrentProfile } from '@/lib/current-profile';
-import { createClient } from '@/lib/supabase/server';
+import { loadCurrentProfile } from '@/src/composition/current-profile';
 import { searchPublicProfiles } from '@/src/composition/profile-search';
+import { loadAuthenticationState } from '@/src/composition/session';
 
 import type { Metadata } from 'next';
 
@@ -24,15 +24,12 @@ export default async function ExplorePage({ searchParams }: ExplorePageProps) {
 
   const query = q?.trim() ?? '';
 
-  const [results, supabase] = await Promise.all([
+  const [results, authenticated] = await Promise.all([
     searchPublicProfiles(query),
-    createClient()
+    loadAuthenticationState()
   ]);
 
-  const { data } = await supabase.auth.getUser();
-  const authenticated = Boolean(data.user);
-
-  const profile = authenticated ? await getCurrentProfile() : undefined;
+  const profile = authenticated ? await loadCurrentProfile() : undefined;
 
   return (
     <main className='min-h-screen bg-white'>

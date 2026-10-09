@@ -5,8 +5,8 @@ import { redirect } from 'next/navigation';
 import { logout } from '@/app/editor/actions';
 import { AppHeader } from '@/components/app-header';
 import { DeleteAccount } from '@/components/settings/delete-account';
-import { getCurrentProfile } from '@/lib/current-profile';
-import { createClient } from '@/lib/supabase/server';
+import { loadCurrentProfile } from '@/src/composition/current-profile';
+import { loadSessionUser } from '@/src/composition/session';
 
 interface SettingsPageProps {
   searchParams: Promise<{
@@ -17,15 +17,13 @@ interface SettingsPageProps {
 export default async function SettingsPage({
   searchParams
 }: SettingsPageProps) {
-  const supabase = await createClient();
+  const user = await loadSessionUser();
 
-  const { data } = await supabase.auth.getUser();
-
-  if (!data.user) {
+  if (!user) {
     redirect('/login');
   }
 
-  const profile = await getCurrentProfile();
+  const profile = await loadCurrentProfile();
 
   const { error } = await searchParams;
 
@@ -143,7 +141,7 @@ export default async function SettingsPage({
 
                   <div className='rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2.5'>
                     <p className='truncate text-neutral-800 text-sm'>
-                      {data.user.email}
+                      {user.email}
                     </p>
                   </div>
 

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-import { createClient } from '@/lib/supabase/server';
+import { loadVerifiedClaimsState } from '@/src/composition/session';
 
 import type { ReactNode } from 'react';
 
@@ -9,11 +9,9 @@ interface EditorLayoutProps {
 }
 
 export default async function EditorLayout({ children }: EditorLayoutProps) {
-  const supabase = await createClient();
+  const authenticated = await loadVerifiedClaimsState();
 
-  const { data } = await supabase.auth.getClaims();
-
-  if (!data?.claims) {
+  if (!authenticated) {
     redirect('/login');
   }
 

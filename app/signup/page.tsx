@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 
 import { SignupForm } from '@/components/auth/signup-form';
 import { SocialLogin } from '@/components/auth/social-login';
-import { createClient } from '@/lib/supabase/server';
+import { loadAuthenticationState } from '@/src/composition/session';
 
 interface SignupPageProps {
   searchParams: Promise<{
@@ -13,11 +13,9 @@ interface SignupPageProps {
 }
 
 export default async function SignupPage({ searchParams }: SignupPageProps) {
-  const supabase = await createClient();
+  const authenticated = await loadAuthenticationState();
 
-  const { data } = await supabase.auth.getUser();
-
-  if (data.user) {
+  if (authenticated) {
     redirect('/editor');
   }
 

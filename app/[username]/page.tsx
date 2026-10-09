@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { PublicProfile } from '@/components/profile/public-profile';
 import { getFollowState } from '@/lib/follows';
-import { getPublicProfile } from '@/lib/public-profile-repository';
+import { loadPublicProfile } from '@/src/composition/public-profile';
 
 import type { Metadata } from 'next';
 
@@ -17,7 +17,7 @@ export async function generateMetadata({
 }: ProfilePageProps): Promise<Metadata> {
   const { username } = await params;
 
-  const publicProfile = await getPublicProfile(username);
+  const publicProfile = await loadPublicProfile(username);
 
   if (!publicProfile) {
     return {
@@ -41,7 +41,7 @@ export async function generateMetadata({
 export default async function ProfilePage({ params }: ProfilePageProps) {
   const { username } = await params;
 
-  const publicProfile = await getPublicProfile(username);
+  const publicProfile = await loadPublicProfile(username);
 
   if (!publicProfile) {
     notFound();

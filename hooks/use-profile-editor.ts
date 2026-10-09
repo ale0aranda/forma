@@ -4,6 +4,7 @@ import { useCallback } from 'react';
 
 import { useProfileHistory } from '@/hooks/use-profile-history';
 import { defaultProfileLayouts } from '@/src/features/profile/domain/profile-defaults';
+import { presetDesigns } from '@/src/features/profile/domain/profile-presets';
 import { useProfileEditorPersistence } from '@/src/features/profile/presentation/hooks/use-profile-editor-persistence';
 
 import type {
@@ -28,35 +29,6 @@ import type {
 interface UseProfileEditorOptions {
   initialProfile: Profile;
 }
-
-type PresetDesign = Pick<
-  Profile['design'],
-  'typography' | 'palette' | 'density' | 'radius' | 'borders'
->;
-
-const presetDesigns: Record<ProfilePreset, PresetDesign> = {
-  minimal: {
-    typography: 'system',
-    palette: 'mono',
-    density: 'airy',
-    radius: 'small',
-    borders: 'subtle'
-  },
-  editorial: {
-    typography: 'times',
-    palette: 'paper',
-    density: 'balanced',
-    radius: 'square',
-    borders: 'none'
-  },
-  blueprint: {
-    typography: 'mono',
-    palette: 'blue',
-    density: 'compact',
-    radius: 'small',
-    borders: 'strong'
-  }
-};
 
 export function useProfileEditor({ initialProfile }: UseProfileEditorOptions) {
   const {

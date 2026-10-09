@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { logout } from '@/app/editor/actions';
 
-import type { CurrentProfile } from '@/lib/current-profile';
+import type { CurrentProfile } from '@/src/features/profile';
 
 interface AccountMenuProps {
   profile: CurrentProfile;

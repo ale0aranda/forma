@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/src/infrastructure/supabase/client';
 
 import { ProfileRepositoryError } from '../../application/profile-repository-error';
 

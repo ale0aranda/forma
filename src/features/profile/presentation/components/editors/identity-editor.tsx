@@ -3,7 +3,11 @@
 import { Camera, Trash2 } from 'lucide-react';
 import { useRef, useState } from 'react';
 
-import { AvatarError, removeAvatar, uploadAvatar } from '@/lib/avatar';
+import {
+  AvatarError,
+  removeAvatar,
+  uploadAvatar
+} from '@/src/composition/profile-media';
 import {
   EditorField,
   EditorInput,

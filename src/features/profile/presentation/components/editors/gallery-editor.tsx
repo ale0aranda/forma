@@ -8,7 +8,7 @@ import {
   isGalleryImageUrl,
   removeGalleryImage,
   uploadGalleryImage
-} from '@/lib/gallery';
+} from '@/src/composition/profile-media';
 import {
   EditorField,
   EditorInput

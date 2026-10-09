@@ -1,7 +1,10 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 
-import { supabasePublishableKey, supabaseUrl } from '@/lib/supabase/env';
+import {
+  supabasePublishableKey,
+  supabaseUrl
+} from '@/src/infrastructure/supabase/env';
 
 import type { NextRequest } from 'next/server';
 

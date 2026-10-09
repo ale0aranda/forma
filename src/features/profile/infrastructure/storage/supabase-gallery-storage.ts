@@ -1,12 +1,12 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/src/infrastructure/supabase/client';
+
+import { GalleryImageError } from '../../application/profile-media-errors';
 
 const galleryBucket = 'gallery';
 
 const allowedGalleryTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
 const maxGalleryImageSize = 5 * 1024 * 1024;
-
-export class GalleryImageError extends Error {}
 
 export async function uploadGalleryImage(file: File): Promise<string> {
   if (!allowedGalleryTypes.has(file.type)) {

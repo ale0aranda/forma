@@ -1,4 +1,4 @@
-import type { Profile } from '@/src/features/profile/domain/profile';
+import type { Profile } from '@/src/features/profile';
 
 export type ProfileConnectionType = 'followers' | 'following';
 

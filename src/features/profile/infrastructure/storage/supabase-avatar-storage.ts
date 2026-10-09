@@ -1,12 +1,12 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/src/infrastructure/supabase/client';
+
+import { AvatarError } from '../../application/profile-media-errors';
 
 const avatarBucket = 'avatars';
 
 const allowedAvatarTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
 const maxAvatarSize = 5 * 1024 * 1024;
-
-export class AvatarError extends Error {}
 
 export async function uploadAvatar(file: File): Promise<string> {
   if (!allowedAvatarTypes.has(file.type)) {

@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 
 import { AccountMenu } from '@/src/shared/components/layout/account-menu';
 
-import type { CurrentProfile } from '@/lib/current-profile';
+import type { CurrentProfile } from '@/src/features/profile';
 
 interface AppHeaderProps {
   authenticated?: boolean;

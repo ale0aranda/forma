@@ -1,4 +1,4 @@
-import { updateSession } from '@/lib/supabase/proxy';
+import { updateSession } from '@/src/infrastructure/supabase/proxy';
 
 import type { NextRequest } from 'next/server';
 

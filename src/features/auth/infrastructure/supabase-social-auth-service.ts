@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/src/infrastructure/supabase/client';
 
 import type { SocialAuthService } from '../application/auth-service';
 

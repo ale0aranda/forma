@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/src/infrastructure/supabase/server';
 
 import type { FollowRepository } from '../../application/ports/follow-repository';
 import type { FollowState } from '../../domain/follow-state';

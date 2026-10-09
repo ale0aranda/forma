@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/src/infrastructure/supabase/server';
 
 import type { Profile } from '@/src/features/profile/domain/profile';
 import type {

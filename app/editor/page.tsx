@@ -11,8 +11,8 @@ import {
 import { ProfileInspector } from '@/components/profile/profile-inspector';
 import { ProfilePreview } from '@/components/profile/profile-preview';
 import { useProfileEditor } from '@/hooks/use-profile-editor';
-import { isValidProfile } from '@/lib/profile-validation';
-import { getDefaultProfile } from '@/lib/profiles';
+import { getDefaultProfile } from '@/src/features/profile/domain/profile-defaults';
+import { isValidProfile } from '@/src/features/profile/domain/profile-validation';
 
 const initialProfile = getDefaultProfile();
 

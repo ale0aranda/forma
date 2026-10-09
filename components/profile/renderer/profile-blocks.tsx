@@ -1,9 +1,9 @@
 import { ArrowRight, BriefcaseBusiness, ImageIcon, Zap } from 'lucide-react';
 
 import { radiusClasses } from '@/components/profile/renderer/styles';
-import { getProfileLayouts } from '@/lib/profiles';
+import { getProfileLayouts } from '@/src/features/profile/domain/profile-defaults';
 
-import type { Profile } from '@/lib/profile';
+import type { Profile } from '@/src/features/profile/domain/profile';
 import type { ProfileViewport } from './styles';
 
 interface BlockProps {

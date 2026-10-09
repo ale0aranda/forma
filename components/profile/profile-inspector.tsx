@@ -20,7 +20,7 @@ import type {
   ProfileProjectsLayout,
   ProfileRadius,
   ProfileTypography
-} from '@/lib/profile';
+} from '@/src/features/profile/domain/profile';
 
 interface ProfileInspectorProps {
   profile: Profile;

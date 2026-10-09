@@ -6,9 +6,12 @@ import {
 import { EditorItem } from '@/components/profile/editor-item';
 import { EditorSegmentedControl } from '@/components/profile/editor-segmented-control';
 import { SortableEditorList } from '@/components/profile/sortable-editor-list';
-import { isValidProfileUrl } from '@/lib/profile-validation';
+import { isValidProfileUrl } from '@/src/features/profile/domain/profile-validation';
 
-import type { ProfileProject, ProfileProjectsLayout } from '@/lib/profile';
+import type {
+  ProfileProject,
+  ProfileProjectsLayout
+} from '@/src/features/profile/domain/profile';
 
 interface ProjectsEditorProps {
   projects: ProfileProject[];

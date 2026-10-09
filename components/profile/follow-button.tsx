@@ -5,7 +5,7 @@ import { useState, useTransition } from 'react';
 
 import { followProfile, unfollowProfile } from '@/app/[username]/actions';
 
-import type { ProfileAppearance } from '@/lib/profile';
+import type { ProfileAppearance } from '@/src/features/profile/domain/profile';
 
 interface FollowButtonProps {
   username: string;

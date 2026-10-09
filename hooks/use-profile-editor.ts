@@ -9,7 +9,7 @@ import {
   publishProfile,
   saveProfile
 } from '@/lib/profile-repository';
-import { defaultProfileLayouts } from '@/lib/profiles';
+import { defaultProfileLayouts } from '@/src/features/profile/domain/profile-defaults';
 
 import type {
   Profile,
@@ -28,7 +28,7 @@ import type {
   ProfileProjectsLayout,
   ProfileRadius,
   ProfileTypography
-} from '@/lib/profile';
+} from '@/src/features/profile/domain/profile';
 
 interface UseProfileEditorOptions {
   initialProfile: Profile;

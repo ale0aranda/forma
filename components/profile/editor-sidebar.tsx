@@ -33,7 +33,10 @@ import {
 } from 'lucide-react';
 
 import type { ReactNode } from 'react';
-import type { ProfileBlock, ProfileBlockSettings } from '@/lib/profile';
+import type {
+  ProfileBlock,
+  ProfileBlockSettings
+} from '@/src/features/profile/domain/profile';
 
 export type EditorSelection = ProfileBlock | 'profile' | 'design';
 

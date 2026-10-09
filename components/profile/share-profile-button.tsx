@@ -3,7 +3,7 @@
 import { Check, Share2 } from 'lucide-react';
 import { useState } from 'react';
 
-import type { ProfileAppearance } from '@/lib/profile';
+import type { ProfileAppearance } from '@/src/features/profile/domain/profile';
 
 interface ShareProfileButtonProps {
   username: string;

@@ -10,7 +10,7 @@ import type {
   ProfileAppearance,
   ProfileBlock,
   ProfilePalette
-} from '@/lib/profile';
+} from '@/src/features/profile/domain/profile';
 import type { ProfileViewport } from './renderer/styles';
 
 interface ProfilePreviewProps {

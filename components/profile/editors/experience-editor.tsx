@@ -6,7 +6,7 @@ import {
 import { EditorItem } from '@/components/profile/editor-item';
 import { SortableEditorList } from '@/components/profile/sortable-editor-list';
 
-import type { ProfileExperience } from '@/lib/profile';
+import type { ProfileExperience } from '@/src/features/profile/domain/profile';
 
 interface ExperienceEditorProps {
   experience: ProfileExperience[];

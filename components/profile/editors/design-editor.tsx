@@ -6,7 +6,7 @@ import type {
   ProfilePreset,
   ProfileRadius,
   ProfileTypography
-} from '@/lib/profile';
+} from '@/src/features/profile/domain/profile';
 
 interface DesignEditorProps {
   preset: ProfilePreset;

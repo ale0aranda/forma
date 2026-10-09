@@ -12,7 +12,10 @@ import {
 } from '@/components/profile/renderer/styles';
 
 import type { ReactNode } from 'react';
-import type { Profile, ProfileBlock } from '@/lib/profile';
+import type {
+  Profile,
+  ProfileBlock
+} from '@/src/features/profile/domain/profile';
 import type { ProfileViewport } from './styles';
 
 interface ProfileCardProps {

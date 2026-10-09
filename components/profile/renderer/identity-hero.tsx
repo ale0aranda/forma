@@ -1,9 +1,12 @@
 import { ProfileLink } from '@/components/profile/profile-link';
 import { radiusClasses } from '@/components/profile/renderer/styles';
-import { getProfileLayouts } from '@/lib/profiles';
+import { getProfileLayouts } from '@/src/features/profile/domain/profile-defaults';
 
 import type { ReactNode } from 'react';
-import type { Profile, ProfileBlock } from '@/lib/profile';
+import type {
+  Profile,
+  ProfileBlock
+} from '@/src/features/profile/domain/profile';
 import type { ProfileViewport } from './styles';
 
 interface IdentityHeroProps {

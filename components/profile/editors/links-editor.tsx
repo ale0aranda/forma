@@ -1,9 +1,9 @@
 import { EditorField, EditorInput } from '@/components/profile/editor-field';
 import { EditorItem } from '@/components/profile/editor-item';
 import { SortableEditorList } from '@/components/profile/sortable-editor-list';
-import { isValidProfileUrl } from '@/lib/profile-validation';
+import { isValidProfileUrl } from '@/src/features/profile/domain/profile-validation';
 
-import type { ProfileLink } from '@/lib/profile';
+import type { ProfileLink } from '@/src/features/profile/domain/profile';
 
 interface LinksEditorProps {
   links: ProfileLink[];

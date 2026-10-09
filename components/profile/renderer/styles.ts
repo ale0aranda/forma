@@ -5,7 +5,7 @@ import type {
   ProfilePalette,
   ProfileRadius,
   ProfileTypography
-} from '@/lib/profile';
+} from '@/src/features/profile/domain/profile';
 
 export type ProfileViewport = 'responsive' | 'desktop' | 'tablet' | 'mobile';
 

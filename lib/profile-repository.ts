@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 
-import type { Profile } from '@/lib/profile';
+import type { Profile } from '@/src/features/profile/domain/profile';
 
 interface ProfileRow {
   username: string;

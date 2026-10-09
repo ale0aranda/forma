@@ -3,7 +3,7 @@
 import { Globe } from 'lucide-react';
 import { useState } from 'react';
 
-import type { ProfileLink as ProfileLinkType } from '@/lib/profile';
+import type { ProfileLink as ProfileLinkType } from '@/src/features/profile/domain/profile';
 
 interface ProfileLinkProps {
   link: ProfileLinkType;

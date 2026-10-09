@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 
-import type { Profile } from '@/lib/profile';
+import type { Profile } from '@/src/features/profile/domain/profile';
 
 export interface ProfileSearchResult {
   username: string;

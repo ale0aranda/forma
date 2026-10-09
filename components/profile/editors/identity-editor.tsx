@@ -12,7 +12,10 @@ import { EditorSegmentedControl } from '@/components/profile/editor-segmented-co
 import { AvatarError, removeAvatar, uploadAvatar } from '@/lib/avatar';
 
 import type { ChangeEvent } from 'react';
-import type { Profile, ProfileIdentityLayout } from '@/lib/profile';
+import type {
+  Profile,
+  ProfileIdentityLayout
+} from '@/src/features/profile/domain/profile';
 
 interface IdentityEditorProps {
   identity: Profile['identity'];

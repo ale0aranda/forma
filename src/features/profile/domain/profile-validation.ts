@@ -1,4 +1,4 @@
-import type { Profile } from '@/lib/profile';
+import type { Profile } from './profile';
 
 const usernamePattern = /^[a-z0-9_-]{3,30}$/;
 

@@ -1,4 +1,4 @@
-import type { Profile, ProfileLayouts } from '@/lib/profile';
+import type { Profile, ProfileLayouts } from './profile';
 
 export const defaultProfileLayouts: ProfileLayouts = {
   identity: 'left',

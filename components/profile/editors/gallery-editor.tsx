@@ -15,7 +15,10 @@ import {
 } from '@/lib/gallery';
 
 import type { ChangeEvent } from 'react';
-import type { ProfileGalleryItem, ProfileGalleryLayout } from '@/lib/profile';
+import type {
+  ProfileGalleryItem,
+  ProfileGalleryLayout
+} from '@/src/features/profile/domain/profile';
 
 interface GalleryEditorProps {
   gallery: ProfileGalleryItem[];

@@ -5,7 +5,11 @@ import { FollowButton } from '@/components/profile/follow-button';
 import { ProfileRenderer } from '@/components/profile/profile-renderer';
 import { ShareProfileButton } from '@/components/profile/share-profile-button';
 
-import type { Profile, ProfileAppearance, ProfilePalette } from '@/lib/profile';
+import type {
+  Profile,
+  ProfileAppearance,
+  ProfilePalette
+} from '@/src/features/profile/domain/profile';
 
 interface PublicProfileProps {
   profile: Profile;

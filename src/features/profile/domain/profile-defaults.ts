@@ -74,10 +74,6 @@ const profiles: Profile[] = [
   }
 ];
 
-export function getProfile(username: string): Profile | undefined {
-  return profiles.find((profile) => profile.username === username);
-}
-
 export function getDefaultProfile(): Profile {
   const profile = profiles[0];
 

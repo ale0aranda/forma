@@ -13,7 +13,7 @@ interface PublicProfileRow {
   following: number;
 }
 
-export async function getPublicProfile(
+async function getPublicProfile(
   username: string
 ): Promise<PublicProfile | undefined> {
   const supabase = await createClient();

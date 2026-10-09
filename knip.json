@@ -1,4 +1,19 @@
 {
-  "$schema": "https://unpkg.com/knip@latest/schema.json",
-  "extends": ["@ale0aranda/rules/knip"]
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "include": [
+    "files",
+    "dependencies",
+    "devDependencies",
+    "optionalPeerDependencies",
+    "unlisted",
+    "binaries",
+    "unresolved",
+    "exports",
+    "nsExports",
+    "types",
+    "nsTypes",
+    "enumMembers",
+    "duplicates"
+  ],
+  "exclude": []
 }

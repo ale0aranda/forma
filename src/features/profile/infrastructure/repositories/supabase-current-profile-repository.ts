@@ -8,7 +8,7 @@ import type {
   CurrentProfileRepository
 } from '../../application/ports/current-profile-repository';
 
-export async function getCurrentProfile(): Promise<CurrentProfile | undefined> {
+async function getCurrentProfile(): Promise<CurrentProfile | undefined> {
   const supabase = await createClient();
 
   const { data } = await supabase.auth.getUser();

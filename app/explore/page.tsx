@@ -4,7 +4,7 @@ import { loadCurrentProfile } from '@/src/composition/current-profile';
 import { searchPublicProfiles } from '@/src/composition/profile-search';
 import { loadAuthenticationState } from '@/src/composition/session';
 import { ProfileResults } from '@/src/features/explore/presentation/components/profile-results';
-import { AppHeader } from '@/src/shared/components/layout/app-header';
+import { AppHeader } from '@/src/features/navigation/presentation/components/app-header';
 
 import type { Metadata } from 'next';
 

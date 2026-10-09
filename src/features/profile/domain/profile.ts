@@ -65,7 +65,7 @@ export interface ProfileBlockSettings {
   visible: boolean;
 }
 
-export interface ProfileDesign {
+interface ProfileDesign {
   preset: ProfilePreset;
   typography: ProfileTypography;
   appearance: ProfileAppearance;

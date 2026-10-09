@@ -34,7 +34,7 @@ async function getAuthenticatedUser() {
   };
 }
 
-export async function getCurrentProfile(): Promise<ProfileRecord> {
+async function getCurrentProfile(): Promise<ProfileRecord> {
   const { supabase, user } = await getAuthenticatedUser();
 
   const { data, error } = await supabase
@@ -50,7 +50,7 @@ export async function getCurrentProfile(): Promise<ProfileRecord> {
   return data as ProfileRecord;
 }
 
-export async function saveProfile(profile: Profile) {
+async function saveProfile(profile: Profile) {
   const { supabase, user } = await getAuthenticatedUser();
 
   const { error } = await supabase
@@ -67,7 +67,7 @@ export async function saveProfile(profile: Profile) {
   }
 }
 
-export async function publishProfile(profile: Profile) {
+async function publishProfile(profile: Profile) {
   const { supabase, user } = await getAuthenticatedUser();
 
   const now = new Date().toISOString();

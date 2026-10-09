@@ -3,9 +3,7 @@ import { createClient } from '@/src/infrastructure/supabase/server';
 import type { FollowRepository } from '../../application/ports/follow-repository';
 import type { FollowState } from '../../domain/follow-state';
 
-export async function getFollowState(
-  profileUserId: string
-): Promise<FollowState> {
+async function getFollowState(profileUserId: string): Promise<FollowState> {
   const supabase = await createClient();
 
   const { data } = await supabase.auth.getUser();

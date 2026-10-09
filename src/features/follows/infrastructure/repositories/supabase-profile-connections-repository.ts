@@ -12,7 +12,7 @@ interface ProfileConnectionRow {
   profile: Profile;
 }
 
-export async function getProfileConnections(
+async function getProfileConnections(
   username: string,
   type: ProfileConnectionType
 ): Promise<ProfileConnection[]> {

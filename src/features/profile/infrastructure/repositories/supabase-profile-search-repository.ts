@@ -12,9 +12,7 @@ interface ProfileSearchRow {
   followers: number;
 }
 
-export async function searchProfiles(
-  query: string
-): Promise<ProfileSearchResult[]> {
+async function searchProfiles(query: string): Promise<ProfileSearchResult[]> {
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc('search_profiles', {

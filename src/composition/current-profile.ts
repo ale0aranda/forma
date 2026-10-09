@@ -6,9 +6,3 @@ import { supabaseCurrentProfileRepository } from '../features/profile/infrastruc
 export function loadCurrentProfile() {
   return getCurrentProfileSummary(supabaseCurrentProfileRepository);
 }
-
-export async function loadCurrentUsername() {
-  const profile = await loadCurrentProfile();
-
-  return profile?.username;
-}

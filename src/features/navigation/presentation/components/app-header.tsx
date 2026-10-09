@@ -4,7 +4,7 @@ import { Search } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { AccountMenu } from '@/src/shared/components/layout/account-menu';
+import { AccountMenu } from '@/src/features/navigation/presentation/components/account-menu';
 
 import type { CurrentProfile } from '@/src/features/profile';
 

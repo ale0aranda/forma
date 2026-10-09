@@ -5,8 +5,8 @@ import { redirect } from 'next/navigation';
 import { logout } from '@/app/editor/actions';
 import { loadCurrentProfile } from '@/src/composition/current-profile';
 import { loadSessionUser } from '@/src/composition/session';
+import { AppHeader } from '@/src/features/navigation/presentation/components/app-header';
 import { DeleteAccount } from '@/src/features/settings/presentation/components/delete-account';
-import { AppHeader } from '@/src/shared/components/layout/app-header';
 
 interface SettingsPageProps {
   searchParams: Promise<{

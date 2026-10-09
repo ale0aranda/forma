@@ -6,10 +6,10 @@ import { loadCurrentProfile } from '@/src/composition/current-profile';
 import { loadProfileConnections } from '@/src/composition/profile-connections';
 import { loadPublicProfile } from '@/src/composition/public-profile';
 import { loadAuthenticationState } from '@/src/composition/session';
-import { ProfileConnectionList } from '@/src/features/follows/presentation/components/profile-connection-list';
-import { AppHeader } from '@/src/shared/components/layout/app-header';
+import { ProfileConnectionList } from '@/src/features/follows';
+import { AppHeader } from '@/src/features/navigation/presentation/components/app-header';
 
-import type { ProfileConnectionType } from '@/src/features/follows/application/ports/profile-connections-repository';
+import type { ProfileConnectionType } from '@/src/features/follows';
 
 interface ProfileConnectionsPageProps {
   params: Promise<{

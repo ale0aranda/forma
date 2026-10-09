@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { createClient } from '@/lib/supabase/server';
+import { authUseCases } from '@/src/composition/auth-server';
 
 import type { NextRequest } from 'next/server';
 
@@ -9,11 +9,9 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get('code');
 
   if (code && !searchParams.has('error')) {
-    const supabase = await createClient();
+    const success = await authUseCases.exchangeCode(code);
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-
-    if (!error) {
+    if (success) {
       return NextResponse.redirect(new URL('/editor', origin));
     }
   }

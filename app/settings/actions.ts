@@ -2,24 +2,18 @@
 
 import { redirect } from 'next/navigation';
 
-import { createClient } from '@/lib/supabase/server';
+import { accountUseCases } from '@/src/composition/settings';
 
 export async function deleteAccount() {
-  const supabase = await createClient();
+  const result = await accountUseCases.deleteAccount();
 
-  const { data } = await supabase.auth.getUser();
-
-  if (!data.user) {
+  if (result === 'unauthenticated') {
     redirect('/login');
   }
 
-  const { error } = await supabase.rpc('delete_account');
-
-  if (error) {
+  if (result === 'failed') {
     redirect('/settings?error=delete');
   }
-
-  await supabase.auth.signOut();
 
   redirect('/');
 }

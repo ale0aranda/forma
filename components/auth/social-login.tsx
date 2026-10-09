@@ -2,9 +2,9 @@
 
 import { useRef, useState } from 'react';
 
-import { createClient } from '@/lib/supabase/client';
+import { socialAuthUseCases } from '@/src/composition/auth-client';
 
-type SocialProvider = 'google' | 'github';
+import type { SocialProvider } from '@/src/features/auth/application/auth-service';
 
 export function SocialLogin() {
   const [pending, setPending] = useState<SocialProvider | null>(null);
@@ -21,24 +21,19 @@ export function SocialLogin() {
     setError(null);
 
     try {
-      const supabase = createClient();
-
-      const { data, error: authError } = await supabase.auth.signInWithOAuth({
+      const signInUrl = await socialAuthUseCases.getSignInUrl(
         provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          skipBrowserRedirect: true
-        }
-      });
+        `${window.location.origin}/auth/callback`
+      );
 
-      if (authError || !data.url) {
+      if (!signInUrl) {
         setError('Could not start sign in. Please try again.');
         busy.current = false;
         setPending(null);
         return;
       }
 
-      window.location.assign(data.url);
+      window.location.assign(signInUrl);
     } catch {
       setError('Could not connect. Please try again.');
       busy.current = false;

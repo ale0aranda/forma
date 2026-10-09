@@ -8,28 +8,20 @@ export const defaultProfileLayouts: ProfileLayouts = {
 
 const profiles: Profile[] = [
   {
-    username: 'alejandro',
+    username: 'john-doe',
     identity: {
-      name: 'Alejandro Aranda',
-      role: 'Software Engineer',
-      bio: 'I build things for the web.'
+      name: 'John Doe',
+      role: 'Bot',
+      bio: 'A simple profile to get started.'
     },
-    about:
-      'Interested in software engineering, open source and learning by building.',
-    now: 'Building Forma.',
-    links: [
-      {
-        id: 'github',
-        label: 'GitHub',
-        url: 'https://github.com/ale0aranda'
-      }
-    ],
+    about: 'Share a little about yourself and what you are working on.',
+    now: 'Exploring new ideas.',
+    links: [],
     projects: [
       {
-        id: 'forma',
-        name: 'Forma',
-        description:
-          'A customizable profile builder for creating personal pages.',
+        id: 'project',
+        name: 'Your project',
+        description: 'Add a project you want to share.',
         url: ''
       }
     ],

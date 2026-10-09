@@ -3,7 +3,7 @@
 import { Monitor, Smartphone, Tablet } from 'lucide-react';
 import { type ReactNode, useState } from 'react';
 
-import { ProfileRenderer } from '@/components/profile/profile-renderer';
+import { ProfileRenderer } from '@/src/features/profile/presentation/components/profile-renderer';
 
 import type {
   Profile,

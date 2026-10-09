@@ -1,5 +1,8 @@
-import { EditorField, EditorInput } from '@/components/profile/editor-field';
 import { isValidUsername } from '@/src/features/profile/domain/profile-validation';
+import {
+  EditorField,
+  EditorInput
+} from '@/src/features/profile/presentation/components/editor-field';
 
 interface ProfileSettingsEditorProps {
   username: string;

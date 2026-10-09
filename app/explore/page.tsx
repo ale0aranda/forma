@@ -1,10 +1,10 @@
 import { Search } from 'lucide-react';
 
-import { AppHeader } from '@/components/app-header';
-import { ProfileResults } from '@/components/explore/profile-results';
 import { loadCurrentProfile } from '@/src/composition/current-profile';
 import { searchPublicProfiles } from '@/src/composition/profile-search';
 import { loadAuthenticationState } from '@/src/composition/session';
+import { ProfileResults } from '@/src/features/explore/presentation/components/profile-results';
+import { AppHeader } from '@/src/shared/components/layout/app-header';
 
 import type { Metadata } from 'next';
 

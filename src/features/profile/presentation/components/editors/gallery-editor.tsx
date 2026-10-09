@@ -3,16 +3,19 @@
 import { ImagePlus, LoaderCircle } from 'lucide-react';
 import { useRef, useState } from 'react';
 
-import { EditorField, EditorInput } from '@/components/profile/editor-field';
-import { EditorItem } from '@/components/profile/editor-item';
-import { EditorSegmentedControl } from '@/components/profile/editor-segmented-control';
-import { SortableEditorList } from '@/components/profile/sortable-editor-list';
 import {
   GalleryImageError,
   isGalleryImageUrl,
   removeGalleryImage,
   uploadGalleryImage
 } from '@/lib/gallery';
+import {
+  EditorField,
+  EditorInput
+} from '@/src/features/profile/presentation/components/editor-field';
+import { EditorItem } from '@/src/features/profile/presentation/components/editor-item';
+import { EditorSegmentedControl } from '@/src/features/profile/presentation/components/editor-segmented-control';
+import { SortableEditorList } from '@/src/features/profile/presentation/components/sortable-editor-list';
 
 import type { ChangeEvent } from 'react';
 import type {

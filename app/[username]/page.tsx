@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 
-import { PublicProfile } from '@/components/profile/public-profile';
 import { loadFollowState } from '@/src/composition/follows';
 import { loadPublicProfile } from '@/src/composition/public-profile';
+import { PublicProfile } from '@/src/features/profile/presentation/components/public-profile';
 
 import type { Metadata } from 'next';
 

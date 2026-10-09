@@ -2,12 +2,12 @@ import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { AppHeader } from '@/components/app-header';
-import { ProfileConnectionList } from '@/components/profile/profile-connection-list';
 import { loadCurrentProfile } from '@/src/composition/current-profile';
 import { loadProfileConnections } from '@/src/composition/profile-connections';
 import { loadPublicProfile } from '@/src/composition/public-profile';
 import { loadAuthenticationState } from '@/src/composition/session';
+import { ProfileConnectionList } from '@/src/features/follows/presentation/components/profile-connection-list';
+import { AppHeader } from '@/src/shared/components/layout/app-header';
 
 import type { ProfileConnectionType } from '@/src/features/follows/application/ports/profile-connections-repository';
 

@@ -1,11 +1,11 @@
-import { IdentityHero } from '@/components/profile/renderer/identity-hero';
-import { ProfileCard } from '@/components/profile/renderer/profile-card';
+import { IdentityHero } from '@/src/features/profile/presentation/components/renderer/identity-hero';
+import { ProfileCard } from '@/src/features/profile/presentation/components/renderer/profile-card';
 import {
   appearanceClasses,
   cardGapClasses,
   type ProfileViewport,
   typographyClasses
-} from '@/components/profile/renderer/styles';
+} from '@/src/features/profile/presentation/components/renderer/styles';
 
 import type { ReactNode } from 'react';
 import type {

@@ -1,4 +1,4 @@
-import { ProfileResult } from '@/components/explore/profile-result';
+import { ProfileResult } from '@/src/features/explore/presentation/components/profile-result';
 
 import type { ProfileSearchResult } from '@/src/features/profile/application/ports/profile-search-repository';
 

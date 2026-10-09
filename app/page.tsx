@@ -7,8 +7,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-import { LandingEditorPreview } from '@/components/landing/editor-preview';
-import { LandingProfilePreview } from '@/components/landing/profile-preview';
+import { LandingEditorPreview } from '@/src/features/marketing/presentation/components/editor-preview';
+import { LandingProfilePreview } from '@/src/features/marketing/presentation/components/profile-preview';
 
 const features = [
   {

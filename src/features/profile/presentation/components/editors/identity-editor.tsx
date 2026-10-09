@@ -3,13 +3,13 @@
 import { Camera, Trash2 } from 'lucide-react';
 import { useRef, useState } from 'react';
 
+import { AvatarError, removeAvatar, uploadAvatar } from '@/lib/avatar';
 import {
   EditorField,
   EditorInput,
   EditorTextarea
-} from '@/components/profile/editor-field';
-import { EditorSegmentedControl } from '@/components/profile/editor-segmented-control';
-import { AvatarError, removeAvatar, uploadAvatar } from '@/lib/avatar';
+} from '@/src/features/profile/presentation/components/editor-field';
+import { EditorSegmentedControl } from '@/src/features/profile/presentation/components/editor-segmented-control';
 
 import type { ChangeEvent } from 'react';
 import type {

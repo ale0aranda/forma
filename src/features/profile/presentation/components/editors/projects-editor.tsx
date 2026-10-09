@@ -1,12 +1,12 @@
+import { isValidProfileUrl } from '@/src/features/profile/domain/profile-validation';
 import {
   EditorField,
   EditorInput,
   EditorTextarea
-} from '@/components/profile/editor-field';
-import { EditorItem } from '@/components/profile/editor-item';
-import { EditorSegmentedControl } from '@/components/profile/editor-segmented-control';
-import { SortableEditorList } from '@/components/profile/sortable-editor-list';
-import { isValidProfileUrl } from '@/src/features/profile/domain/profile-validation';
+} from '@/src/features/profile/presentation/components/editor-field';
+import { EditorItem } from '@/src/features/profile/presentation/components/editor-item';
+import { EditorSegmentedControl } from '@/src/features/profile/presentation/components/editor-segmented-control';
+import { SortableEditorList } from '@/src/features/profile/presentation/components/sortable-editor-list';
 
 import type {
   ProfileProject,

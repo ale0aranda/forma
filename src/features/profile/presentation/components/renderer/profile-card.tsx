@@ -4,12 +4,12 @@ import {
   GalleryBlock,
   NowBlock,
   ProjectsBlock
-} from '@/components/profile/renderer/profile-blocks';
+} from '@/src/features/profile/presentation/components/renderer/profile-blocks';
 import {
   borderClasses,
   cardPaddingClasses,
   radiusClasses
-} from '@/components/profile/renderer/styles';
+} from '@/src/features/profile/presentation/components/renderer/styles';
 
 import type { ReactNode } from 'react';
 import type {

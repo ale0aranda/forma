@@ -1,7 +1,10 @@
-import { EditorField, EditorInput } from '@/components/profile/editor-field';
-import { EditorItem } from '@/components/profile/editor-item';
-import { SortableEditorList } from '@/components/profile/sortable-editor-list';
 import { isValidProfileUrl } from '@/src/features/profile/domain/profile-validation';
+import {
+  EditorField,
+  EditorInput
+} from '@/src/features/profile/presentation/components/editor-field';
+import { EditorItem } from '@/src/features/profile/presentation/components/editor-item';
+import { SortableEditorList } from '@/src/features/profile/presentation/components/sortable-editor-list';
 
 import type { ProfileLink } from '@/src/features/profile/domain/profile';
 

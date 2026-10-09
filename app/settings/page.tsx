@@ -3,10 +3,10 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { logout } from '@/app/editor/actions';
-import { AppHeader } from '@/components/app-header';
-import { DeleteAccount } from '@/components/settings/delete-account';
 import { loadCurrentProfile } from '@/src/composition/current-profile';
 import { loadSessionUser } from '@/src/composition/session';
+import { DeleteAccount } from '@/src/features/settings/presentation/components/delete-account';
+import { AppHeader } from '@/src/shared/components/layout/app-header';
 
 interface SettingsPageProps {
   searchParams: Promise<{

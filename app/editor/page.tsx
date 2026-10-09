@@ -3,15 +3,15 @@
 import { LayoutGrid, Monitor, Palette, Settings2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { EditorHeader } from '@/components/profile/editor-header';
+import { getDefaultProfile } from '@/src/features/profile/domain/profile-defaults';
+import { isValidProfile } from '@/src/features/profile/domain/profile-validation';
+import { EditorHeader } from '@/src/features/profile/presentation/components/editor-header';
 import {
   type EditorSelection,
   EditorSidebar
-} from '@/components/profile/editor-sidebar';
-import { ProfileInspector } from '@/components/profile/profile-inspector';
-import { ProfilePreview } from '@/components/profile/profile-preview';
-import { getDefaultProfile } from '@/src/features/profile/domain/profile-defaults';
-import { isValidProfile } from '@/src/features/profile/domain/profile-validation';
+} from '@/src/features/profile/presentation/components/editor-sidebar';
+import { ProfileInspector } from '@/src/features/profile/presentation/components/profile-inspector';
+import { ProfilePreview } from '@/src/features/profile/presentation/components/profile-preview';
 import { useProfileEditor } from '@/src/features/profile/presentation/hooks/use-profile-editor';
 import { useProfileAutosave } from '@/src/shared/hooks/use-profile-autosave';
 

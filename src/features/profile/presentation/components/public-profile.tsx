@@ -1,9 +1,9 @@
 import { ArrowLeft, Pencil } from 'lucide-react';
 import Link from 'next/link';
 
-import { FollowButton } from '@/components/profile/follow-button';
-import { ProfileRenderer } from '@/components/profile/profile-renderer';
-import { ShareProfileButton } from '@/components/profile/share-profile-button';
+import { FollowButton } from '@/src/features/follows/presentation/components/follow-button';
+import { ProfileRenderer } from '@/src/features/profile/presentation/components/profile-renderer';
+import { ShareProfileButton } from '@/src/features/profile/presentation/components/share-profile-button';
 
 import type {
   Profile,

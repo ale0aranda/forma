@@ -1,7 +1,7 @@
 import { ArrowRight, BriefcaseBusiness, ImageIcon, Zap } from 'lucide-react';
 
-import { radiusClasses } from '@/components/profile/renderer/styles';
 import { getProfileLayouts } from '@/src/features/profile/domain/profile-defaults';
+import { radiusClasses } from '@/src/features/profile/presentation/components/renderer/styles';
 
 import type { Profile } from '@/src/features/profile/domain/profile';
 import type { ProfileViewport } from './styles';

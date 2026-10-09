@@ -1,10 +1,10 @@
-import { DesignEditor } from '@/components/profile/editors/design-editor';
-import { ExperienceEditor } from '@/components/profile/editors/experience-editor';
-import { GalleryEditor } from '@/components/profile/editors/gallery-editor';
-import { IdentityEditor } from '@/components/profile/editors/identity-editor';
-import { LinksEditor } from '@/components/profile/editors/links-editor';
-import { ProfileSettingsEditor } from '@/components/profile/editors/profile-settings-editor';
-import { ProjectsEditor } from '@/components/profile/editors/projects-editor';
+import { DesignEditor } from '@/src/features/profile/presentation/components/editors/design-editor';
+import { ExperienceEditor } from '@/src/features/profile/presentation/components/editors/experience-editor';
+import { GalleryEditor } from '@/src/features/profile/presentation/components/editors/gallery-editor';
+import { IdentityEditor } from '@/src/features/profile/presentation/components/editors/identity-editor';
+import { LinksEditor } from '@/src/features/profile/presentation/components/editors/links-editor';
+import { ProfileSettingsEditor } from '@/src/features/profile/presentation/components/editors/profile-settings-editor';
+import { ProjectsEditor } from '@/src/features/profile/presentation/components/editors/projects-editor';
 
 import type { ReactNode } from 'react';
 import type {

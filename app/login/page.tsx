@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { LoginForm } from '@/components/auth/login-form';
-import { SocialLogin } from '@/components/auth/social-login';
 import { loadAuthenticationState } from '@/src/composition/session';
+import { LoginForm } from '@/src/features/auth/presentation/components/login-form';
+import { SocialLogin } from '@/src/features/auth/presentation/components/social-login';
 
 interface LoginPageProps {
   searchParams: Promise<{

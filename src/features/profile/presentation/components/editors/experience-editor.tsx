@@ -2,9 +2,9 @@ import {
   EditorField,
   EditorInput,
   EditorTextarea
-} from '@/components/profile/editor-field';
-import { EditorItem } from '@/components/profile/editor-item';
-import { SortableEditorList } from '@/components/profile/sortable-editor-list';
+} from '@/src/features/profile/presentation/components/editor-field';
+import { EditorItem } from '@/src/features/profile/presentation/components/editor-item';
+import { SortableEditorList } from '@/src/features/profile/presentation/components/sortable-editor-list';
 
 import type { ProfileExperience } from '@/src/features/profile/domain/profile';
 

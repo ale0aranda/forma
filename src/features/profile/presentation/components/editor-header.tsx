@@ -11,7 +11,7 @@ import {
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
-import { ShareProfileButton } from '@/components/profile/share-profile-button';
+import { ShareProfileButton } from '@/src/features/profile/presentation/components/share-profile-button';
 
 interface EditorHeaderProps {
   username: string;

@@ -1,6 +1,6 @@
-import { ProfileLink } from '@/components/profile/profile-link';
-import { radiusClasses } from '@/components/profile/renderer/styles';
 import { getProfileLayouts } from '@/src/features/profile/domain/profile-defaults';
+import { ProfileLink } from '@/src/features/profile/presentation/components/profile-link';
+import { radiusClasses } from '@/src/features/profile/presentation/components/renderer/styles';
 
 import type { ReactNode } from 'react';
 import type {

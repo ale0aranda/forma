@@ -2,55 +2,33 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { createClient } from '@/lib/supabase/server';
+import {
+  executeFollowProfile,
+  executeUnfollowProfile
+} from '@/src/composition/follows';
 
-interface FollowActionResult {
-  success: boolean;
-  error?: string;
-}
+import type { FollowActionResult } from '@/src/features/follows/application/commands/follow-profile';
 
 export async function followProfile(
   username: string
 ): Promise<FollowActionResult> {
-  const supabase = await createClient();
+  const result = await executeFollowProfile(username);
 
-  const { error } = await supabase.rpc('follow_profile', {
-    profile_username: username
-  });
-
-  if (error) {
-    return {
-      success: false,
-      error: 'Could not follow this profile.'
-    };
+  if (result.success) {
+    revalidatePath(`/${username}`);
   }
 
-  revalidatePath(`/${username}`);
-
-  return {
-    success: true
-  };
+  return result;
 }
 
 export async function unfollowProfile(
   username: string
 ): Promise<FollowActionResult> {
-  const supabase = await createClient();
+  const result = await executeUnfollowProfile(username);
 
-  const { error } = await supabase.rpc('unfollow_profile', {
-    profile_username: username
-  });
-
-  if (error) {
-    return {
-      success: false,
-      error: 'Could not unfollow this profile.'
-    };
+  if (result.success) {
+    revalidatePath(`/${username}`);
   }
 
-  revalidatePath(`/${username}`);
-
-  return {
-    success: true
-  };
+  return result;
 }

@@ -40,6 +40,28 @@ export async function getFollowState(
   };
 }
 
+async function followProfile(username: string): Promise<boolean> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc('follow_profile', {
+    profile_username: username
+  });
+
+  return !error;
+}
+
+async function unfollowProfile(username: string): Promise<boolean> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc('unfollow_profile', {
+    profile_username: username
+  });
+
+  return !error;
+}
+
 export const supabaseFollowRepository: FollowRepository = {
-  getFollowState
+  getFollowState,
+  followProfile,
+  unfollowProfile
 };
